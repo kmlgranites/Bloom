@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloom — Agent-First Workflow</title>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.525.0/font/lucide.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+<style>
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-regular.ttf");font-weight:400}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-medium.ttf");font-weight:500}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-semibold.ttf");font-weight:600}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-bold.ttf");font-weight:700}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body,#root{height:100%;font-family:"Proxima Soft",system-ui,sans-serif}
+  body{background:#FAFAFA;overflow:hidden}
+  ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#D1D5DB;border-radius:2px}
+  @keyframes bloom-bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+  @keyframes bloom-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes bloom-fade{from{opacity:0}to{opacity:1}}
+  @keyframes bloom-pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  .bloom-in{animation:bloom-in 0.24s ease forwards}
+  .bloom-fade{animation:bloom-fade 0.3s ease forwards}
+  button:focus,input:focus{outline:none}
+  input::placeholder{color:#A5A5A5}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="ChatComponents.jsx"></script>
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* ─── Stage list ─── */
+const STAGE_LIST = [
+  {id:"welcome",    label:"Welcome",         icon:"ti-sparkles"},
+  {id:"onboarding", label:"Onboarding",       icon:"ti-user-plus"},
+  {id:"profile",    label:"Build Profile",    icon:"ti-file-cv"},
+  {id:"preferences",label:"Preferences",      icon:"ti-adjustments-horizontal"},
+  {id:"matching",   label:"Job Matching",     icon:"ti-briefcase-search"},
+  {id:"apply",      label:"Apply",            icon:"ti-send"},
+  {id:"loop",       label:"Automate",         icon:"ti-refresh"},
+];
+
+const STAGE_LABELS = {
+  welcome:"Welcome", onboarding:"Getting to Know You", profile:"Building Your Profile",
+  preferences:"Job Preferences", matching:"Job Matching",
+  apply_copilot:"Applying — Copilot Mode", apply_copilot_2:"Applying — Copilot Mode",
+  apply_autopilot:"Applying — Autopilot Mode", loop:"Ongoing Automation",
+};
+
+/* ─── Conversation scripts ─── */
+const mkScripts = () => ({
+  welcome:{
+    messages:[
+      {from:"agent",text:"👋 Hi there! I'm Bloom — your AI-powered job search copilot."},
+      {from:"agent",text:"I find roles that match your skills, tailor your resume for each one, and apply on your behalf. Most users land their first interview within 2 weeks."},
+      {from:"agent",text:"Ready? Let's get you set up — it takes under 2 minutes. ⚡"},
+    ],
+    chips:[
+      {label:"Get started →",primary:true,next:"onboarding"},
+      {label:"How does it work?",next:"welcome"},
+    ],
+  },
+  onboarding:{
+    messages:[
+      {from:"agent",text:"Let's get to know you! First — what's your name?"},
+      {from:"user",text:"Alex Chen"},
+      {from:"agent",text:"Great to meet you, Alex! 👋 What kind of role are you looking for?"},
+    ],
+    chips:[
+      {label:"Software Engineer",primary:true,next:"profile"},
+      {label:"Product Manager",next:"profile"},
+      {label:"Designer",next:"profile"},
+      {label:"Data Scientist",next:"profile"},
+    ],
+  },
+  profile:{
+    messages:[
+      {from:"user",text:"Software Engineer"},
+      {from:"agent",text:"Perfect! To find you the best matches I need to understand your background. Do you have a resume I can analyze, or prefer a quick Q&A?"},
+      {from:"agent",component:"resume-upload"},
+      {from:"user",text:"Upload resume"},
+      {from:"agent",text:"Got it — analyzing now…"},
+      {from:"agent",component:"profile-progress",pct:85,fields:[
+        {label:"Work experience (8 yrs)",done:true,extracted:true},
+        {label:"Technical skills (React, TypeScript…)",done:true,extracted:true},
+        {label:"Education",done:true,extracted:true},
+        {label:"LinkedIn URL",done:false},
+        {label:"Portfolio / GitHub",done:false},
+      ]},
+      {from:"agent",text:"Done! I found 8 years of experience — React, TypeScript, and Node.js. Your profile is 85% complete."},
+      {from:"agent",component:"warning",text:"Adding a LinkedIn URL increases interview callback rates by 38% on average. It takes 10 seconds.",options:["Add LinkedIn","Skip for now"]},
+    ],
+    chips:[
+      {label:"Add LinkedIn",primary:true,next:"preferences"},
+      {label:"Skip, continue →",next:"preferences"},
+    ],
+  },
+  preferences:{
+    messages:[
+      {from:"user",text:"Skip for now"},
+      {from:"agent",text:"No worries! Let's dial in your preferences so I focus on the right roles."},
+      {from:"user",text:"Remote only, $130k+, full-time, Series B or later"},
+      {from:"agent",text:"Perfect. Here are your active filters:"},
+      {from:"agent",component:"pref-chips",prefs:["Remote only","$130k–$160k+","Full-time","React / TypeScript","Series B–Public"]},
+      {from:"agent",text:"These look right? You can update them anytime — just tell me."},
+    ],
+    chips:[
+      {label:"Looks good — find my matches →",primary:true,next:"matching"},
+      {label:"Change something",next:"preferences"},
+    ],
+  },
+  matching:{
+    messages:[
+      {from:"user",text:"Looks good — find my matches →"},
+      {from:"agent",text:"Scanning 12,000+ companies… Found 47 roles that match your profile. Here are your top picks:"},
+      {from:"agent",component:"job-cards",jobs:[JOBS[0],JOBS[1],JOBS[2]]},
+      {from:"agent",text:"Miro is a 95% fit — they're actively hiring and your React + TypeScript stack is exactly what they need. Notion and Linear are also strong."},
+      {from:"agent",text:"How would you like to proceed?"},
+    ],
+    chips:[
+      {label:"⚡ Autopilot — apply to all",primary:true,next:"apply_autopilot",setMode:"autopilot"},
+      {label:"✋ Copilot — review each one",next:"apply_copilot",setMode:"copilot"},
+      {label:"Show more matches",next:"matching"},
+    ],
+  },
+  apply_copilot:{
+    messages:[
+      {from:"user",text:"✋ Copilot — I'll review each one"},
+      {from:"agent",component:"mode-badge",mode:"copilot"},
+      {from:"agent",text:"Great — I'll walk you through each application and you approve before anything is sent."},
+      {from:"agent",text:"Starting with Miro (95% match). I've tailored your resume, highlighting your real-time collaboration experience. Here's the role:"},
+      {from:"agent",component:"job-cards",jobs:[JOBS[0]],copilot:true},
+      {from:"agent",text:"Your tailored resume is ready. Shall I submit the application?"},
+    ],
+    chips:[
+      {label:"Submit to Miro ✓",primary:true,next:"apply_copilot_2"},
+      {label:"Edit resume first",next:"apply_copilot"},
+      {label:"Skip Miro",next:"apply_copilot_2"},
+    ],
+  },
+  apply_copilot_2:{
+    messages:[
+      {from:"user",text:"Submit to Miro ✓"},
+      {from:"agent",text:"✅ Applied to Miro! I'll track this and alert you when they respond."},
+      {from:"agent",text:"Next up: Notion — Frontend Engineer, $130k–$160k, San Francisco. Strong fit for your CSS architecture experience."},
+      {from:"agent",component:"job-cards",jobs:[JOBS[1]],copilot:true},
+      {from:"agent",component:"warning",text:"This role asks for a cover letter. I've drafted one tailored to your background — want to review it before sending?",options:["Review draft","Send as-is"]},
+    ],
+    chips:[
+      {label:"Review cover letter",primary:true,next:"loop"},
+      {label:"Send as-is",next:"loop"},
+      {label:"Skip Notion",next:"loop"},
+    ],
+  },
+  apply_autopilot:{
+    messages:[
+      {from:"user",text:"⚡ Autopilot — apply to all"},
+      {from:"agent",component:"mode-badge",mode:"autopilot"},
+      {from:"agent",text:"Autopilot activated! I'll apply to your top 12 matches using a resume tailored to each role. I'll pause if I hit anything that needs your input."},
+      {from:"agent",component:"activity",items:[
+        {icon:"check-circle",text:"Applied to Miro — Software Engineer",status:"done",time:"just now"},
+        {icon:"loader",text:"Applying to Notion — Frontend Engineer…",status:"pending",time:""},
+        {icon:"clock",text:"Linear — Full Stack Developer",status:"queued",time:""},
+        {icon:"clock",text:"Figma — Senior SWE",status:"queued",time:""},
+        {icon:"alert-triangle",text:"Stripe — skills assessment required (est. 20 min)",status:"error",time:"paused"},
+      ]},
+      {from:"agent",text:"One flag: Stripe requires a technical assessment I can't complete for you. Want a reminder in a few hours, or skip Stripe?"},
+    ],
+    chips:[
+      {label:"Remind me in 3 hrs",primary:true,next:"loop"},
+      {label:"Skip Stripe",next:"loop"},
+      {label:"Pause autopilot",next:"loop"},
+    ],
+  },
+  loop:{
+    messages:[
+      {from:"agent",text:"Good morning, Alex! ☀️ Here's what happened overnight:"},
+      {from:"agent",component:"stats",stats:[
+        {value:"8",label:"Applied"},
+        {value:"3",label:"Profile views"},
+        {value:"12",label:"New matches"},
+        {value:"1",label:"Interview 🎉"},
+      ]},
+      {from:"agent",text:"🔥 Miro viewed your profile 2 hours ago — strong signal. Want me to send a brief, personalized follow-up message?"},
+      {from:"agent",component:"job-cards",jobs:[JOBS[0]]},
+      {from:"agent",text:"Also, 12 new roles match your profile since yesterday. Should I queue them for autopilot?"},
+    ],
+    chips:[
+      {label:"Send follow-up to Miro",primary:true,next:"loop"},
+      {label:"Queue 12 new matches",next:"loop"},
+      {label:"Show all applications",next:"loop"},
+      {label:"Update preferences",next:"preferences"},
+    ],
+  },
+});
+
+/* ─── Message renderer ─── */
+function RenderMsg({ msg, mode }) {
+  if (msg.from==="user") return <UserBubble text={msg.text} />;
+  switch(msg.component) {
+    case "job-cards": return (
+      <AgentBubble>
+        {msg.jobs.map(j=><InlineJobCard key={j.id} job={j} mode={msg.copilot?"copilot":"view"} />)}
+      </AgentBubble>
+    );
+    case "activity": return (
+      <AgentBubble>
+        {msg.items.map((it,i)=><ActivityItem key={i} {...it} />)}
+      </AgentBubble>
+    );
+    case "mode-badge": return <ModeBadge mode={msg.mode} />;
+    case "warning": return (
+      <AgentBubble><WarningCard text={msg.text} options={msg.options} /></AgentBubble>
+    );
+    case "pref-chips": return <AgentBubble><PrefChips prefs={msg.prefs} /></AgentBubble>;
+    case "stats": return <AgentBubble><StatsGrid stats={msg.stats} /></AgentBubble>;
+    case "resume-upload": return <AgentBubble><ResumeUpload /></AgentBubble>;
+    case "profile-progress": return (
+      <AgentBubble><ProfilePanelInline pct={msg.pct} fields={msg.fields} /></AgentBubble>
+    );
+    default: return <AgentBubble>{msg.text}</AgentBubble>;
+  }
+}
+
+/* ─── Sidebar ─── */
+function Sidebar({ stageId, onStage, mode, onMode }) {
+  const canon = stageId.startsWith("apply")?"apply":stageId;
+  const activeIdx = STAGE_LIST.findIndex(s=>s.id===canon);
+  return (
+    <div style={{width:224,flexShrink:0,height:"100%",background:"#022F36",
+      display:"flex",flexDirection:"column"}}>
+      <div style={{padding:"18px 18px 14px",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+        <img src="assets/Logo Main.png" alt="Bloom" style={{height:26}} />
+      </div>
+      <div style={{flex:1,padding:"10px 8px",overflowY:"auto"}}>
+        <div style={{fontSize:9,fontWeight:700,color:"rgba(255,255,255,0.3)",
+          letterSpacing:"0.1em",textTransform:"uppercase",padding:"0 8px",marginBottom:6}}>
+          Workflow
+        </div>
+        {STAGE_LIST.map((s,i)=>{
+          const isActive = s.id===canon;
+          const isDone = i<activeIdx;
+          return (
+            <button key={s.id}
+              onClick={()=>onStage(s.id)}
+              style={{
+                width:"100%",display:"flex",alignItems:"center",gap:8,
+                padding:"9px 10px",borderRadius:8,border:"none",
+                background:isActive?"rgba(90,235,235,0.11)":"transparent",
+                color:isActive?"#5AEBEB":isDone?"rgba(255,255,255,0.65)":"rgba(255,255,255,0.3)",
+                cursor:"pointer",textAlign:"left",fontFamily:"Proxima Soft,sans-serif",
+                fontSize:13,fontWeight:isActive?700:500,
+                marginBottom:2,transition:"background 0.15s",
+              }}>
+              <div style={{width:22,height:22,borderRadius:"50%",flexShrink:0,display:"flex",
+                alignItems:"center",justifyContent:"center",
+                background:isActive?"#5AEBEB":isDone?"rgba(0,177,107,0.15)":"rgba(255,255,255,0.06)"}}>
+                {isDone
+                  ? <i className="ti ti-check" style={{fontSize:12,color:"#00B16B"}} />
+                  : <i className={`ti ${s.icon}`}
+                      style={{fontSize:12,color:isActive?"#022F36":"rgba(255,255,255,0.3)"}} />
+                }
+              </div>
+              <span style={{flex:1}}>{s.label}</span>
+              {isActive&&<div style={{width:4,height:4,borderRadius:"50%",background:"#5AEBEB"}} />}
+            </button>
+          );
+        })}
+
+        {/* Edge cases section */}
+        <div style={{marginTop:16,borderTop:"1px solid rgba(255,255,255,0.07)",paddingTop:12}}>
+          <div style={{fontSize:9,fontWeight:700,color:"rgba(255,255,255,0.3)",
+            letterSpacing:"0.1em",textTransform:"uppercase",padding:"0 8px",marginBottom:6}}>
+            Edge Cases
+          </div>
+          {[
+            {label:"Incomplete resume",stage:"profile"},
+            {label:"Failed application",stage:"apply_autopilot"},
+            {label:"Edit mid-flow",stage:"apply_copilot"},
+          ].map(e=>(
+            <button key={e.label} onClick={()=>onStage(e.stage)} style={{
+              width:"100%",display:"flex",alignItems:"center",gap:8,
+              padding:"8px 10px",borderRadius:8,border:"none",
+              background:"transparent",color:"rgba(255,255,255,0.3)",
+              cursor:"pointer",textAlign:"left",fontFamily:"Proxima Soft,sans-serif",
+              fontSize:12,fontWeight:500,marginBottom:2,
+            }}>
+              <i className="ti ti-alert-circle" style={{fontSize:11,flexShrink:0}} />
+              {e.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Mode toggle */}
+      <div style={{padding:"12px 12px 10px",borderTop:"1px solid rgba(255,255,255,0.07)"}}>
+        <div style={{fontSize:9,fontWeight:700,color:"rgba(255,255,255,0.3)",
+          letterSpacing:"0.1em",textTransform:"uppercase",marginBottom:8}}>Agent mode</div>
+        <div style={{display:"flex",background:"rgba(255,255,255,0.06)",borderRadius:9999,padding:3}}>
+          {["copilot","autopilot"].map(m=>(
+            <button key={m} onClick={()=>onMode(m)} style={{
+              flex:1,background:mode===m?"#fff":"transparent",
+              color:mode===m?"#022F36":"rgba(255,255,255,0.4)",
+              border:"none",borderRadius:9999,padding:"5px 0",
+              fontSize:11,fontWeight:700,cursor:"pointer",
+              fontFamily:"Proxima Soft,sans-serif",transition:"all 0.2s",
+            }}>{m==="copilot"?"✋ Copilot":"⚡ Auto"}</button>
+          ))}
+        </div>
+      </div>
+
+      {/* User */}
+      <div style={{padding:"10px 14px 14px",display:"flex",alignItems:"center",gap:9}}>
+        <div style={{width:30,height:30,borderRadius:"50%",background:"#5AEBEB",
+          display:"flex",alignItems:"center",justifyContent:"center",
+          fontSize:13,fontWeight:700,color:"#022F36",flexShrink:0}}>A</div>
+        <div>
+          <div style={{fontSize:12,fontWeight:700,color:"rgba(255,255,255,0.85)"}}>Alex Chen</div>
+          <div style={{fontSize:10,color:"rgba(255,255,255,0.35)"}}>Free · 3/5 auto-applies</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Context panel ─── */
+function ContextPanel({ stageId, mode }) {
+  const APPS = [
+    {logo:"M",logoColor:"#000",logoBg:"#FFD02F",company:"Miro",status:"Viewed",date:"2h ago"},
+    {logo:"N",logoColor:"#fff",logoBg:"#000",company:"Notion",status:"Applied",date:"Today"},
+    {logo:"L",logoColor:"#fff",logoBg:"#5E6AD2",company:"Linear",status:"Queued",date:"Pending"},
+    {logo:"F",logoColor:"#fff",logoBg:"#1ABCFE",company:"Figma",status:"Queued",date:"Pending"},
+  ];
+  const FIELDS = [
+    {label:"Work experience",done:true},{label:"Technical skills",done:true},
+    {label:"Education",done:true},{label:"LinkedIn URL",done:false},{label:"Portfolio",done:false},
+  ];
+
+  if (["welcome","onboarding"].includes(stageId)) {
+    return (
+      <div style={{padding:"20px 0 20px 4px",display:"flex",flexDirection:"column",gap:0}}>
+        <ContextCard title="Why Bloom?" icon="sparkles">
+          <div style={{fontSize:12,color:C.text3,lineHeight:1.7,marginBottom:10}}>
+            Bloom automates the most tedious parts of job hunting — so you only show up for the interviews.
+          </div>
+          {[
+            {icon:"search",text:"Finds 40+ matching roles daily"},
+            {icon:"file-text",text:"Tailors your resume per role"},
+            {icon:"send",text:"Auto-applies with one click"},
+            {icon:"bell",text:"Tracks every application"},
+          ].map(f=>(
+            <div key={f.text} style={{display:"flex",gap:8,alignItems:"center",marginBottom:8}}>
+              <div style={{width:24,height:24,borderRadius:6,background:"#EEF9F9",
+                display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                <i className={`lucide lucide-${f.icon}`} style={{fontSize:11,color:C.brandMid}} />
+              </div>
+              <span style={{fontSize:12,fontWeight:500,color:C.text2}}>{f.text}</span>
+            </div>
+          ))}
+        </ContextCard>
+        <ContextCard title="Trusted by 500K+ job seekers" icon="users">
+          <div style={{fontSize:12,color:C.text3,fontStyle:"italic",lineHeight:1.6,marginBottom:8}}>
+            "Applied to 120 jobs, got 4 interviews, received an offer in 21 days."
+          </div>
+          <div style={{fontSize:11,fontWeight:600,color:C.text2}}>— Maya T., Product Manager</div>
+        </ContextCard>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{padding:"20px 0 20px 4px",display:"flex",flexDirection:"column",gap:0}}>
+      {stageId==="profile" && (
+        <ContextCard title="Profile completion" icon="user">
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:12}}>
+            <div style={{flex:1,height:5,background:C.border,borderRadius:9999,overflow:"hidden"}}>
+              <div style={{width:"85%",height:"100%",background:"#5AEBEB",borderRadius:9999}} />
+            </div>
+            <span style={{fontSize:12,fontWeight:700,color:C.brandMid}}>85%</span>
+          </div>
+          {FIELDS.map(f=>(
+            <div key={f.label} style={{display:"flex",alignItems:"center",gap:7,marginBottom:7}}>
+              <i className={`lucide lucide-${f.done?"check-circle":"circle"}`}
+                style={{fontSize:12,color:f.done?C.green:"#D1D5DB",flexShrink:0}} />
+              <span style={{fontSize:11,color:f.done?C.text2:"#9CA3AF",fontWeight:f.done?600:400}}>{f.label}</span>
+            </div>
+          ))}
+        </ContextCard>
+      )}
+      {stageId==="preferences" && (
+        <ContextCard title="Active filters" icon="sliders-horizontal">
+          <PrefChips prefs={["Remote","$130k+","Full-time","React","TypeScript"]} />
+          <div style={{marginTop:10,fontSize:11,color:C.text3,fontWeight:500}}>47 roles match</div>
+        </ContextCard>
+      )}
+      {stageId==="matching" && (
+        <ContextCard title="47 role matches" icon="search" accent="#5AEBEB44">
+          <div style={{marginBottom:12}}>
+            <span style={{fontSize:28,fontWeight:700,color:C.brandMid,fontFamily:"Inter,sans-serif"}}>47</span>
+            <span style={{fontSize:12,color:C.text3,marginLeft:6}}>roles found</span>
+          </div>
+          {JOBS.map(j=>(
+            <div key={j.id} style={{display:"flex",alignItems:"center",gap:8,marginBottom:7}}>
+              <div style={{width:22,height:22,borderRadius:5,background:j.logoBg,
+                display:"flex",alignItems:"center",justifyContent:"center",
+                fontSize:10,fontWeight:700,color:j.logoColor,flexShrink:0}}>{j.logo}</div>
+              <span style={{flex:1,fontSize:11,fontWeight:600,color:C.text2}}>{j.company}</span>
+              <span style={{fontSize:11,fontWeight:700,
+                color:j.match>=90?C.green:j.match>=80?C.brandMid:C.text3}}>{j.match}%</span>
+            </div>
+          ))}
+        </ContextCard>
+      )}
+      {(stageId.startsWith("apply")||stageId==="loop") && (
+        <AppTrackerPanel apps={APPS} />
+      )}
+      {mode==="autopilot"&&stageId.startsWith("apply") && (
+        <ContextCard title="Autopilot status" icon="zap" accent="#FCD34D">
+          <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:12}}>
+            <div style={{width:8,height:8,borderRadius:"50%",background:C.green,
+              animation:"bloom-pulse 1.8s infinite"}} />
+            <span style={{fontSize:12,fontWeight:600,color:C.green}}>Active — 4/12 applied</span>
+          </div>
+          <div style={{height:4,background:C.border,borderRadius:9999,marginBottom:12,overflow:"hidden"}}>
+            <div style={{width:"33%",height:"100%",background:C.green,borderRadius:9999}} />
+          </div>
+          <button style={{width:"100%",background:"#FFF3E0",color:"#B45309",
+            border:"1.5px solid #FCD34D",borderRadius:9999,padding:"7px 0",
+            fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"Proxima Soft,sans-serif"}}>
+            ⏸ Pause Autopilot
+          </button>
+        </ContextCard>
+      )}
+      {stageId==="loop" && (
+        <ContextCard title="This week" icon="trending-up">
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+            {[{v:"8",l:"Applied"},{v:"3",l:"Views"},{v:"12",l:"Matches"},{v:"1",l:"Interview"}].map(s=>(
+              <div key={s.l} style={{background:"#F9FAFB",borderRadius:8,padding:"10px 12px"}}>
+                <div style={{fontSize:20,fontWeight:700,color:C.brandMid,lineHeight:1,fontFamily:"Inter,sans-serif"}}>{s.v}</div>
+                <div style={{fontSize:10,color:C.text3,marginTop:2}}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+        </ContextCard>
+      )}
+    </div>
+  );
+}
+
+/* ─── Main App ─── */
+function App() {
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "density": "comfortable",
+    "showAnnotations": true,
+    "accentMode": "teal"
+  }/*EDITMODE-END*/;
+
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  const [stageId, setStageId]         = useState("welcome");
+  const [mode, setMode]               = useState("copilot");
+  const [visibleCount, setVisibleCount] = useState(0);
+  const [isTyping, setIsTyping]       = useState(false);
+  const [chipsVisible, setChipsVisible] = useState(false);
+  const [inputVal, setInputVal]       = useState("");
+  const [chipsUsed, setChipsUsed]     = useState(false);
+  const chatEndRef                    = useRef(null);
+  const timerRef                      = useRef([]);
+
+  const clearTimers = () => { timerRef.current.forEach(clearTimeout); timerRef.current=[]; };
+
+  const goToStage = useCallback((id, instant=false) => {
+    clearTimers();
+    setStageId(id);
+    setVisibleCount(0);
+    setIsTyping(false);
+    setChipsVisible(false);
+    setChipsUsed(false);
+
+    const scripts = mkScripts();
+    const script  = scripts[id] || scripts.welcome;
+    const msgs    = script.messages || [];
+
+    if (instant) { setVisibleCount(msgs.length); setChipsVisible(true); return; }
+
+    const timers = [];
+    let delay = 450;
+    msgs.forEach((msg, idx) => {
+      if (msg.from !== "user") {
+        timers.push(setTimeout(()=>setIsTyping(true), Math.max(0, delay-140)));
+      }
+      timers.push(setTimeout(()=>{
+        setIsTyping(false);
+        setVisibleCount(v=>v+1);
+        if (idx===msgs.length-1) {
+          timers.push(setTimeout(()=>setChipsVisible(true), 450));
+        }
+      }, delay));
+      delay += msg.from==="user" ? 320 : 680;
+    });
+    timerRef.current = timers;
+  }, []);
+
+  /* boot */
+  useEffect(()=>{ goToStage("welcome"); return clearTimers; }, []);
+
+  /* scroll */
+  useEffect(()=>{
+    if (chatEndRef.current) {
+      chatEndRef.current.parentElement.scrollTop = chatEndRef.current.offsetTop;
+    }
+  }, [visibleCount, isTyping]);
+
+  const handleChip = (chip) => {
+    if (chipsUsed) return;
+    setChipsUsed(true);
+    setChipsVisible(false);
+    if (chip.setMode) setMode(chip.setMode);
+    if (chip.next) setTimeout(()=>goToStage(chip.next), 120);
+  };
+
+  const handleSidebarStage = (id) => {
+    let target = id;
+    if (id==="apply") target = mode==="autopilot" ? "apply_autopilot" : "apply_copilot";
+    goToStage(target, true);
+  };
+
+  const handleModeChange = (m) => {
+    setMode(m);
+    if (stageId.startsWith("apply")) {
+      goToStage(m==="autopilot"?"apply_autopilot":"apply_copilot", true);
+    }
+  };
+
+  const scripts = mkScripts();
+  const script  = scripts[stageId] || scripts.welcome;
+  const msgs    = script.messages || [];
+  const chips   = script.chips || [];
+  const stageLabel = STAGE_LABELS[stageId] || "Bloom AI";
+
+  const compact = tweaks.density === "compact";
+
+  return (
+    <div style={{height:"100vh",display:"flex",overflow:"hidden",background:"#FAFAFA"}}>
+      <Sidebar stageId={stageId} onStage={handleSidebarStage} mode={mode} onMode={handleModeChange} />
+
+      {/* Main */}
+      <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden",minWidth:0}}>
+        {/* Header */}
+        <div style={{height:54,flexShrink:0,background:"#fff",borderBottom:`1px solid ${C.border}`,
+          display:"flex",alignItems:"center",padding:"0 24px",gap:10}}>
+          <img src="assets/favicon.png" style={{width:20,height:20}} alt="" />
+          <span style={{fontSize:14,fontWeight:700,color:C.text1}}>Bloom AI</span>
+          <div style={{width:6,height:6,borderRadius:"50%",background:C.green}} />
+          <span style={{fontSize:11,color:C.green,fontWeight:600}}>Online</span>
+          <div style={{flex:1}} />
+          {/* Mode indicator */}
+          <div style={{
+            background:mode==="autopilot"?"#FFF3E0":"#E0EFFF",
+            color:mode==="autopilot"?"#B45309":C.brandMid,
+            borderRadius:9999,padding:"4px 14px",fontSize:11,fontWeight:700,
+            display:"flex",alignItems:"center",gap:5,
+          }}>
+            <i className={`lucide lucide-${mode==="autopilot"?"zap":"hand-metal"}`} style={{fontSize:11}} />
+            {mode==="autopilot"?"Autopilot active":"Copilot mode"}
+          </div>
+          {tweaks.showAnnotations && (
+            <div style={{background:"#FFF8E6",border:"1px solid #FCD34D",borderRadius:9999,
+              padding:"3px 12px",fontSize:10,fontWeight:600,color:"#B45309"}}>
+              ✏️ Annotate mode on
+            </div>
+          )}
+        </div>
+
+        {/* Chat + context */}
+        <div style={{flex:1,display:"flex",overflow:"hidden"}}>
+          {/* Chat feed */}
+          <div style={{flex:1,overflowY:"auto",padding:compact?"16px 24px":"24px 32px"}}>
+            {/* Stage divider */}
+            <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:compact?16:22}}>
+              <div style={{flex:1,height:1,background:C.border}} />
+              <span style={{fontSize:10,fontWeight:700,color:C.muted,textTransform:"uppercase",
+                letterSpacing:"0.08em",whiteSpace:"nowrap"}}>{stageLabel}</span>
+              <div style={{flex:1,height:1,background:C.border}} />
+            </div>
+
+            {/* Messages */}
+            {msgs.slice(0,visibleCount).map((msg,i)=>(
+              <div key={`${stageId}-${i}`} className="bloom-in">
+                <RenderMsg msg={msg} mode={mode} />
+              </div>
+            ))}
+
+            {isTyping && <TypingIndicator />}
+
+            {chipsVisible && chips.length>0 && (
+              <div className="bloom-fade">
+                <ActionChips chips={chips} onChip={handleChip} disabled={chipsUsed} />
+              </div>
+            )}
+
+            {/* Annotations overlay */}
+            {tweaks.showAnnotations && visibleCount>0 && (
+              <div className="bloom-fade" style={{marginTop:20,padding:"12px 16px",
+                background:"#FFFBEB",border:"1px dashed #FCD34D",borderRadius:10}}>
+                <div style={{fontSize:11,fontWeight:700,color:"#B45309",marginBottom:6}}>
+                  🔍 UX Annotation — {stageLabel}
+                </div>
+                {stageId==="welcome"&&<div style={{fontSize:11,color:"#78350F",lineHeight:1.6}}>Agent immediately establishes value prop. Single primary CTA reduces cognitive load. No form, no friction.</div>}
+                {stageId==="onboarding"&&<div style={{fontSize:11,color:"#78350F",lineHeight:1.6}}>Conversational Q&amp;A replaces signup forms. Role chips speed up first interaction. Name collected via natural dialogue.</div>}
+                {stageId==="profile"&&<div style={{fontSize:11,color:"#78350F",lineHeight:1.6}}>Resume upload is the primary action. AI extracts data automatically. Profile completion progress creates momentum. Warning card nudges toward LinkedIn — edge case handled inline.</div>}
+                {stageId==="preferences"&&<div style={{fontSize:11,color:"#78350F",lineHeight:1.6}}>Preferences shown as editable chips — visual and tactile. User can update anytime via chat — no settings screen needed.</div>}
+                {stageId==="matching"&&<div style={{fontSize:11,color:"#78350F",lineHeight:1.6}}>Job cards appear inline in chat — no context switch to a separate board. The Copilot/Autopilot fork is the key trust decision moment.</div>}
+                {stageId==="apply_copilot"&&<div style={{fontSize:11,color:"#78350F",lineHeight:1.6}}>Copilot: Agent proposes, user approves per job. Apply / Skip / Edit controls visible on each card. Mode badge is persistent reminder of current state.</div>}
+                {stageId==="apply_copilot_2"&&<div style={{fontSize:11,color:"#78350F",lineHeight:1.6}}>Edge case: cover letter required. Agent surfaces inline, offers review or trust-the-agent. No hard stop, no separate screen.</div>}
+                {stageId==="apply_autopilot"&&<div style={{fontSize:11,color:"#78350F",lineHeight:1.6}}>Autopilot: Activity log replaces per-job approvals. Error state (Stripe assessment) surfaces naturally in-thread. User retains control via Pause chip.</div>}
+                {stageId==="loop"&&<div style={{fontSize:11,color:"#78350F",lineHeight:1.6}}>Ongoing loop: agent proactively surfaces insights (profile view, new matches). Stats grid keeps metrics visible without a separate dashboard.</div>}
+              </div>
+            )}
+
+            <div ref={chatEndRef} style={{height:24}} />
+          </div>
+
+          {/* Context panel */}
+          <div style={{width:268,flexShrink:0,overflowY:"auto",
+            borderLeft:`1px solid ${C.border}`,padding:"16px 16px 16px 12px",
+            background:"#FAFAFA"}}>
+            <ContextPanel stageId={stageId} mode={mode} />
+          </div>
+        </div>
+
+        {/* Input bar */}
+        <div style={{flexShrink:0,borderTop:`1px solid ${C.border}`,
+          background:"#fff",padding:"10px 24px",
+          display:"flex",gap:10,alignItems:"center"}}>
+          <div style={{flex:1,display:"flex",alignItems:"center",gap:8,
+            background:"#F5F6F7",borderRadius:12,padding:"0 14px"}}>
+            <img src="assets/favicon.png" style={{width:16,height:16,opacity:0.4}} alt="" />
+            <input
+              value={inputVal}
+              onChange={e=>setInputVal(e.target.value)}
+              onKeyDown={e=>{ if(e.key==="Enter"){ setInputVal(""); } }}
+              placeholder="Ask me anything, or type your reply…"
+              style={{flex:1,background:"transparent",border:"none",padding:"11px 0",
+                fontSize:13,fontFamily:"Proxima Soft,sans-serif",color:C.text2}}
+            />
+            <i className="lucide lucide-paperclip" style={{fontSize:15,color:C.muted,cursor:"pointer"}} />
+          </div>
+          <button
+            onClick={()=>setInputVal("")}
+            style={{width:40,height:40,borderRadius:10,background:C.brandMid,border:"none",
+              display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",
+              transition:"background 0.15s"}}>
+            <i className="lucide lucide-send" style={{fontSize:15,color:"#fff"}} />
+          </button>
+        </div>
+      </div>
+
+      {/* Tweaks panel */}
+      <TweaksPanel>
+        <TweakSection title="Layout">
+          <TweakRadio id="density" label="Density"
+            options={["comfortable","compact"]}
+            value={tweaks.density} onChange={v=>setTweak("density",v)} />
+        </TweakSection>
+        <TweakSection title="Presentation">
+          <TweakToggle id="showAnnotations" label="UX Annotations"
+            value={tweaks.showAnnotations} onChange={v=>setTweak("showAnnotations",v)} />
+        </TweakSection>
+        <TweakSection title="Mode">
+          <TweakRadio id="agentMode" label="Agent mode"
+            options={["copilot","autopilot"]}
+            value={mode} onChange={v=>handleModeChange(v)} />
+        </TweakSection>
+      </TweaksPanel>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

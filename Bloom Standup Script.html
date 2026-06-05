@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/svg+xml" href="assets/bloom-favicon.svg">
+<title>Bloom · Standup Script</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&display=swap');
+
+  :root {
+    --cream: #F6F1E7;
+    --paper: #FFFFFF;
+    --ink: #022F36;
+    --inkSoft: #3C5356;
+    --muted: #7B8B8E;
+    --hairline: #E8DFCD;
+    --cyan: #5AEBEB;
+    --cyanInk: #0BB3B3;
+    --mint: #C8F0D8;
+    --mintInk: #0F7A4A;
+    --butter: #FFE08A;
+    --butterInk: #7A5300;
+    --flame: #F76638;
+    --lilac: #D9D2FF;
+    --lilacInk: #3F2F8F;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Newsreader', Georgia, serif;
+    font-size: 19px;
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 64px 32px 200px;
+  }
+
+  /* ── Masthead ─────────────────────────────────── */
+  .masthead {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 22px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 8px;
+  }
+  .masthead img { height: 30px; width: auto; display: block; }
+  .masthead .meta {
+    margin-left: auto;
+    text-align: right;
+    font-family: 'Newsreader', serif;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+    font-style: italic;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 46px;
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    margin: 30px 0 10px;
+  }
+  .dek {
+    font-size: 20px;
+    color: var(--inkSoft);
+    font-style: italic;
+    max-width: 600px;
+    margin-bottom: 14px;
+  }
+  .runtime {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--cyanInk);
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    padding: 6px 13px;
+    border-radius: 999px;
+  }
+
+  /* ── Section headers ──────────────────────────── */
+  .scene {
+    margin-top: 64px;
+    scroll-margin-top: 24px;
+  }
+  .scene-tag {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .scene-num {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--paper);
+    background: var(--ink);
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+  }
+  .scene-tag .label {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .scene-tag .rule { flex: 1; height: 1px; background: var(--hairline); }
+  .scene h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+    margin-bottom: 20px;
+  }
+
+  p { margin-bottom: 17px; }
+  p.script { font-size: 19.5px; }
+  em { color: var(--inkSoft); }
+  strong { font-weight: 600; }
+  .accent { color: var(--cyanInk); font-weight: 600; font-style: normal; }
+  .flame { color: var(--flame); font-weight: 600; font-style: normal; }
+  .mint { color: var(--mintInk); font-weight: 600; font-style: normal; }
+
+  /* ── Stage cue ────────────────────────────────── */
+  .cue {
+    display: flex;
+    gap: 11px;
+    align-items: flex-start;
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-left: 3px solid var(--cyan);
+    border-radius: 10px;
+    padding: 11px 15px;
+    margin: 6px 0 20px;
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--inkSoft);
+  }
+  .cue .ico { flex-shrink: 0; font-size: 14px; line-height: 1.5; }
+  .cue b { color: var(--ink); font-weight: 600; }
+
+  /* ── Pull stat ────────────────────────────────── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 8px 0 26px;
+  }
+  .stat {
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 16px;
+    padding: 20px 18px;
+    text-align: center;
+  }
+  .stat.cyan { background: var(--cyan); color: var(--ink); }
+  .stat.mint { background: var(--mint); color: var(--mintInk); }
+  .stat .big {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 38px;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .stat .cap {
+    font-family: 'Fraunces', serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    margin-top: 6px;
+    opacity: 0.85;
+  }
+
+  /* ── Callout ──────────────────────────────────── */
+  .callout {
+    background: var(--paper);
+    border: 1px solid var(--hairline);
+    border-radius: 16px;
+    padding: 22px 24px;
+    margin: 22px 0;
+  }
+  .callout .kicker {
+    font-family: 'Fraunces', serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--cyanInk);
+    margin-bottom: 8px;
+  }
+  .callout p:last-child { margin-bottom: 0; }
+
+  /* ── Beat / breath marker ─────────────────────── */
+  .beat {
+    text-align: center;
+    color: var(--muted);
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    margin: 26px 0;
+    font-style: normal;
+  }
+
+  /* ── Quote line (say-this-verbatim emphasis) ──── */
+  .say {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 24px;
+    line-height: 1.34;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    padding: 4px 0 4px 20px;
+    border-left: 3px solid var(--butter);
+    margin: 22px 0;
+  }
+
+  /* ── Nav rail ─────────────────────────────────── */
+  .navrail {
+    position: fixed;
+    top: 50%;
+    right: 28px;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    z-index: 50;
+  }
+  .navrail a {
+    width: 11px; height: 11px;
+    border-radius: 50%;
+    background: var(--hairline);
+    border: 1.5px solid transparent;
+    transition: all 0.18s;
+    cursor: pointer;
+  }
+  .navrail a:hover { background: var(--cyanInk); transform: scale(1.25); }
+  @media (max-width: 1080px) { .navrail { display: none; } }
+
+  .end {
+    margin-top: 70px;
+    padding-top: 28px;
+    border-top: 2px solid var(--ink);
+    text-align: center;
+  }
+  .end .mascot { width: 64px; height: auto; margin-bottom: 12px; }
+  .end p { font-style: italic; color: var(--muted); margin-bottom: 0; }
+</style>
+</head>
+<body>
+
+<nav class="navrail" aria-label="Jump to scene">
+  <a href="#open" title="Open"></a>
+  <a href="#problem" title="The problem & ROI"></a>
+  <a href="#onboarding" title="Onboarding"></a>
+  <a href="#home" title="Home"></a>
+  <a href="#review" title="Review mode"></a>
+  <a href="#auto" title="Auto mode"></a>
+  <a href="#tracker" title="Tracker"></a>
+  <a href="#close" title="Close"></a>
+</nav>
+
+<div class="wrap">
+
+  <div class="masthead">
+    <img src="assets/bloom-logo.svg" alt="bloom">
+    <div class="meta">Standup demo script<br>~7 minutes · read at an easy pace</div>
+  </div>
+
+  <h1>Meet Bloom.</h1>
+  <p class="dek">A walkthrough script — what to say, and what to click, as you take the team through the prototype.</p>
+  <span class="runtime">● Speaker notes · just read down the page</span>
+
+  <!-- ════════════════ OPEN ════════════════ -->
+  <section class="scene" id="open">
+    <div class="scene-tag">
+      <span class="scene-num">1</span>
+      <span class="label">Open · set the scene</span>
+      <span class="rule"></span>
+    </div>
+    <h2>The thirty-second hook</h2>
+
+    <p class="script">Okay — so for the last few weeks I've been building out <strong>Bloom</strong>, and today I want to actually walk you through the whole thing end to end. Not slides. The real prototype.</p>
+
+    <p class="script">Here's the one-line version: <span class="accent">job hunting is a part-time job nobody applied for.</span> You find a role, you re-type the same details into yet another form, you write a cover letter you'll never reuse, and you do that forty, fifty times before anything sticks. It's soul-crushing, and honestly most of it is copy-paste.</p>
+
+    <p class="say">Bloom's whole bet is this: you should make the <em>decisions</em>, and let our copilot do the <em>typing</em>.</p>
+
+    <div class="cue"><span class="ico">▶</span><span>Have the prototype open on the <b>Home</b> screen before you start talking. Don't click yet — just let it sit there.</span></div>
+  </section>
+
+  <!-- ════════════════ PROBLEM + ROI ════════════════ -->
+  <section class="scene" id="problem">
+    <div class="scene-tag">
+      <span class="scene-num">2</span>
+      <span class="label">Why it matters · the ROI</span>
+      <span class="rule"></span>
+    </div>
+    <h2>Before I click anything — the numbers</h2>
+
+    <p class="script">Let me ground this in why it's worth our time. The average serious job seeker spends somewhere around <strong>fifteen to twenty minutes per application</strong> once you count finding it, tailoring the answers, and filling the form. Multiply that across a real search and it's <strong>dozens of hours</strong> of pure admin.</p>
+
+    <p class="script">Here's what Bloom changes:</p>
+
+    <div class="stats">
+      <div class="stat cyan">
+        <div class="big">~25min</div>
+        <div class="cap">saved per application</div>
+      </div>
+      <div class="stat">
+        <div class="big">90s</div>
+        <div class="cap">to review &amp; send, vs ~20min</div>
+      </div>
+      <div class="stat mint">
+        <div class="big">0</div>
+        <div class="cap">forms the user fills by hand</div>
+      </div>
+    </div>
+
+    <p class="script">So the pitch to a user is simple and honest: <span class="mint">we give you back your evenings.</span> Instead of grinding forms, you're spending ninety seconds approving an application that's already written in your voice — or zero seconds, if you let it run on auto.</p>
+
+    <div class="callout">
+      <div class="kicker">The ROI line to land</div>
+      <p>"If Bloom saves someone even ten hours over a job search — and it saves a lot more than that — then a few dollars a month is a no-brainer. We're not selling software. We're selling their time back."</p>
+    </div>
+
+    <div class="beat">— breathe, then start the demo —</div>
+  </section>
+
+  <!-- ════════════════ ONBOARDING ════════════════ -->
+  <section class="scene" id="onboarding">
+    <div class="scene-tag">
+      <span class="scene-num">3</span>
+      <span class="label">Onboarding · the easy setup</span>
+      <span class="rule"></span>
+    </div>
+    <h2>"It learns you in two minutes"</h2>
+
+    <p class="script">Let me start where the user starts. The biggest risk with a product like this is a setup wall — a giant form before you get any value. So we did the opposite.</p>
+
+    <div class="cue"><span class="ico">▶</span><span>Trigger onboarding: <b>sidebar avatar → Settings → Account → "Replay guided setup."</b> (Or just have it pre-loaded.)</span></div>
+
+    <p class="script">Meet <strong>Sprout</strong> — our copilot. Notice onboarding isn't a form, it's a <span class="accent">conversation.</span> Sprout introduces itself and the very first thing it says is "tap, don't type."</p>
+
+    <p class="script">Every question is a tap. Your role, your experience level, your salary floor, the kind of companies you want. Four quick chapters. And while you're tapping, Sprout is quietly reading your résumé in the background and pre-filling everything it can — so by the time you're done, it already knows your years of experience, your authorization status, your notice period.</p>
+
+    <p class="say">The point: zero blank text boxes. You're never staring at a cursor wondering what to write.</p>
+
+    <div class="cue"><span class="ico">▶</span><span>Tap through 2–3 chapters so they see how fast it moves. Point at the animated Sprout on the left as you talk.</span></div>
+
+    <p class="script">By the end of this, Sprout has a profile of you. That's the foundation for everything else — because now it can fill any application as if it were you.</p>
+  </section>
+
+  <!-- ════════════════ HOME ════════════════ -->
+  <section class="scene" id="home">
+    <div class="scene-tag">
+      <span class="scene-num">4</span>
+      <span class="label">Home · the daily landing</span>
+      <span class="rule"></span>
+    </div>
+    <h2>"Here's your morning in one screen"</h2>
+
+    <div class="cue"><span class="ico">▶</span><span>Land on <b>Home</b>. Gesture to the queue and the weekly stats.</span></div>
+
+    <p class="script">This is what you see when you open Bloom each day. Up top, the stats that matter — applications out, replies in, time saved. We lead with <span class="accent">time saved</span> on purpose, because that's the emotional payoff.</p>
+
+    <p class="script">Below that is your queue — roles Sprout found and drafted overnight, ready for you. And there's a recap of what Sprout did while you were away: "found this," "skipped four roles below your salary floor," "a recruiter replied." It's transparent. You always know what your copilot has been up to.</p>
+
+    <p class="script">From here there are two ways to work, and this is the core of the product — so let me show both.</p>
+  </section>
+
+  <!-- ════════════════ REVIEW MODE ════════════════ -->
+  <section class="scene" id="review">
+    <div class="scene-tag">
+      <span class="scene-num">5</span>
+      <span class="label">Review mode · you approve each one</span>
+      <span class="rule"></span>
+    </div>
+    <h2>"Ninety seconds, all taps"</h2>
+
+    <p class="script">The default is <strong>Review mode</strong> — Sprout drafts, you approve. This is for people who want to stay in control of every send.</p>
+
+    <div class="cue"><span class="ico">▶</span><span>From Home, click <b>"Review →"</b> on a queued job (Linear). Let the review screen load.</span></div>
+
+    <p class="script">So here's a real application. On the left, it's a <span class="accent">conversation, not a form.</span> Sprout walks you through each question one at a time. Cover letter? It's already drafted — I can tap "looks good," or tap "make it warmer," "make it shorter," and it rewrites instantly. Watch.</p>
+
+    <div class="cue"><span class="ico">▶</span><span>Click a refine pill like <b>"Make it warmer."</b> Show the rewrite, then click <b>"Perfect, next."</b></span></div>
+
+    <p class="script">Then the structured stuff — years of experience, salary expectation, work authorization, visa. These are the questions every application form asks, and they're <span class="mint">already filled in from your profile.</span> You just confirm. Tap, tap, tap.</p>
+
+    <p class="script">On the right, two things I love. There's a <strong>checklist</strong> showing exactly what still needs your eyes versus what's auto-handled — so you're never guessing how much is left. And there's <strong>"Bloom handled the rest,"</strong> which lists everything it auto-filled, so there's no black box.</p>
+
+    <p class="script">And if you ever want to go off-script —</p>
+
+    <div class="cue"><span class="ico">▶</span><span>Click the floating <b>Sprout bubble</b> (bottom-right). Type <b>"how does my fit break down?"</b> and send.</span></div>
+
+    <p class="script">— there's a chat. But it's <span class="accent">scoped on purpose.</span> It answers things about the role, tweaks an answer, or helps you skip. It's not an open-ended chatbot that wanders off — it's a focused assistant. Ask it about your fit, the hiring manager, the interview process, and it answers.</p>
+
+    <p class="say">The whole thing takes about ninety seconds. Then you hit "Approve &amp; send," and it's gone — submitted in your voice.</p>
+
+    <div class="cue"><span class="ico">▶</span><span>Finish the questions, then click <b>"Approve &amp; send."</b> Note the confirmation. Optionally show the <b>Skip</b> dialog first.</span></div>
+  </section>
+
+  <!-- ════════════════ AUTO MODE ════════════════ -->
+  <section class="scene" id="auto">
+    <div class="scene-tag">
+      <span class="scene-num">6</span>
+      <span class="label">Auto mode · hands-free</span>
+      <span class="rule"></span>
+    </div>
+    <h2>"Or… don't lift a finger"</h2>
+
+    <p class="script">Now — that's for people who want control. But some people just want results. So there's a second gear: <strong>Auto Apply.</strong></p>
+
+    <div class="cue"><span class="ico">▶</span><span>In the sidebar Sprout card, flip the toggle to <b>🚀 Auto</b>. Point out it now reads <b>"LIVE · FULL AUTO"</b> with the green pulse.</span></div>
+
+    <p class="script">One switch. Now Sprout doesn't wait for you — it finds matching roles, fills them, and submits them automatically. You'll notice the copilot card lights up green: <span class="flame">live, full auto.</span> It's working for you in the background.</p>
+
+    <p class="script">And here's the nice part — it's still transparent and still reversible.</p>
+
+    <div class="cue"><span class="ico">▶</span><span>Go to <b>Applications</b>. Show the first column now reads <b>"Ready to send"</b> with the <b>"One-Click Apply to all"</b> button and the "Sending in ~Xm" badges.</span></div>
+
+    <p class="script">Everything queued up shows right here. I can let it run on its own schedule, or — if I'm impatient — I hit <strong>"One-Click Apply to all,"</strong> and it fires off the entire batch at once.</p>
+
+    <div class="cue"><span class="ico">▶</span><span>Click <b>"One-Click Apply to all."</b> Let the batch overlay play through — jobs ticking to ✓ — to the "applications sent 🎉" summary.</span></div>
+
+    <p class="script">Look at that — it's applying to each one, in your voice, ticking them off, and at the end it tells you exactly how much time it just saved you. <span class="mint">Twelve applications. A couple of hours of form-filling. Gone.</span></p>
+
+    <p class="say">Review mode for control. Auto mode for scale. Same copilot — the user just chooses how much to hand over.</p>
+  </section>
+
+  <!-- ════════════════ TRACKER ════════════════ -->
+  <section class="scene" id="tracker">
+    <div class="scene-tag">
+      <span class="scene-num">7</span>
+      <span class="label">Applications · the tracker</span>
+      <span class="rule"></span>
+    </div>
+    <h2>"And nothing falls through the cracks"</h2>
+
+    <p class="script">Last piece. Once applications are out, they live here, on the <strong>Applications</strong> board. It's a simple pipeline: <span class="accent">Review → Applied → Replied → Interviewing → Offer.</span></p>
+
+    <div class="cue"><span class="ico">▶</span><span>On the Applications board, hover a card and click the <b>eye icon</b> to open the job detail modal.</span></div>
+
+    <p class="script">Tap any application and you get the full picture — the role, why Sprout matched you, and a complete <strong>history timeline</strong>: when it was drafted, when it was submitted, when the recruiter viewed it, when they replied. Every application has a paper trail.</p>
+
+    <div class="cue"><span class="ico">▶</span><span>Open the <b>History</b> tab in the modal. Then close it and show the <b>move menu</b> (the arrow icon) → mark one as <b>Selected</b>.</span></div>
+
+    <p class="script">And as things move, you just update the status — drag it forward, or use the move menu to mark it Interviewing, Selected, or not selected. It's your whole search in one organized place, instead of a spreadsheet and twelve browser tabs.</p>
+  </section>
+
+  <!-- ════════════════ CLOSE ════════════════ -->
+  <section class="scene" id="close">
+    <div class="scene-tag">
+      <span class="scene-num">8</span>
+      <span class="label">Close · bring it home</span>
+      <span class="rule"></span>
+    </div>
+    <h2>The wrap</h2>
+
+    <p class="script">So that's Bloom, start to finish. <strong>Two-minute setup</strong> that feels like a chat. A copilot that drafts every application in your voice. <strong>Review mode</strong> when you want control, <strong>Auto mode</strong> when you want it hands-free. And a tracker so nothing slips.</p>
+
+    <p class="script">The thing I'd ask you to hold onto is the ROI, because that's the story: <span class="accent">we're giving people back the hours job hunting steals from them.</span> Every other feature is in service of that one promise.</p>
+
+    <p class="say">Decisions stay with the human. The busywork goes to Sprout.</p>
+
+    <p class="script">That's the demo — happy to take questions, or run any part of the flow again live.</p>
+
+    <div class="end">
+      <img class="mascot" src="assets/bloom-favicon.svg" alt="">
+      <p>End of script · thanks, team</p>
+    </div>
+  </section>
+
+</div>
+</body>
+</html>

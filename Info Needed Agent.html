@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloom — Complete with AI</title>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.525.0/font/lucide.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+<style>
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-regular.ttf");font-weight:400}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-medium.ttf");font-weight:500}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-semibold.ttf");font-weight:600}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-bold.ttf");font-weight:700}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body,#root{height:100%;font-family:"Proxima Soft",system-ui,sans-serif}
+  body{background:#F0F3F7;overflow:hidden}
+  ::-webkit-scrollbar{width:4px;height:4px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:#D4D4D4;border-radius:2px}
+  @keyframes bloom-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes bloom-bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+  @keyframes bloom-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  @keyframes score-up{from{filter:brightness(1.4)}to{filter:brightness(1)}}
+  .msg-in{animation:bloom-in .22s ease forwards}
+  button{cursor:pointer;font-family:"Proxima Soft",sans-serif}
+  input,textarea{font-family:"Proxima Soft",sans-serif}
+  input:focus,textarea:focus{outline:none}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* ─── Tokens ─── */
+const C = {
+  brandDark:"#022F36",brandMid:"#1D484F",cyan:"#5AEBEB",orange:"#F76638",
+  green:"#00B16B",bgPage:"#F0F3F7",bgCard:"#FEFEFE",border:"#E6E5E1",
+  border2:"#E5E7EB",text1:"#030303",text2:"#23262E",text3:"#4A5464",
+  muted:"#A5A5A5",amber:"#FEEAAE",amberBorder:"#F0D080",
+};
+
+/* ─── Bold-text renderer ─── */
+function T({ t }) {
+  const parts = String(t).split(/(\*\*[^*]+\*\*)/g);
+  return <>{parts.map((p,i) => p.startsWith('**')
+    ? <strong key={i} style={{color:C.brandDark}}>{p.slice(2,-2)}</strong>
+    : p)}</>;
+}
+
+/* ─── Application data ─── */
+const APPS_DATA = [
+  {id:1,company:"Chargebee",role:"Software Engineer",location:"Atlanta, GA • Remote",
+   logo:"C",logoBg:"#FF4D00",logoColor:"#fff",filled:14,total:20,missing:8},
+  {id:2,company:"Okta",role:"Full Stack Developer",location:"Portland, OR • Remote",
+   logo:"O",logoBg:"#007DC1",logoColor:"#fff",filled:5,total:18,missing:5},
+  {id:3,company:"Okta",role:"Full Stack Developer",location:"Portland, OR • Remote",
+   logo:"O",logoBg:"#007DC1",logoColor:"#fff",filled:5,total:18,missing:5},
+  {id:4,company:"Exness",role:"DevOps Engineer",location:"Columbus, US • Full-time",
+   logo:"ex",logoBg:"#F7C600",logoColor:"#000",filled:18,total:18,missing:0,done:true},
+  {id:5,company:"Shutter Tech",role:"Cloud Architect",location:"Houston, TX • Hybrid",
+   logo:"S",logoBg:"#16213E",logoColor:"#fff",filled:0,total:0,missing:0,processing:true},
+];
+
+/* ─── Flow scripts ─── */
+const FLOW = {
+  idle:{
+    msgs:[
+      {from:"ai",t:"Hi Alex! 👋"},
+      {from:"ai",t:"I found **14 missing fields** across **3 of your applications**. These are blocking submission right now."},
+      {from:"ai",comp:"apps_preview"},
+      {from:"ai",t:"Here's the good news: I can cluster all of these into **5 quick questions** and auto-fill every application at once. Most people finish in under **90 seconds**."},
+    ],
+    chips:[
+      {label:"Let's do it →",primary:true,next:"clustering"},
+      {label:"What's missing exactly?",next:"clustering"},
+    ],
+    ars:47,
+  },
+  clustering:{
+    msgs:[
+      {from:"ai",t:"Perfect! I've grouped your **14 missing fields** into **5 smart questions** that cover all 3 apps at once — no repetition."},
+      {from:"ai",comp:"cluster_preview"},
+      {from:"ai",t:"Your answers will be saved to your profile and reused on every future application automatically. Ready to start?"},
+    ],
+    chips:[
+      {label:"Start →",primary:true,next:"q_auth"},
+      {label:"Skip a question",next:"q_auth"},
+    ],
+    ars:47,
+  },
+  q_auth:{
+    msgs:[
+      {from:"ai",comp:"q_header",data:{n:1,of:5,scope:"All 3 applications",category:"Work & Legal",color:"#3B82F6"}},
+      {from:"ai",t:"Are you **legally authorized to work in the United States**?"},
+      {from:"ai",t:"This question is required by all 3 employers before they can process your application."},
+    ],
+    chips:[
+      {label:"Yes — Citizen / Permanent Resident",primary:true,next:"q_notice"},
+      {label:"Yes — Work visa (H-1B, OPT, TN…)",next:"q_notice"},
+      {label:"No — I need sponsorship",next:"q_notice"},
+    ],
+    ars:47,
+  },
+  q_notice:{
+    msgs:[
+      {from:"ai",comp:"q_header",data:{n:2,of:5,scope:"Chargebee + Okta (2 apps)",category:"Availability",color:"#00B16B"}},
+      {from:"ai",t:"What is your **earliest available start date** / notice period?"},
+      {from:"ai",t:"I'll tailor the phrasing for each employer — Chargebee wants a date, Okta asks for notice period in weeks."},
+    ],
+    chips:[
+      {label:"Immediately available",primary:true,next:"q_salary"},
+      {label:"2 weeks",next:"q_salary"},
+      {label:"1 month",next:"q_salary"},
+      {label:"2+ months",next:"q_salary"},
+    ],
+    ars:55,
+  },
+  q_salary:{
+    msgs:[
+      {from:"ai",comp:"q_header",data:{n:3,of:5,scope:"All 3 applications",category:"Compensation",color:"#F76638"}},
+      {from:"ai",t:"What is your **expected annual salary range**?"},
+      {from:"ai",t:"💡 Based on your experience and these roles, the typical range is **$140k–$180k**. I'd suggest anchoring slightly above market."},
+    ],
+    chips:[
+      {label:"$120k – $140k",next:"q_highlight"},
+      {label:"$140k – $160k",primary:true,next:"q_highlight"},
+      {label:"$160k – $180k",next:"q_highlight"},
+      {label:"$180k+",next:"q_highlight"},
+    ],
+    ars:62,
+  },
+  q_highlight:{
+    msgs:[
+      {from:"ai",comp:"q_header",data:{n:4,of:5,scope:"Chargebee only",category:"Career History",color:"#8B5CF6"}},
+      {from:"ai",t:"Chargebee asks: **\"In under 200 words, describe a project or initiative that has been a career highlight for you.\"**"},
+      {from:"ai",t:"💡 Tip: Chargebee is growth-stage. Mention **measurable impact** (scale, revenue, users) — they value outcome-oriented thinking."},
+      {from:"ai",comp:"text_input",data:{placeholder:"e.g. Led migration of legacy monolith to microservices, reducing deploy time by 70%…",field:"highlight"}},
+    ],
+    chips:null,
+    inputField:"highlight",
+    ars:70,
+  },
+  q_employer:{
+    msgs:[
+      {from:"ai",comp:"q_header",data:{n:5,of:5,scope:"All 3 applications",category:"Employment",color:"#EC4899"}},
+      {from:"ai",t:"What is your **current employer**?"},
+      {from:"ai",t:"If you're currently between roles, just type \"N/A\" — I'll handle the rest."},
+      {from:"ai",comp:"text_input",data:{placeholder:"e.g. Stripe, Google, N/A…",field:"employer"}},
+    ],
+    chips:[
+      {label:"Currently between roles (N/A)",next:"completing"},
+    ],
+    inputField:"employer",
+    ars:76,
+  },
+  completing:{
+    msgs:[
+      {from:"ai",t:"Got everything I need. Filling **14 fields across 3 applications** now…"},
+      {from:"ai",comp:"activity_log"},
+      {from:"ai",t:"⚡ All done! I've submitted your answers and queued applications for final processing."},
+    ],
+    chips:[
+      {label:"See summary →",primary:true,next:"summary"},
+    ],
+    ars:82,
+  },
+  summary:{
+    msgs:[
+      {from:"ai",comp:"summary_card"},
+      {from:"ai",t:"Your **Automation Readiness Score** jumped from **47 → 82**. These answers are now saved and will pre-fill future applications automatically — no more repeating yourself."},
+      {from:"ai",t:"Want me to find more roles that match your profile while you wait for responses?"},
+    ],
+    chips:[
+      {label:"Find more matches",primary:true,next:"summary"},
+      {label:"View submitted apps",next:"summary"},
+      {label:"Set up Autopilot",next:"summary"},
+    ],
+    ars:82,
+  },
+};
+
+/* ─── ARS Donut ─── */
+function ARSDonut({ score }) {
+  const r = 28, sw = 5.5, circ = 2*Math.PI*r;
+  return (
+    <svg width={66} height={66} style={{transform:"rotate(-90deg)"}}>
+      <circle cx={33} cy={33} r={r} fill="none" stroke="#EBEBEB" strokeWidth={sw} />
+      <circle cx={33} cy={33} r={r} fill="none" stroke={C.cyan} strokeWidth={sw}
+        strokeDasharray={`${(score/100)*circ} ${circ}`} strokeLinecap="round"
+        style={{transition:"stroke-dasharray 1s cubic-bezier(.4,0,.2,1)"}} />
+    </svg>
+  );
+}
+
+/* ─── ARS Card ─── */
+function ARSCard({ score }) {
+  const base = 47;
+  const cats = [
+    {label:"Work Authorization", filled: score>=55},
+    {label:"Availability",       filled: score>=62},
+    {label:"Salary Range",       filled: score>=70},
+    {label:"Career History",     filled: score>=76},
+    {label:"Employment",         filled: score>=82},
+  ];
+  return (
+    <div style={{background:"#fff",borderBottom:`1px solid ${C.border}`,padding:"14px 16px 12px"}}>
+      <div style={{display:"flex",gap:12,alignItems:"flex-start"}}>
+        {/* Donut */}
+        <div style={{position:"relative",flexShrink:0}}>
+          <ARSDonut score={score} />
+          <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",
+            alignItems:"center",justifyContent:"center"}}>
+            <span style={{fontSize:17,fontWeight:700,color:C.brandDark,lineHeight:1,
+              ...(score>base?{animation:"score-up 0.6s ease"}:{})}}>{score}</span>
+            <span style={{fontSize:7,fontWeight:700,color:C.muted,letterSpacing:"0.06em",textTransform:"uppercase"}}>/100</span>
+          </div>
+        </div>
+        {/* Text + bars */}
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{display:"flex",alignItems:"center",gap:7,marginBottom:3}}>
+            <span style={{fontSize:12,fontWeight:700,color:C.text1}}>Automation Readiness</span>
+            {score>base && (
+              <span style={{background:"#E6F9F1",color:C.green,fontSize:9,fontWeight:700,
+                borderRadius:9999,padding:"2px 7px"}}>+{score-base} today</span>
+            )}
+          </div>
+          <p style={{fontSize:10,color:C.text3,lineHeight:1.5,marginBottom:9}}>
+            Every answer is saved and reused on future applications.
+          </p>
+          <div style={{display:"flex",flexDirection:"column",gap:4}}>
+            {cats.map(c=>(
+              <div key={c.label} style={{display:"flex",alignItems:"center",gap:7}}>
+                <i className={`ti ti-${c.filled?"circle-check-filled":"circle"}`}
+                  style={{fontSize:10,color:c.filled?C.green:"#D4D4D4",flexShrink:0}} />
+                <span style={{fontSize:9.5,color:c.filled?C.text2:C.muted,fontWeight:c.filled?600:400,flex:1}}>{c.label}</span>
+                {c.filled && <span style={{fontSize:9,color:C.green,fontWeight:700}}>✓ saved</span>}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Inline chat components ─── */
+
+function AppsPreview() {
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:6}}>
+      {[
+        {c:"Chargebee",r:"Software Engineer",n:8,bg:"#FF4D00",ic:"C",tc:"#fff"},
+        {c:"Okta",r:"Full Stack Developer",n:5,bg:"#007DC1",ic:"O",tc:"#fff"},
+        {c:"Okta",r:"Full Stack Developer",n:5,bg:"#007DC1",ic:"O",tc:"#fff"},
+      ].map((a,i)=>(
+        <div key={i} style={{background:"#fff",border:`1px solid ${C.border2}`,borderRadius:9,
+          padding:"9px 12px",display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:28,height:28,borderRadius:6,background:a.bg,
+            display:"flex",alignItems:"center",justifyContent:"center",
+            fontSize:11,fontWeight:700,color:a.tc,flexShrink:0}}>{a.ic}</div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:12,fontWeight:700,color:C.text1}}>{a.r}</div>
+            <div style={{fontSize:10,color:C.text3}}>{a.c}</div>
+          </div>
+          <span style={{background:"#FFF3ED",color:C.orange,borderRadius:9999,
+            padding:"3px 9px",fontSize:10,fontWeight:700,flexShrink:0,
+            border:`1px solid ${C.orange}44`,display:"flex",alignItems:"center",gap:4}}>
+            <i className="ti ti-alert-triangle" style={{fontSize:10}} />
+            {a.n} fields
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ClusterPreview() {
+  const clusters = [
+    {n:1,label:"Work Authorization",apps:"All 3 apps",icon:"ti-shield-check",color:"#3B82F6",q:1},
+    {n:2,label:"Notice Period / Start Date",apps:"Chargebee + Okta",icon:"ti-calendar",color:"#00B16B",q:1},
+    {n:3,label:"Salary Expectation",apps:"All 3 apps",icon:"ti-currency-dollar",color:"#F76638",q:1},
+    {n:4,label:"Career Highlight",apps:"Chargebee only",icon:"ti-star",color:"#8B5CF6",q:1},
+    {n:5,label:"Current Employer",apps:"All 3 apps",icon:"ti-building",color:"#EC4899",q:1},
+  ];
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:5}}>
+      {clusters.map(cl=>(
+        <div key={cl.n} style={{background:"#fff",border:`1px solid ${C.border2}`,borderRadius:9,
+          padding:"9px 12px",display:"flex",alignItems:"center",gap:10}}>
+          <div style={{width:28,height:28,borderRadius:7,
+            background:cl.color+"15",display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+            <i className={cl.icon} style={{fontSize:13,color:cl.color}} />
+          </div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:12,fontWeight:700,color:C.text1}}>{cl.label}</div>
+            <div style={{fontSize:10,color:C.text3,marginTop:1}}>{cl.apps}</div>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:4}}>
+            <span style={{fontSize:10,fontWeight:700,color:cl.color,background:cl.color+"15",
+              borderRadius:9999,padding:"2px 8px"}}>1 question</span>
+          </div>
+        </div>
+      ))}
+      <div style={{background:"#F0FCFF",border:`1px solid ${C.cyan}44`,borderRadius:8,
+        padding:"8px 12px",display:"flex",alignItems:"center",gap:7,marginTop:2}}>
+        <i className="ti ti-sparkles" style={{fontSize:12,color:C.brandMid,flexShrink:0}} />
+        <span style={{fontSize:11,color:C.brandMid,fontWeight:500}}>
+          5 questions replaces 14 individual form fields across 3 applications
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function QHeader({ data }) {
+  return (
+    <div style={{display:"flex",alignItems:"center",gap:8,padding:"8px 12px",
+      background:data.color+"0F",borderRadius:8,border:`1px solid ${data.color}22`}}>
+      <div style={{width:22,height:22,borderRadius:"50%",background:data.color,
+        display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+        <span style={{fontSize:11,fontWeight:700,color:"#fff"}}>{data.n}</span>
+      </div>
+      <div style={{flex:1}}>
+        <span style={{fontSize:11,fontWeight:700,color:data.color}}>{data.category}</span>
+        <span style={{fontSize:11,color:C.text3,marginLeft:6}}>·</span>
+        <span style={{fontSize:11,color:C.text3,marginLeft:6}}>Question {data.n} of {data.of}</span>
+      </div>
+      <span style={{fontSize:10,color:C.text3,background:"#fff",borderRadius:9999,
+        padding:"2px 9px",border:`1px solid ${C.border2}`}}>{data.scope}</span>
+    </div>
+  );
+}
+
+function TextInputComp({ data, onSubmit }) {
+  const [val,setVal] = useState("");
+  return (
+    <div style={{background:"#fff",border:`1px solid ${C.border2}`,borderRadius:10,overflow:"hidden"}}>
+      <textarea
+        value={val}
+        onChange={e=>setVal(e.target.value)}
+        placeholder={data.placeholder}
+        rows={3}
+        style={{width:"100%",border:"none",padding:"10px 12px",fontSize:12.5,
+          color:C.text2,resize:"none",lineHeight:1.55,background:"transparent"}}
+      />
+      <div style={{padding:"6px 10px",borderTop:`1px solid ${C.border2}`,
+        display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <span style={{fontSize:10,color:C.muted}}>{val.length} / 200 words</span>
+        <button onClick={()=>val.trim()&&onSubmit(val)} style={{
+          background:val.trim()?C.brandMid:"#D4D4D4",color:"#fff",border:"none",
+          borderRadius:9999,padding:"5px 16px",fontSize:11,fontWeight:700,
+          transition:"background .15s"}}>Submit</button>
+      </div>
+    </div>
+  );
+}
+
+function ActivityLog() {
+  const [step, setStep] = useState(0);
+  const items = [
+    {icon:"ti-check",text:"Work authorization — saved to profile",status:"done",app:"All apps"},
+    {icon:"ti-check",text:"Notice period — saved to profile",status:"done",app:"All apps"},
+    {icon:"ti-check",text:"Salary range $140k–$160k — saved",status:"done",app:"All apps"},
+    {icon:"ti-check",text:"Chargebee — 8 fields auto-filled",status:"done",app:"Chargebee"},
+    {icon:"ti-check",text:"Okta (1) — 5 fields auto-filled",status:"done",app:"Okta"},
+    {icon:"ti-loader",text:"Okta (2) — filling 5 fields…",status:"pending",app:"Okta"},
+  ];
+  useEffect(()=>{
+    const t = setInterval(()=>setStep(s=>s<items.length?s+1:s),380);
+    return ()=>clearInterval(t);
+  },[]);
+  const shown = items.slice(0, step);
+  return (
+    <div style={{display:"flex",flexDirection:"column",gap:5}}>
+      {shown.map((it,i)=>(
+        <div key={i} className="msg-in" style={{display:"flex",alignItems:"center",gap:9,
+          padding:"7px 10px",background:it.status==="done"?"#F0FBF6":"#F9FAFB",
+          borderRadius:8,border:`1px solid ${it.status==="done"?"#A7F3D0":C.border2}`}}>
+          <i className={it.icon} style={{fontSize:11,color:it.status==="done"?C.green:C.orange,flexShrink:0}} />
+          <span style={{flex:1,fontSize:11,color:C.text2}}>{it.text}</span>
+          <span style={{fontSize:9,color:it.status==="done"?C.green:C.orange,fontWeight:700,
+            textTransform:"uppercase"}}>{it.status}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function SummaryCard() {
+  const items = [
+    {label:"Chargebee — Software Engineer",n:8,color:"#FF4D00",ic:"C"},
+    {label:"Okta — Full Stack Developer (×2)",n:10,color:"#007DC1",ic:"O"},
+  ];
+  return (
+    <div style={{background:"#fff",border:`1.5px solid ${C.green}44`,borderRadius:12,overflow:"hidden"}}>
+      <div style={{background:"#E6F9F1",padding:"12px 14px",display:"flex",alignItems:"center",gap:10}}>
+        <div style={{width:32,height:32,borderRadius:"50%",background:C.green,
+          display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+          <i className="ti ti-check" style={{fontSize:16,color:"#fff"}} />
+        </div>
+        <div>
+          <div style={{fontSize:13,fontWeight:700,color:"#065F46"}}>All done — 3 applications updated</div>
+          <div style={{fontSize:10,color:"#047857",marginTop:1}}>14 fields auto-filled · 0 remaining</div>
+        </div>
+      </div>
+      <div style={{padding:"10px 14px",display:"flex",flexDirection:"column",gap:7}}>
+        {items.map((it,i)=>(
+          <div key={i} style={{display:"flex",alignItems:"center",gap:8}}>
+            <div style={{width:22,height:22,borderRadius:5,background:it.color,
+              display:"flex",alignItems:"center",justifyContent:"center",
+              fontSize:9,fontWeight:700,color:"#fff",flexShrink:0}}>{it.ic}</div>
+            <span style={{flex:1,fontSize:11,color:C.text2}}>{it.label}</span>
+            <span style={{fontSize:10,fontWeight:700,color:C.green}}>{it.n} fields ✓</span>
+          </div>
+        ))}
+        <div style={{borderTop:`1px solid ${C.border2}`,paddingTop:9,marginTop:2}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+            <div style={{display:"flex",flexDirection:"column",gap:2}}>
+              <span style={{fontSize:11,fontWeight:700,color:C.text1}}>Automation Readiness Score</span>
+              <span style={{fontSize:10,color:C.text3}}>14 new answers saved to your profile</span>
+            </div>
+            <div style={{display:"flex",alignItems:"center",gap:6}}>
+              <span style={{fontSize:14,color:C.muted,textDecoration:"line-through",fontFamily:"Inter,sans-serif"}}>47</span>
+              <i className="ti ti-arrow-right" style={{fontSize:11,color:C.muted}} />
+              <span style={{fontSize:20,fontWeight:700,color:C.green,fontFamily:"Inter,sans-serif"}}>82</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── AI / User bubbles ─── */
+function AiBubble({ children }) {
+  return (
+    <div style={{display:"flex",gap:8,alignItems:"flex-start",marginBottom:9}}>
+      <img src="assets/favicon.png" alt="" style={{width:24,height:24,borderRadius:"50%",
+        flexShrink:0,marginTop:2,border:`1.5px solid ${C.cyan}66`}} />
+      <div style={{flex:1,minWidth:0,
+        background:"#F2F5F8",borderRadius:"4px 14px 14px 14px",
+        padding:"10px 13px",fontSize:13,lineHeight:1.6,color:C.text2,fontWeight:500,
+        boxShadow:"0 1px 3px rgba(0,0,0,0.04)"}}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function UserBubble({ text }) {
+  return (
+    <div style={{display:"flex",justifyContent:"flex-end",marginBottom:9}}>
+      <div style={{background:C.brandMid,color:"#fff",borderRadius:"14px 4px 14px 14px",
+        padding:"9px 14px",fontSize:13,fontWeight:500,maxWidth:"80%",lineHeight:1.5}}>
+        {text}
+      </div>
+    </div>
+  );
+}
+
+function Typing() {
+  return (
+    <div style={{display:"flex",gap:8,alignItems:"flex-start",marginBottom:9}}>
+      <img src="assets/favicon.png" alt="" style={{width:24,height:24,borderRadius:"50%",flexShrink:0,
+        border:`1.5px solid ${C.cyan}66`}} />
+      <div style={{background:"#F2F5F8",borderRadius:"4px 14px 14px 14px",padding:"12px 14px",
+        display:"flex",gap:4,alignItems:"center"}}>
+        {[0,1,2].map(i=>(
+          <div key={i} style={{width:6,height:6,borderRadius:"50%",background:"#BCC4CE",
+            animation:`bloom-bounce 1.3s ease ${i*0.18}s infinite`}} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Message renderer ─── */
+function RenderMsg({ msg, onTextSubmit }) {
+  if (msg.from==="user") return <UserBubble text={msg.t} />;
+  let inner;
+  switch(msg.comp) {
+    case "apps_preview":  inner = <AppsPreview />; break;
+    case "cluster_preview": inner = <ClusterPreview />; break;
+    case "q_header":      inner = <QHeader data={msg.data} />; break;
+    case "text_input":    inner = <TextInputComp data={msg.data} onSubmit={onTextSubmit} />; break;
+    case "activity_log":  inner = <ActivityLog />; break;
+    case "summary_card":  inner = <SummaryCard />; break;
+    default:              inner = <T t={msg.t} />;
+  }
+  return <AiBubble>{inner}</AiBubble>;
+}
+
+/* ─── Chips row ─── */
+function Chips({ chips, onChip, disabled }) {
+  const [hov,setHov] = useState(null);
+  return (
+    <div style={{display:"flex",flexWrap:"wrap",gap:7,padding:"4px 0 4px 32px"}}>
+      {chips.map((ch,i)=>(
+        <button key={i}
+          onMouseEnter={()=>setHov(i)} onMouseLeave={()=>setHov(null)}
+          onClick={()=>!disabled&&onChip(ch)}
+          style={{
+            background:ch.primary?(hov===i?"#022F36":C.brandMid):(hov===i?"#F5F7FA":"#fff"),
+            color:ch.primary?"#fff":C.text2,
+            border:`1.5px solid ${ch.primary?C.brandMid:C.border2}`,
+            borderRadius:9999,padding:"7px 16px",fontSize:12.5,fontWeight:600,
+            transition:"all .13s",opacity:disabled?.5:1,
+          }}>{ch.label}</button>
+      ))}
+    </div>
+  );
+}
+
+/* ─── Top Nav ─── */
+function TopNav() {
+  const items = [{icon:"ti-briefcase",label:"Jobs"},{icon:"ti-checkbox",label:"Applications",active:true},
+    {icon:"ti-user",label:"Profile"},{icon:"ti-settings",label:"Settings"}];
+  return (
+    <div style={{height:64,background:"#fff",borderBottom:`1px solid ${C.border}`,
+      display:"flex",alignItems:"center",padding:"0 28px",gap:0,flexShrink:0}}>
+      <img src="assets/Logo Dark.png" alt="Bloom" style={{height:24,marginRight:36}} />
+      <div style={{display:"flex",gap:0,flex:1}}>
+        {items.map(it=>(
+          <div key={it.label} style={{
+            display:"flex",flexDirection:"column",alignItems:"center",gap:5,
+            padding:"10px 20px",cursor:"pointer",
+            borderBottom:`2px solid ${it.active?"#030303":"transparent"}`,
+          }}>
+            <i className={it.icon} style={{fontSize:18,color:it.active?C.text1:C.text3}} />
+            <span style={{fontSize:13,fontWeight:700,color:it.active?C.text1:C.text3,letterSpacing:"-0.02em"}}>{it.label}</span>
+          </div>
+        ))}
+      </div>
+      {/* Upgrade pill */}
+      <div style={{background:"#fff",border:"2px solid #E0E0E0",borderRadius:20,
+        padding:"5px 10px",display:"flex",alignItems:"center",gap:8,marginRight:12}}>
+        <i className="ti ti-bolt" style={{fontSize:12,color:C.text1}} />
+        <span style={{fontSize:11,fontWeight:700,color:C.text1}}>Get 100+ Auto Applies · $9</span>
+        <div style={{borderRadius:9999,padding:"3px 10px",fontSize:11,fontWeight:700,color:"#2C2C2C",
+          background:"#fff",border:"1px solid #E0E0E0",position:"relative",overflow:"hidden"}}>
+          <div style={{position:"absolute",inset:-1,background:
+            "linear-gradient(90deg,#26C0FF,#E600C2,#FF494E,#FFA13E,#FFC837,#00CC3D)",
+            borderRadius:9999,zIndex:0}} />
+          <div style={{position:"relative",zIndex:1,background:"#fff",borderRadius:9999,
+            padding:"3px 10px",margin:"-3px -10px"}}>Upgrade Now</div>
+        </div>
+      </div>
+      {/* Streak */}
+      <div style={{background:"#FFEDE0",border:"1px solid #FFB990",borderRadius:20,
+        padding:"5px 14px",display:"flex",alignItems:"center",gap:5,marginRight:12}}>
+        <span style={{fontSize:13}}>🔥</span>
+        <span style={{fontSize:14,fontWeight:700,color:"#7D0F0F"}}>5</span>
+        <span style={{fontSize:13,fontWeight:700,color:"#934841"}}>day streak</span>
+      </div>
+      {/* Avatar */}
+      <div style={{width:34,height:34,borderRadius:"50%",background:C.brandMid,
+        display:"flex",alignItems:"center",justifyContent:"center"}}>
+        <i className="ti ti-user" style={{fontSize:16,color:"#fff"}} />
+      </div>
+    </div>
+  );
+}
+
+/* ─── Application card ─── */
+function AppCard({ app, completed, onComplete }) {
+  const pctFill = app.total ? (app.filled/app.total)*100 : 0;
+  if (app.done) return (
+    <div style={{background:"#fff",border:`1px solid ${C.border}`,borderRadius:12,
+      padding:"14px 18px",display:"flex",alignItems:"center",gap:12}}>
+      <div style={{width:40,height:40,borderRadius:10,background:app.logoBg,
+        display:"flex",alignItems:"center",justifyContent:"center",
+        fontSize:13,fontWeight:700,color:app.logoColor,flexShrink:0}}>{app.logo}</div>
+      <div style={{flex:1}}>
+        <div style={{fontSize:14,fontWeight:700,color:C.text1}}>{app.role}</div>
+        <div style={{fontSize:12,color:C.text3}}>{app.company} · {app.location}</div>
+      </div>
+      <span style={{background:"#E6F9F1",color:C.green,borderRadius:9999,
+        padding:"4px 12px",fontSize:11,fontWeight:700}}>✓ Submitted</span>
+    </div>
+  );
+  if (app.processing) return (
+    <div style={{background:"#fff",border:`1px solid ${C.border}`,borderRadius:12,
+      padding:"14px 18px",display:"flex",alignItems:"center",gap:12}}>
+      <div style={{width:40,height:40,borderRadius:10,background:app.logoBg,
+        display:"flex",alignItems:"center",justifyContent:"center",
+        fontSize:13,fontWeight:700,color:app.logoColor,flexShrink:0}}>{app.logo}</div>
+      <div style={{flex:1}}>
+        <div style={{fontSize:14,fontWeight:700,color:C.text1}}>{app.role}</div>
+        <div style={{fontSize:12,color:C.text3}}>{app.company} · {app.location}</div>
+      </div>
+      <span style={{background:"#F0F0FF",color:"#5E6AD2",borderRadius:9999,
+        padding:"4px 12px",fontSize:11,fontWeight:700,display:"flex",alignItems:"center",gap:5}}>
+        <i className="ti ti-loader" style={{fontSize:10}} />Processing
+      </span>
+    </div>
+  );
+  return (
+    <div style={{background:"#fff",border:`1.5px solid ${completed?"#A7F3D0":C.border}`,borderRadius:12,
+      boxShadow:"0 2px 6px rgba(0,0,0,0.04)",transition:"border-color .3s"}}>
+      <div style={{padding:"14px 18px 10px"}}>
+        <div style={{display:"flex",alignItems:"flex-start",gap:12}}>
+          <div style={{width:40,height:40,borderRadius:10,background:app.logoBg,
+            display:"flex",alignItems:"center",justifyContent:"center",
+            fontSize:13,fontWeight:700,color:app.logoColor,flexShrink:0}}>{app.logo}</div>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:14,fontWeight:700,color:C.text1}}>{app.role}</div>
+            <div style={{fontSize:12,color:C.text3}}>{app.company} · {app.location}</div>
+          </div>
+          {completed
+            ? <span style={{background:"#E6F9F1",color:C.green,borderRadius:9999,
+                padding:"4px 12px",fontSize:11,fontWeight:700}}>✓ Complete</span>
+            : <span style={{background:"#FFF3ED",color:C.orange,borderRadius:9999,
+                padding:"4px 10px",fontSize:11,fontWeight:700,
+                border:`1px solid ${C.orange}33`,display:"flex",alignItems:"center",gap:4}}>
+                <i className="ti ti-alert-triangle" style={{fontSize:11}} />
+                {app.missing} fields
+              </span>
+          }
+        </div>
+        <div style={{marginTop:10}}>
+          <div style={{display:"flex",justifyContent:"space-between",marginBottom:5}}>
+            <span style={{fontSize:11,color:C.text3}}>Application completion</span>
+            <span style={{fontSize:11,fontWeight:700,color:C.text3,fontFamily:"Inter,sans-serif"}}>
+              {completed?app.total:app.filled} / {app.total}
+            </span>
+          </div>
+          <div style={{height:4,background:"#EBEBEB",borderRadius:9999,overflow:"hidden"}}>
+            <div style={{height:"100%",borderRadius:9999,
+              background:completed?C.green:C.orange,
+              width:`${completed?100:pctFill}%`,transition:"width 0.8s ease"}} />
+          </div>
+        </div>
+      </div>
+      <div style={{borderTop:`1px solid ${C.border2}`,display:"flex",gap:0}}>
+        <button style={{flex:1,padding:"9px 0",border:"none",background:"transparent",
+          fontSize:12,fontWeight:600,color:C.text3,display:"flex",alignItems:"center",
+          justifyContent:"center",gap:6,borderRight:`1px solid ${C.border2}`}}>
+          <i className="ti ti-file-description" style={{fontSize:13}} />View Application
+        </button>
+        <button style={{flex:1,padding:"9px 0",border:"none",background:"transparent",
+          fontSize:12,fontWeight:600,color:C.text3,display:"flex",alignItems:"center",
+          justifyContent:"center",gap:6,borderRight:`1px solid ${C.border2}`}}>
+          <i className="ti ti-player-play" style={{fontSize:13}} />View Recording
+        </button>
+        {!completed && (
+          <button onClick={onComplete} style={{flex:1,padding:"9px 0",border:"none",
+            background:"linear-gradient(135deg,#022F36,#1D484F)",
+            fontSize:12,fontWeight:700,color:"#fff",
+            display:"flex",alignItems:"center",justifyContent:"center",gap:6,borderRadius:"0 0 10px 0"}}>
+            <img src="assets/favicon.png" alt="" style={{width:14,height:14,borderRadius:"50%"}} />
+            Complete with AI
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main App ─── */
+function App() {
+  const [stateKey, setStateKey] = useState("idle");
+  const [allMsgs, setAllMsgs] = useState([]);
+  const [typing, setTyping] = useState(false);
+  const [chipsLocked, setChipsLocked] = useState(false);
+  const [textInputActive, setTextInputActive] = useState(false);
+  const [completed, setCompleted] = useState(false);
+  const [started, setStarted] = useState(false);
+  const endRef = useRef(null);
+  const timers = useRef([]);
+
+  const clearT = () => { timers.current.forEach(clearTimeout); timers.current=[]; };
+
+  const appendMsgs = useCallback((msgs, cb) => {
+    let delay = 0;
+    msgs.forEach((m,i) => {
+      const isAgent = m.from==="ai" && !m.comp;
+      if (isAgent) {
+        timers.current.push(setTimeout(()=>setTyping(true), delay));
+        delay += 600;
+      }
+      timers.current.push(setTimeout(()=>{
+        setTyping(false);
+        setAllMsgs(prev=>[...prev, {...m, _id: Date.now()+i}]);
+        if (i===msgs.length-1 && cb) setTimeout(cb, 300);
+      }, delay));
+      delay += isAgent ? 100 : 200;
+    });
+  }, []);
+
+  const goToState = useCallback((key, userMsg) => {
+    clearT();
+    setChipsLocked(true);
+    setTextInputActive(false);
+    const script = FLOW[key];
+    if (!script) return;
+    setStateKey(key);
+
+    const intro = [];
+    if (userMsg) intro.push({from:"user", t:userMsg, _id:Date.now()});
+    const rest = script.msgs.map(m=>({...m}));
+
+    appendMsgs([...intro,...rest], ()=>{
+      setChipsLocked(false);
+      if (script.inputField) setTextInputActive(true);
+      if (key==="summary") setCompleted(true);
+    });
+  }, [appendMsgs]);
+
+  // Boot
+  useEffect(()=>{
+    if (started) return;
+    return;
+  }, []);
+
+  const handleStart = () => {
+    if (started) return;
+    setStarted(true);
+    goToState("idle");
+  };
+
+  const handleChip = (chip) => {
+    if (chipsLocked) return;
+    goToState(chip.next, chip.label);
+  };
+
+  const handleTextSubmit = (val) => {
+    setTextInputActive(false);
+    const cur = FLOW[stateKey];
+    if (!cur) return;
+    const nextKey = stateKey==="q_highlight"?"q_employer":"completing";
+    goToState(nextKey, val.slice(0,60)+(val.length>60?"…":""));
+  };
+
+  // Scroll
+  useEffect(()=>{
+    if (endRef.current) {
+      endRef.current.parentElement.scrollTop = endRef.current.offsetTop;
+    }
+  }, [allMsgs, typing]);
+
+  const curScript = FLOW[stateKey] || {};
+  const arsScore = curScript.ars || 47;
+
+  return (
+    <div style={{height:"100vh",display:"flex",flexDirection:"column",overflow:"hidden"}}>
+      <TopNav />
+      <div style={{flex:1,display:"flex",overflow:"hidden",background:C.bgPage}}>
+
+        {/* ── Left Panel ── */}
+        <div style={{flex:1,overflowY:"auto",padding:"20px 20px 20px 24px",minWidth:0}}>
+
+          {/* Attention banner */}
+          {!completed ? (
+            <div style={{background:C.amber,borderRadius:14,
+              border:`1px solid ${C.amberBorder}`,padding:"16px 20px",
+              display:"flex",alignItems:"center",gap:16,marginBottom:20,
+              boxShadow:"0 2px 6px rgba(0,0,0,0.06)"}}>
+              <div style={{width:52,height:52,borderRadius:"50%",background:"#fff",
+                display:"flex",alignItems:"center",justifyContent:"center",
+                fontSize:26,fontWeight:700,color:"#5B4841",flexShrink:0,
+                boxShadow:"0 1px 4px rgba(0,0,0,0.08)"}}>3</div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:17,fontWeight:700,color:"#120B0B",opacity:.8}}>Applications</div>
+                <div style={{fontSize:15,fontWeight:500,color:"#120B0B"}}>Need Your Attention</div>
+              </div>
+              <button onClick={handleStart} style={{
+                background:"linear-gradient(160deg,#F76638 0%,#D72A2A 100%)",
+                color:"#fff",border:"none",borderRadius:9,padding:"9px 20px",
+                fontSize:14,fontWeight:700,display:"flex",alignItems:"center",gap:8,
+                boxShadow:"0 2px 8px rgba(247,102,56,0.4)"}}>
+                <img src="assets/favicon.png" alt="" style={{width:16,height:16,borderRadius:"50%"}} />
+                Complete with AI
+              </button>
+            </div>
+          ) : (
+            <div style={{background:"#E6F9F1",borderRadius:14,border:"1px solid #A7F3D0",
+              padding:"14px 20px",display:"flex",alignItems:"center",gap:14,marginBottom:20}}>
+              <div style={{width:40,height:40,borderRadius:"50%",background:C.green,
+                display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <i className="ti ti-check" style={{fontSize:18,color:"#fff"}} />
+              </div>
+              <div style={{flex:1}}>
+                <div style={{fontSize:15,fontWeight:700,color:"#065F46"}}>All 3 applications completed!</div>
+                <div style={{fontSize:12,color:"#047857"}}>14 fields auto-filled · Submitted for processing</div>
+              </div>
+              <span style={{fontSize:12,fontWeight:700,color:C.green}}>Readiness: 47 → 82 ✨</span>
+            </div>
+          )}
+
+          {/* Stats row */}
+          <div style={{display:"flex",gap:12,marginBottom:20}}>
+            {[
+              {label:"Need Attention",val:completed?"0":"3",color:C.orange,icon:"ti-alert-triangle"},
+              {label:"Processing",val:"2",color:C.brandMid,icon:"ti-loader"},
+              {label:"Submitted",val:completed?"3":"0",color:C.green,icon:"ti-circle-check"},
+            ].map(s=>(
+              <div key={s.label} style={{background:"#fff",border:`1px solid ${C.border}`,
+                borderRadius:12,padding:"14px 18px",display:"flex",alignItems:"center",gap:12,flex:1,
+                boxShadow:"0 1px 3px rgba(0,0,0,0.04)"}}>
+                <i className={s.icon} style={{fontSize:20,color:s.color}} />
+                <div>
+                  <div style={{fontSize:24,fontWeight:700,color:s.color,lineHeight:1,fontFamily:"Inter,sans-serif"}}>{s.val}</div>
+                  <div style={{fontSize:11,color:C.text3,marginTop:2}}>{s.label}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Tabs */}
+          <div style={{display:"flex",gap:0,marginBottom:16,background:"#fff",borderRadius:9,
+            border:`1px solid ${C.border}`,padding:4,width:"fit-content"}}>
+            {["Active","Archive","Saved"].map((t,i)=>(
+              <button key={t} style={{padding:"6px 20px",borderRadius:7,border:"none",
+                background:i===0?"#F0F3F7":"transparent",
+                fontSize:13,fontWeight:700,color:i===0?C.text1:C.text3}}>{t}</button>
+            ))}
+          </div>
+
+          {/* App cards */}
+          <div style={{display:"flex",flexDirection:"column",gap:10}}>
+            {APPS_DATA.map(app=>(
+              <AppCard key={app.id} app={app} completed={completed&&app.missing>0}
+                onComplete={handleStart} />
+            ))}
+          </div>
+        </div>
+
+        {/* ── Right Panel (AI) ── */}
+        <div style={{width:420,flexShrink:0,display:"flex",flexDirection:"column",
+          borderLeft:`1px solid ${C.border}`,background:"#fff",overflow:"hidden"}}>
+
+          <ARSCard score={arsScore} />
+
+          {/* Chat header */}
+          <div style={{padding:"10px 16px",borderBottom:`1px solid ${C.border2}`,
+            display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
+            <img src="assets/favicon.png" alt="" style={{width:20,height:20}} />
+            <span style={{fontSize:13,fontWeight:700,color:C.text1}}>Bloom AI</span>
+            <div style={{width:6,height:6,borderRadius:"50%",background:C.green}} />
+            <span style={{fontSize:10,color:C.green,fontWeight:600}}>Online</span>
+          </div>
+
+          {/* Chat feed */}
+          <div style={{flex:1,overflowY:"auto",padding:"16px 14px"}}>
+            {!started && (
+              <div style={{display:"flex",flexDirection:"column",alignItems:"center",
+                justifyContent:"center",height:"100%",gap:14,padding:"0 16px"}}>
+                <div style={{width:56,height:56,borderRadius:"50%",background:"#F0FCFF",
+                  display:"flex",alignItems:"center",justifyContent:"center",
+                  border:`2px solid ${C.cyan}44`}}>
+                  <img src="assets/favicon.png" alt="" style={{width:32,height:32}} />
+                </div>
+                <div style={{textAlign:"center"}}>
+                  <div style={{fontSize:15,fontWeight:700,color:C.text1,marginBottom:6}}>
+                    3 applications need info
+                  </div>
+                  <div style={{fontSize:12,color:C.text3,lineHeight:1.6}}>
+                    Click <strong style={{color:C.orange}}>"Complete with AI"</strong> on any card, or the banner above, to start a quick conversation that fills all missing fields at once.
+                  </div>
+                </div>
+              </div>
+            )}
+            {allMsgs.map(msg=>(
+              <div key={msg._id} className="msg-in">
+                <RenderMsg msg={msg} onTextSubmit={handleTextSubmit} />
+              </div>
+            ))}
+            {typing && <Typing />}
+            {!typing && !chipsLocked && curScript.chips && started && (
+              <div className="msg-in">
+                <Chips chips={curScript.chips} onChip={handleChip} disabled={chipsLocked} />
+              </div>
+            )}
+            <div ref={endRef} style={{height:8}} />
+          </div>
+
+          {/* Input bar */}
+          <div style={{flexShrink:0,borderTop:`1px solid ${C.border2}`,padding:"10px 14px",
+            display:"flex",gap:8,alignItems:"center"}}>
+            <div style={{flex:1,display:"flex",alignItems:"center",gap:8,
+              background:"#F5F6F7",borderRadius:12,padding:"0 12px"}}>
+              <input
+                placeholder="Ask me anything or share info…"
+                style={{flex:1,background:"transparent",border:"none",padding:"10px 0",
+                  fontSize:12.5,color:C.text2}}
+              />
+              <i className="ti ti-paperclip" style={{fontSize:14,color:C.muted}} />
+            </div>
+            <button style={{width:38,height:38,borderRadius:10,background:C.brandMid,border:"none",
+              display:"flex",alignItems:"center",justifyContent:"center"}}>
+              <i className="ti ti-send" style={{fontSize:15,color:"#fff"}} />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

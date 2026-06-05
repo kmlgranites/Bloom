@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloom — Closed Jobs: 3 Treatment Options</title>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-regular.ttf");font-weight:400}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-medium.ttf");font-weight:500}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-semibold.ttf");font-weight:600}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-bold.ttf");font-weight:700}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body,#root{height:100%;font-family:"Proxima Soft",system-ui,sans-serif}
+  body{background:#1f1f1f;overflow:hidden}
+  button{cursor:pointer;font-family:"Proxima Soft",sans-serif;border:none;background:none}
+  input{font-family:"Proxima Soft",sans-serif;border:none;outline:none}
+  .num{font-family:"Inter",sans-serif;font-feature-settings:"tnum"}
+  @keyframes shimmer{0%,100%{opacity:.6}50%{opacity:1}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="ApplicationsPage.jsx"></script>
+<script type="text/babel">
+const { useState } = React;
+
+function Annotation({ title, points, color = "#5AEBEB" }) {
+  return (
+    <div style={{
+      padding:"24px 28px", background:"#fff",
+      borderRadius:14, border:"1px solid #E6E5E1",
+      maxWidth:760, margin:"0 auto 20px"
+    }}>
+      <div style={{display:"flex",gap:14,alignItems:"flex-start"}}>
+        <div style={{
+          width:36,height:36,borderRadius:10,background:color,
+          display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0
+        }}>
+          <i className="ti ti-bulb" style={{fontSize:20,color:"#022F36"}} />
+        </div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:16,fontWeight:700,color:"#022F36",marginBottom:8}}>{title}</div>
+          <ul style={{listStyle:"none",padding:0,margin:0,display:"flex",flexDirection:"column",gap:6}}>
+            {points.map((p,i)=>(
+              <li key={i} style={{fontSize:13,color:"#4A5464",lineHeight:1.5,display:"flex",gap:8}}>
+                <span style={{color:"#00B16B",fontWeight:700}}>✓</span>
+                <span dangerouslySetInnerHTML={{__html:p}} />
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <DesignCanvas title="Bloom — Closed/Expired Jobs: 3 Treatments" initialZoom={0.5}>
+      <DCSection id="problem" title="The problem & three approaches">
+        <DCArtboard id="intro" label="Context" width={820} height={520}>
+          <div style={{padding:"60px 56px",fontFamily:'"Proxima Soft",sans-serif',background:"#fff",height:"100%"}}>
+            <div style={{
+              display:"inline-block",padding:"4px 12px",borderRadius:6,
+              background:"#FEEAAE",fontSize:11,fontWeight:700,letterSpacing:".06em",
+              color:"#7A5500",marginBottom:20
+            }}>THE PROBLEM</div>
+            <h1 style={{fontFamily:'"Filson Soft","Proxima Soft",sans-serif',fontSize:36,
+                fontWeight:700,color:"#022F36",lineHeight:1.15,marginBottom:18,letterSpacing:"-.02em"}}>
+              Closed jobs are getting<br/>mislabeled as “Manual Apply.”
+            </h1>
+            <p style={{fontSize:17,color:"#4A5464",lineHeight:1.55,marginBottom:32,maxWidth:600}}>
+              These are two very different states. Conflating them frustrates users —
+              they click expecting a form, find a closed listing, and lose trust in the queue.
+            </p>
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:18,marginBottom:24}}>
+              <div style={{padding:"18px 20px",borderRadius:12,background:"#FFF7ED",border:"1px solid #FED7AA"}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+                  <i className="ti ti-edit" style={{fontSize:18,color:"#C2410C"}} />
+                  <div style={{fontSize:14,fontWeight:700,color:"#7C2D12"}}>Manual Apply Required</div>
+                </div>
+                <div style={{fontSize:13,color:"#7C2D12",lineHeight:1.5}}>
+                  Bloom can't auto-submit (e.g. assessment, login wall, captcha).
+                  <strong> User action: fill out the form yourself.</strong>
+                </div>
+              </div>
+              <div style={{padding:"18px 20px",borderRadius:12,background:"#F1F5F9",border:"1px solid #CBD5E1"}}>
+                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
+                  <i className="ti ti-lock" style={{fontSize:18,color:"#475569"}} />
+                  <div style={{fontSize:14,fontWeight:700,color:"#0F172A"}}>Closed / Expired</div>
+                </div>
+                <div style={{fontSize:13,color:"#334155",lineHeight:1.5}}>
+                  Recruiter pulled the listing. <strong>No action possible — only recovery.</strong>
+                  These shouldn't crowd the active queue.
+                </div>
+              </div>
+            </div>
+            <div style={{padding:"14px 18px",borderRadius:10,background:"#022F36",color:"#fff",fontSize:13.5,lineHeight:1.5}}>
+              <strong style={{color:"#5AEBEB"}}>Goal →</strong> separate the two states, give Closed its own
+              affordances (filter, status, dashboard tile, and a recovery path), and turn the dead-end
+              into a “find similar roles” moment.
+            </div>
+          </div>
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="A" title="Option A — Inline & Subtle (lowest-friction)">
+        <DCArtboard id="A-page" label="Treatment A · Applications page" width={1280} height={1180}>
+          <ApplicationsPage variant="A" />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="B" title="Option B — Recovery Banner (recommended)">
+        <DCArtboard id="B-page" label="Treatment B · Applications page" width={1280} height={1260}>
+          <ApplicationsPage variant="B" />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="C" title="Option C — Dedicated tab (cleanest list)">
+        <DCArtboard id="C-page" label="Treatment C · Applications page" width={1280} height={1180}>
+          <ApplicationsPage variant="C" />
+        </DCArtboard>
+        <DCArtboard id="C-tab" label="Treatment C · Inside the Closed tab" width={1280} height={1080}>
+          <ApplicationsPage variant="C" tab="closed" />
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

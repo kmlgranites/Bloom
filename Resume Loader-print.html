@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bloom — Resume Parsing Loader (Print)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-regular.ttf");font-weight:400}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-medium.ttf");font-weight:500}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-semibold.ttf");font-weight:600}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-bold.ttf");font-weight:700}
+
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html,body{font-family:"Proxima Soft",system-ui,sans-serif;background:#F0F3F7;color:#022F36}
+  .num{font-family:"Inter",sans-serif;font-feature-settings:"tnum"}
+
+  /* ---- Page layout ---- */
+  .page{
+    width:100%; min-height:100vh; padding:48px 56px;
+    display:flex; flex-direction:column;
+    page-break-after:always; break-after:page;
+    position:relative; background:#F0F3F7;
+  }
+  .page:last-child{ page-break-after:auto; break-after:auto; }
+
+  .page-header{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:36px;
+  }
+  .page-header .brand{
+    display:flex; align-items:center; gap:10px;
+    font-family:"Filson Soft","Proxima Soft",sans-serif;
+    font-weight:700; font-size:22px; letter-spacing:-.02em; color:#022F36;
+  }
+  .page-header .brand .logo{
+    width:30px; height:30px; border-radius:50%; background:#022F36; position:relative;
+    display:flex; align-items:flex-end; justify-content:center; padding-bottom:6px;
+  }
+  .page-header .brand .logo::before,
+  .page-header .brand .logo::after{
+    content:""; position:absolute; top:-3px; width:6px; height:6px;
+    border-radius:50%; background:#5AEBEB;
+  }
+  .page-header .brand .logo::before{ left:6px; }
+  .page-header .brand .logo::after{ right:6px; }
+  .page-header .brand .logo span{
+    width:11px; height:6px; border-radius:0 0 11px 11px; background:#fff;
+  }
+  .page-header .meta{
+    font-size:11px; font-weight:600; letter-spacing:.1em; text-transform:uppercase;
+    color:#7B8794;
+  }
+
+  .page-title{
+    font-family:"Filson Soft","Proxima Soft",sans-serif;
+    font-size:22px; font-weight:700; letter-spacing:-.02em; color:#022F36;
+    margin-bottom:6px;
+  }
+  .page-sub{
+    font-size:13px; color:#4A5464; margin-bottom:28px;
+  }
+
+  .stage-grid{
+    display:flex; align-items:center; justify-content:center;
+    flex:1; gap:36px;
+  }
+
+  /* ---- Loader card ---- */
+  .card{
+    width:540px; background:#fff; border-radius:24px;
+    padding:44px 48px 34px; border:1px solid #E6E5E1;
+    box-shadow:0 30px 80px -20px rgba(2,47,54,.25), 0 8px 24px -8px rgba(2,47,54,.12);
+    position:relative; overflow:hidden; text-align:center;
+  }
+  .card .halo{
+    position:absolute; top:-60px; left:50%; transform:translateX(-50%);
+    width:340px; height:340px; border-radius:50%;
+    background:radial-gradient(circle, rgba(90,235,235,.18) 0%, rgba(90,235,235,0) 70%);
+    pointer-events:none;
+  }
+  .mascot{ position:relative; display:flex; justify-content:center; margin-bottom:18px; }
+  .mascot img{ width:112px; height:112px; }
+  .mascot .shadow{
+    position:absolute; bottom:-4px; left:50%; transform:translateX(-50%);
+    width:70px; height:8px; border-radius:50%;
+    background:rgba(2,47,54,.12); filter:blur(4px);
+  }
+  .headline{
+    font-family:"Filson Soft","Proxima Soft",sans-serif;
+    font-size:26px; font-weight:700; color:#022F36; letter-spacing:-.02em;
+  }
+  .subline{ font-size:14.5px; color:#4A5464; margin-top:6px; font-weight:500; }
+
+  .progress{ margin-top:24px; }
+  .progress-track{
+    height:8px; border-radius:99px; background:#EAF1F4; position:relative; overflow:hidden;
+  }
+  .progress-fill{
+    height:100%; border-radius:99px;
+    background:linear-gradient(90deg, #9FE2EA 0%, #5AEBEB 50%, #9FE2EA 100%);
+  }
+  .progress-meta{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:10px; font-size:12.5px; color:#7B8794; font-weight:600;
+  }
+  .progress-meta .pct{ color:#022F36; font-weight:700; }
+
+  .stages{
+    margin-top:26px;
+    display:grid; grid-template-columns:1fr 1fr; gap:10px 14px;
+    text-align:left;
+  }
+  .stage{
+    display:flex; align-items:center; gap:10px;
+    font-size:13.5px; font-weight:600;
+  }
+  .stage .dot{
+    width:20px; height:20px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:#F1F4F7; border:2px solid #E2E8F0;
+  }
+  .stage.done{ color:#022F36; }
+  .stage.done .dot{ background:#022F36; border-color:#022F36; color:#fff; }
+  .stage.done .dot i{ font-size:13px; color:#fff; font-weight:900; }
+  .stage.active{ color:#022F36; }
+  .stage.active .dot{ background:#fff; border-color:#5AEBEB; }
+  .stage.active .dot::before{
+    content:""; width:8px; height:8px; border-radius:50%; background:#5AEBEB;
+  }
+  .stage.pending{ color:#7B8794; opacity:.6; }
+
+  .tip{
+    margin-top:28px; padding:12px 14px;
+    background:#F6F9FB; border-radius:12px; border:1px solid #E6E5E1;
+    display:flex; align-items:center; gap:11px; text-align:left;
+  }
+  .tip .ico{
+    width:30px; height:30px; border-radius:8px; flex-shrink:0;
+    background:#022F36;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .tip .ico i{ font-size:16px; color:#5AEBEB; }
+  .tip .label{
+    font-size:11px; font-weight:700; color:#7B8794;
+    letter-spacing:.06em; text-transform:uppercase;
+  }
+  .tip .text{ font-size:13.5px; color:#022F36; font-weight:600; line-height:1.35; }
+
+  /* ---- Annotations panel ---- */
+  .notes{
+    width:300px; align-self:stretch; padding:24px;
+    background:#fff; border:1px solid #E6E5E1; border-radius:18px;
+    display:flex; flex-direction:column; gap:18px;
+  }
+  .notes .group-label{
+    font-size:10.5px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+    color:#7B8794;
+  }
+  .notes h3{
+    font-family:"Filson Soft","Proxima Soft",sans-serif;
+    font-size:18px; font-weight:700; color:#022F36; margin-top:4px; letter-spacing:-.01em;
+  }
+  .notes .kv{ display:flex; flex-direction:column; gap:4px; }
+  .notes .kv .k{ font-size:11px; font-weight:700; color:#7B8794; letter-spacing:.06em; text-transform:uppercase; }
+  .notes .kv .v{ font-size:13px; color:#022F36; font-weight:500; line-height:1.45; }
+  .notes hr{ border:0; border-top:1px solid #E6E5E1; }
+
+  /* ---- Final summary page ---- */
+  .summary{
+    background:#fff; border:1px solid #E6E5E1; border-radius:18px;
+    padding:32px; flex:1; display:flex; flex-direction:column; gap:24px;
+  }
+  .summary h2{
+    font-family:"Filson Soft","Proxima Soft",sans-serif;
+    font-size:22px; font-weight:700; color:#022F36; letter-spacing:-.02em;
+  }
+  .summary .grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:18px;
+  }
+  .summary .row{
+    border:1px solid #E6E5E1; border-radius:12px; padding:16px 18px;
+    display:flex; flex-direction:column; gap:6px;
+  }
+  .summary .row .t{ font-family:"Inter"; font-size:11px; font-weight:700; color:#7B8794; letter-spacing:.06em; text-transform:uppercase; }
+  .summary .row .label{ font-size:14px; font-weight:700; color:#022F36; }
+  .summary .row .desc{ font-size:13px; color:#4A5464; line-height:1.45; }
+
+  .message-list{
+    display:grid; grid-template-columns:1fr 1fr; gap:12px;
+  }
+  .message-list .mrow{
+    display:flex; align-items:flex-start; gap:10px;
+    padding:10px 12px; border:1px solid #E6E5E1; border-radius:10px;
+    background:#F8FAFB;
+  }
+  .message-list .mrow .num{
+    width:22px; height:22px; border-radius:6px; background:#022F36; color:#5AEBEB;
+    font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .message-list .mrow .h{ font-size:13px; font-weight:700; color:#022F36; }
+  .message-list .mrow .s{ font-size:11.5px; color:#4A5464; margin-top:2px; line-height:1.35; }
+
+  @page { size: A4 portrait; margin: 0; }
+  @media print {
+    .page{ min-height:auto; height:100vh; }
+    html,body{ background:#F0F3F7; }
+  }
+</style>
+</head>
+<body>
+
+<!-- STATE 1: ~15% — early -->
+<section class="page">
+  <div class="page-header">
+    <div class="brand">
+      <div class="logo"><span></span></div>
+      bloom
+    </div>
+    <div class="meta">Resume Parsing Loader · State 1 of 3</div>
+  </div>
+  <div class="page-title">Early — second ~3</div>
+  <div class="page-sub">First-stage parse; user just uploaded their resume.</div>
+  <div class="stage-grid">
+    <div class="card">
+      <div class="halo"></div>
+      <div class="mascot">
+        <img src="assets/mushroom-loader.gif" alt="">
+        <div class="shadow"></div>
+      </div>
+      <div class="headline">Got it. Analyzing your profile…</div>
+      <div class="subline">Identifying your strengths and career signals</div>
+      <div class="progress">
+        <div class="progress-track">
+          <div class="progress-fill" style="width:15%"></div>
+        </div>
+        <div class="progress-meta">
+          <span class="pct num">15%</span>
+          <span>~20s remaining</span>
+        </div>
+      </div>
+      <div class="stages">
+        <div class="stage active"><span class="dot"></span>Parsing resume</div>
+        <div class="stage pending"><span class="dot"></span>Analyzing profile</div>
+        <div class="stage pending"><span class="dot"></span>Matching open roles</div>
+        <div class="stage pending"><span class="dot"></span>Ranking your fits</div>
+      </div>
+      <div class="tip">
+        <div class="ico"><i class="ti ti-shield-check"></i></div>
+        <div>
+          <div class="label">Did you know</div>
+          <div class="text">Your resume stays private — never shared without consent.</div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div>
+        <div class="group-label">Stage 01</div>
+        <h3>Parse &amp; recognize</h3>
+      </div>
+      <div class="kv">
+        <div class="k">Elapsed</div>
+        <div class="v">0 – 6s</div>
+      </div>
+      <div class="kv">
+        <div class="k">Headline cadence</div>
+        <div class="v">Swaps every 3s with fade-up. First two messages convey the system has received and is reading the resume.</div>
+      </div>
+      <div class="kv">
+        <div class="k">Why it works</div>
+        <div class="v">Verbs (“parsing”, “analyzing”) anchor user expectations and signal active work rather than waiting.</div>
+      </div>
+      <hr/>
+      <div class="kv">
+        <div class="k">Tip rotation</div>
+        <div class="v">Independent 4s cadence — privacy reassurance up front lowers the perceived risk of the wait.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATE 2: ~55% — mid -->
+<section class="page">
+  <div class="page-header">
+    <div class="brand">
+      <div class="logo"><span></span></div>
+      bloom
+    </div>
+    <div class="meta">Resume Parsing Loader · State 2 of 3</div>
+  </div>
+  <div class="page-title">Mid — second ~13</div>
+  <div class="page-sub">Resume parsed; matching engine running.</div>
+  <div class="stage-grid">
+    <div class="card">
+      <div class="halo"></div>
+      <div class="mascot">
+        <img src="assets/mushroom-loader.gif" alt="">
+        <div class="shadow"></div>
+      </div>
+      <div class="headline">Ranking the best fits…</div>
+      <div class="subline">Prioritizing roles you’re most likely to love</div>
+      <div class="progress">
+        <div class="progress-track">
+          <div class="progress-fill" style="width:55%"></div>
+        </div>
+        <div class="progress-meta">
+          <span class="pct num">55%</span>
+          <span>~10s remaining</span>
+        </div>
+      </div>
+      <div class="stages">
+        <div class="stage done"><span class="dot"><i class="ti ti-check"></i></span>Parsing resume</div>
+        <div class="stage done"><span class="dot"><i class="ti ti-check"></i></span>Analyzing profile</div>
+        <div class="stage active"><span class="dot"></span>Matching open roles</div>
+        <div class="stage pending"><span class="dot"></span>Ranking your fits</div>
+      </div>
+      <div class="tip">
+        <div class="ico"><i class="ti ti-trending-up"></i></div>
+        <div>
+          <div class="label">Did you know</div>
+          <div class="text">Profiles with portfolios get 3× more recruiter responses.</div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div>
+        <div class="group-label">Stage 02 → 03</div>
+        <h3>Match &amp; rank</h3>
+      </div>
+      <div class="kv">
+        <div class="k">Elapsed</div>
+        <div class="v">12 – 18s</div>
+      </div>
+      <div class="kv">
+        <div class="k">Checklist payoff</div>
+        <div class="v">Two stages have ticked off. Users now see real progress, not just a moving bar — anxiety drops sharply at this midpoint.</div>
+      </div>
+      <div class="kv">
+        <div class="k">Active state</div>
+        <div class="v">Cyan border + pulsing dot on the current stage; pending stages dim to ~60% opacity.</div>
+      </div>
+      <hr/>
+      <div class="kv">
+        <div class="k">Tip rotation</div>
+        <div class="v">Mid-wait shifts to value tips (portfolio, salary signal) — turns dead time into onboarding.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATE 3: ~92% — late -->
+<section class="page">
+  <div class="page-header">
+    <div class="brand">
+      <div class="logo"><span></span></div>
+      bloom
+    </div>
+    <div class="meta">Resume Parsing Loader · State 3 of 3</div>
+  </div>
+  <div class="page-title">Late — second ~22</div>
+  <div class="page-sub">Final polish before handing off to the matches feed.</div>
+  <div class="stage-grid">
+    <div class="card">
+      <div class="halo"></div>
+      <div class="mascot">
+        <img src="assets/mushroom-loader.gif" alt="">
+        <div class="shadow"></div>
+      </div>
+      <div class="headline">Almost there…</div>
+      <div class="subline">Polishing the final picks before we show you</div>
+      <div class="progress">
+        <div class="progress-track">
+          <div class="progress-fill" style="width:92%"></div>
+        </div>
+        <div class="progress-meta">
+          <span class="pct num">92%</span>
+          <span>Just a few seconds left</span>
+        </div>
+      </div>
+      <div class="stages">
+        <div class="stage done"><span class="dot"><i class="ti ti-check"></i></span>Parsing resume</div>
+        <div class="stage done"><span class="dot"><i class="ti ti-check"></i></span>Analyzing profile</div>
+        <div class="stage done"><span class="dot"><i class="ti ti-check"></i></span>Matching open roles</div>
+        <div class="stage active"><span class="dot"></span>Ranking your fits</div>
+      </div>
+      <div class="tip">
+        <div class="ico"><i class="ti ti-wand"></i></div>
+        <div>
+          <div class="label">Did you know</div>
+          <div class="text">Edit the AI-drafted cover letter before any application sends.</div>
+        </div>
+      </div>
+    </div>
+    <div class="notes">
+      <div>
+        <div class="group-label">Stage 04</div>
+        <h3>Finalize &amp; hand off</h3>
+      </div>
+      <div class="kv">
+        <div class="k">Elapsed</div>
+        <div class="v">21 – 24s</div>
+      </div>
+      <div class="kv">
+        <div class="k">Reassurance copy</div>
+        <div class="v">“Just a few seconds left” replaces the countdown under 5s so the number never shows a misleading “0s remaining”.</div>
+      </div>
+      <div class="kv">
+        <div class="k">Final beat</div>
+        <div class="v">On reaching 100%, headline becomes “All set! Opening your personalized matches…” for ~1s before the matches feed loads.</div>
+      </div>
+      <hr/>
+      <div class="kv">
+        <div class="k">Tip rotation</div>
+        <div class="v">Late-stage tips preview features the user will encounter next, easing the cognitive shift.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SUMMARY PAGE -->
+<section class="page">
+  <div class="page-header">
+    <div class="brand">
+      <div class="logo"><span></span></div>
+      bloom
+    </div>
+    <div class="meta">Resume Parsing Loader · Spec</div>
+  </div>
+  <div class="page-title">Loader spec &amp; copy reference</div>
+  <div class="page-sub">All eight rotating headlines plus the system behavior driving them.</div>
+
+  <div class="summary">
+    <h2>Headlines (3s cadence)</h2>
+    <div class="message-list">
+      <div class="mrow"><div class="num">01</div><div><div class="h">Parsing your resume…</div><div class="s">Reading your experience, education, and skills</div></div></div>
+      <div class="mrow"><div class="num">02</div><div><div class="h">Got it. Analyzing your profile…</div><div class="s">Identifying your strengths and career signals</div></div></div>
+      <div class="mrow"><div class="num">03</div><div><div class="h">Searching open roles…</div><div class="s">Scanning thousands of fresh listings for you</div></div></div>
+      <div class="mrow"><div class="num">04</div><div><div class="h">Matching your skills…</div><div class="s">Comparing your experience against job requirements</div></div></div>
+      <div class="mrow"><div class="num">05</div><div><div class="h">Ranking the best fits…</div><div class="s">Prioritizing roles you’re most likely to love</div></div></div>
+      <div class="mrow"><div class="num">06</div><div><div class="h">Personalizing your feed…</div><div class="s">Tailoring recommendations to your goals</div></div></div>
+      <div class="mrow"><div class="num">07</div><div><div class="h">Almost there…</div><div class="s">Polishing the final picks before we show you</div></div></div>
+      <div class="mrow"><div class="num">08</div><div><div class="h">Just a moment…</div><div class="s">Loading your matches — this takes a second</div></div></div>
+    </div>
+
+    <h2 style="margin-top:8px">Behavior</h2>
+    <div class="grid">
+      <div class="row"><div class="t">Duration</div><div class="label">24s default · tunable 10–45s</div><div class="desc">Covers the 20–30s engineering window. Falls back gracefully if jobs load earlier — header swaps straight to “All set!”.</div></div>
+      <div class="row"><div class="t">Progress bar</div><div class="label">Continuous fill + shimmer</div><div class="desc">Live % + “~Xs remaining”. Under 5s, copy switches to “Just a few seconds left” to avoid a misleading countdown to zero.</div></div>
+      <div class="row"><div class="t">Stage checklist</div><div class="label">4 stages · ticks at 25/50/80/100%</div><div class="desc">Pulsing cyan dot for the active stage, check for completed, dimmed for pending. Gives structural sense of progress beyond the bar.</div></div>
+      <div class="row"><div class="t">Tip strip</div><div class="label">4s cadence · 6 tips · independent loop</div><div class="desc">Privacy → value → feature preview. Converts the wait into onboarding and reduces perceived duration.</div></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // Wait for fonts + a small buffer, then auto-print.
+  (async () => {
+    try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+    setTimeout(() => window.print(), 500);
+  })();
+</script>
+</body>
+</html>

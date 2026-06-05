@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloom V3 — Sprout (Gen Z rethink)</title>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@500;600;700;800;900&display=swap">
+
+<style>
+  @font-face{font-family:"Proxima Soft";src:url("genz/fonts/proxima-nova-soft-regular.ttf") format("truetype");font-weight:400;font-display:swap}
+  @font-face{font-family:"Proxima Soft";src:url("genz/fonts/proxima-nova-soft-medium.ttf") format("truetype");font-weight:500;font-display:swap}
+  @font-face{font-family:"Proxima Soft";src:url("genz/fonts/proxima-nova-soft-semibold.ttf") format("truetype");font-weight:600;font-display:swap}
+  @font-face{font-family:"Proxima Soft";src:url("genz/fonts/proxima-nova-soft-bold.ttf") format("truetype");font-weight:700;font-display:swap}
+  /* Filson Soft display fallback — Nunito has similar rounded display feel */
+  @font-face{font-family:"Filson Soft";src:local("Nunito");font-weight:700}
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body,#root{height:100%;font-family:"Proxima Soft",system-ui,sans-serif}
+  body{background:#EEF0EB;overflow:hidden;color:#022F36}
+  button{cursor:pointer;font-family:inherit;border:none;background:none;color:inherit}
+  input,textarea{font-family:inherit;outline:none}
+
+  /* Animations used across screens */
+  @keyframes sprPulse {
+    0%, 100% { opacity:.35; transform:scale(.7); }
+    50%      { opacity:1;   transform:scale(1);  }
+  }
+  @keyframes sprBob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+  @keyframes sprRipple {
+    0%   { transform: scale(0.85); opacity: 0.6; }
+    100% { transform: scale(1.35); opacity: 0; }
+  }
+
+  /* Phone shadow on canvas */
+  .phone-frame { filter: drop-shadow(0 30px 60px rgba(2,47,54,0.18)) drop-shadow(0 10px 24px rgba(2,47,54,0.08)); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="genz/design-canvas.jsx"></script>
+<script type="text/babel" src="genz/ios-frame.jsx"></script>
+<script type="text/babel" src="genz/tweaks-panel.jsx"></script>
+<script type="text/babel" src="genz/sprout-shared.jsx"></script>
+<script type="text/babel" src="genz/sprout-onboarding.jsx"></script>
+<script type="text/babel" src="genz/sprout-mode.jsx"></script>
+<script type="text/babel" src="genz/sprout-home.jsx"></script>
+<script type="text/babel" src="genz/sprout-variants.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+const {
+  DesignCanvas, DCSection, DCArtboard,
+  TweaksPanel, useTweaks, TweakSection, TweakRadio, TweakToggle, TweakColor,
+  IOSDevice, sprT,
+  SproutMascot, SproutWordmark, SprChip, SprBtn, SprBubble, SprAvatar, StatTile, Sparkle, LivePill,
+  OB_Welcome, OB_Chat1_Role, OB_Chat2_Resume, OB_Chat3_Summary,
+  OB_ModePicker, OB_Activating,
+  Home_Momentum, Home_Discovery, Home_Review,
+  Variant_BloomClassic, Variant_MushroomLand, LockScreen, SproutChat,
+} = window;
+
+// ── Tweakable defaults ───────────────────────────────────────────────
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "copilotName": "Sprout",
+  "accent": "cyan",
+  "tone": "playful"
+}/*EDITMODE-END*/;
+
+// ── Phone wrapper — auto-frame ───────────────────────────────────────
+function Phone({ children, dark = false, w = 390, h = 820 }) {
+  return (
+    <div className="phone-frame">
+      <IOSDevice width={w} height={h} dark={dark}>
+        {children}
+      </IOSDevice>
+    </div>
+  );
+}
+
+// ── Visual language summary card ────────────────────────────────────
+function SystemMoodboard() {
+  const swatch = (color, name) => (
+    <div key={name} style={{display:"flex", flexDirection:"column", alignItems:"center", gap:6}}>
+      <div style={{width:60, height:60, borderRadius: 18, background: color, border:`1px solid rgba(0,0,0,0.06)`}}/>
+      <div style={{fontSize: 11, fontWeight: 700, color: sprT.ink, letterSpacing:"0.02em"}}>{name}</div>
+    </div>
+  );
+  return (
+    <div style={{
+      width: 1200, padding: 40, background: sprT.cream, borderRadius: 28,
+      display:"flex", gap: 40, fontFamily:'"Proxima Soft",sans-serif',
+    }}>
+      <div style={{flex: 1, minWidth: 0}}>
+        <div style={{fontSize: 12, fontWeight: 700, color: sprT.muted, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom: 14}}>Bloom V3 · Sprout</div>
+        <div style={{fontFamily: window.fontDisplay, fontSize: 64, fontWeight: 700, lineHeight: 0.95, letterSpacing:"-0.035em", color: sprT.ink, marginBottom: 18}}>
+          Friendlier.<br/>
+          Lighter.<br/>
+          <span style={{color: sprT.cyanInk}}>Less SaaS.</span>
+        </div>
+        <div style={{fontSize: 17, lineHeight: 1.5, color: sprT.inkSoft, fontWeight: 500, maxWidth: 480, marginBottom: 28}}>
+          A rethink of Bloom for the Gen Z job seeker. The product becomes a <b>friend named Sprout</b> who texts you, applies overnight, and surfaces wins as momentum — not as rows in a dashboard.
+        </div>
+
+        <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap: 16, marginBottom: 28}}>
+          {[
+            {h:"Chat, not forms", b:"Onboarding is a conversation. Tap chips, drop your résumé, done in 90s."},
+            {h:"One copilot", b:"Sprout. Named, animated, with a personality. No multi-agent complexity."},
+            {h:"Modes, not config", b:"Cruise / Co-pilot / Manual. Three persona cards, not a settings page."},
+            {h:"Momentum > dashboard", b:"Every screen reinforces: \"AI worked while you slept.\" Streaks, replies, time saved."},
+          ].map(p => (
+            <div key={p.h} style={{background:"#fff", border: `1px solid ${sprT.hairline}`, borderRadius: 18, padding: 18}}>
+              <div style={{fontSize: 16, fontWeight: 700, color: sprT.ink, marginBottom: 6, fontFamily: window.fontDisplay, letterSpacing:"-0.01em"}}>{p.h}</div>
+              <div style={{fontSize: 13, color: sprT.inkSoft, fontWeight: 500, lineHeight: 1.45}}>{p.b}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Palette + type */}
+        <div style={{display:"flex", gap: 28, alignItems:"flex-start"}}>
+          <div>
+            <div style={{fontSize: 11, fontWeight: 800, color: sprT.muted, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom: 12}}>Palette</div>
+            <div style={{display:"flex", gap: 12}}>
+              {[
+                [sprT.ink,"Ink"],[sprT.cream,"Cream"],[sprT.cyan,"Cyan"],
+                [sprT.mint,"Mint"],[sprT.butter,"Butter"],[sprT.flame,"Flame"],
+              ].map(([c,n]) => swatch(c, n))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right column — Mascot + tone */}
+      <div style={{width: 360, display:"flex", flexDirection:"column", gap: 18, flexShrink: 0}}>
+        <div style={{background: sprT.ink, color:"#fff", borderRadius: 26, padding: 26, position:"relative", overflow:"hidden"}}>
+          <div style={{position:"absolute", top:-30, right:-30, width: 180, height: 180, borderRadius:"50%", background: sprT.cyan, opacity: 0.16, filter:"blur(20px)"}}/>
+          <div style={{display:"flex", justifyContent:"center", padding:"10px 0 18px", position:"relative"}}>
+            <SproutMascot size={120}/>
+          </div>
+          <div style={{fontFamily: window.fontDisplay, fontSize: 20, fontWeight: 700, letterSpacing:"-0.02em", marginBottom: 6, textAlign:"center"}}>Sprout</div>
+          <div style={{fontSize: 13, opacity: 0.7, textAlign:"center", lineHeight: 1.4, fontWeight: 500}}>Friendly, eager, slightly nerdy. Always says "gm." Never says "leverage."</div>
+        </div>
+
+        <div style={{background:"#fff", borderRadius: 22, padding: 18, border: `1px solid ${sprT.hairline}`}}>
+          <div style={{fontSize: 11, fontWeight: 800, color: sprT.muted, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom: 10}}>Tone of voice</div>
+          <div style={{display:"flex", flexDirection:"column", gap: 8}}>
+            {[
+              ["✅", "\"gm! while you slept I applied to 7 jobs ✨\""],
+              ["✅", "\"this one's a stretch but I think you'd crush it\""],
+              ["🚫", "\"Your application has been successfully submitted.\""],
+              ["🚫", "\"Leverage AI to optimize your candidacy.\""],
+            ].map(([k,v],i) => (
+              <div key={i} style={{display:"flex", gap: 8, fontSize: 13, color: sprT.ink, lineHeight: 1.35}}>
+                <span style={{flexShrink: 0}}>{k}</span>
+                <span style={{opacity: k === "🚫" ? 0.5 : 1, textDecoration: k === "🚫" ? "line-through" : "none", fontWeight: 500}}>{v}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Annotation strip below frames ────────────────────────────────────
+function Anno({ children, w = 390, color = sprT.ink }) {
+  return (
+    <div style={{width: w, padding: "12px 4px 0", fontSize: 12.5, color: sprT.inkSoft, fontWeight: 500, lineHeight: 1.45, fontFamily:'"Proxima Soft",sans-serif'}}>
+      {children}
+    </div>
+  );
+}
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  // Tone overrides (light — could be used to swap copy)
+  const toneMap = {
+    playful:"gm-style, warm, lots of personality",
+    warm:"warm, encouraging, no slang",
+    professional:"crisp, direct, less mascot",
+  };
+
+  return (
+    <>
+      <DesignCanvas storageKey="bloom-v3-sprout-genz">
+
+        {/* ──────────────────────────────────────────────────────── */}
+        <DCSection
+          id="moodboard"
+          title="① The new system"
+          subtitle="Bloom rethought as a Gen Z consumer app: a single named copilot, chat-first onboarding, momentum over dashboards."
+        >
+          <DCArtboard id="sys" label="Visual language · who is Sprout" width={1200} height={640}>
+            <SystemMoodboard/>
+          </DCArtboard>
+        </DCSection>
+
+        {/* ──────────────────────────────────────────────────────── */}
+        <DCSection
+          id="onboarding"
+          title="② Onboarding — a conversation, not a form"
+          subtitle="Welcome → chat about you → drop résumé → Sprout summarises. The form is gone; chips do the heavy lifting."
+        >
+          <DCArtboard id="ob-welcome" label="0 — Welcome · big mascot, single CTA" width={390} height={870}>
+            <Phone><OB_Welcome/></Phone>
+          </DCArtboard>
+          <DCArtboard id="ob-chat1" label="1 — Tell me what you want (chips, not dropdowns)" width={390} height={870}>
+            <Phone><OB_Chat1_Role/></Phone>
+          </DCArtboard>
+          <DCArtboard id="ob-chat2" label="2 — Drop résumé · file is a chat attachment" width={390} height={870}>
+            <Phone><OB_Chat2_Resume/></Phone>
+          </DCArtboard>
+          <DCArtboard id="ob-chat3" label="3 — Sprout summarises what it learned" width={390} height={870}>
+            <Phone><OB_Chat3_Summary/></Phone>
+          </DCArtboard>
+        </DCSection>
+
+        {/* ──────────────────────────────────────────────────────── */}
+        <DCSection
+          id="mode"
+          title="③ Mode picker — pick your driving style"
+          subtitle="Replaces enterprise-style settings with a single human question: how much should I do alone?"
+        >
+          <DCArtboard id="md-picker" label="Cruise / Co-pilot / Manual · persona cards" width={390} height={870}>
+            <Phone><OB_ModePicker/></Phone>
+          </DCArtboard>
+          <DCArtboard id="md-activate" label="Activation · the magic ROI moment" width={390} height={870}>
+            <Phone dark><OB_Activating/></Phone>
+          </DCArtboard>
+        </DCSection>
+
+        {/* ──────────────────────────────────────────────────────── */}
+        <DCSection
+          id="home"
+          title="④ Home — momentum, not a dashboard"
+          subtitle="The reward loop. Every load tells you what Sprout did, how much time it saved, and what needs your call."
+        >
+          <DCArtboard id="h-home" label={`Home · "You slept, I applied to 7 jobs"`} width={390} height={870}>
+            <Phone><Home_Momentum/></Phone>
+          </DCArtboard>
+          <DCArtboard id="h-discovery" label="Discover · Tinder-style swipe with Sprout's take" width={390} height={870}>
+            <Phone><Home_Discovery/></Phone>
+          </DCArtboard>
+          <DCArtboard id="h-review" label="Review · approve Sprout's draft before send" width={390} height={870}>
+            <Phone><Home_Review/></Phone>
+          </DCArtboard>
+          <DCArtboard id="h-chat" label="Sprout · text it like a friend at any time" width={390} height={870}>
+            <Phone><SproutChat/></Phone>
+          </DCArtboard>
+        </DCSection>
+
+        {/* ──────────────────────────────────────────────────────── */}
+        <DCSection
+          id="rituals"
+          title="⑤ Momentum rituals"
+          subtitle="ROI lives on the lock screen and in micro-celebrations. Sprout earns daily attention without nagging."
+        >
+          <DCArtboard id="lock" label="Lock screen · while you slept, Sprout worked" width={390} height={870}>
+            <Phone dark><LockScreen/></Phone>
+          </DCArtboard>
+        </DCSection>
+
+        {/* ──────────────────────────────────────────────────────── */}
+        <DCSection
+          id="variants"
+          title="⑥ Visual direction — three options compared"
+          subtitle="Same home/hero moment, three vibes. Use this to pick how far to push the visuals."
+        >
+          <DCArtboard id="v-classic" label="A — Bloom Classic (safe, in current system)" width={390} height={870}>
+            <Phone><Variant_BloomClassic/></Phone>
+          </DCArtboard>
+          <DCArtboard id="v-bold" label="B — Sprout Bold ⭐ recommended" width={390} height={870}>
+            <Phone><Home_Momentum/></Phone>
+          </DCArtboard>
+          <DCArtboard id="v-weird" label="C — Mushroom Land (Gen Z weird)" width={390} height={870}>
+            <Phone><Variant_MushroomLand/></Phone>
+          </DCArtboard>
+        </DCSection>
+
+      </DesignCanvas>
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection title="Copilot personality" subtitle="Live-edit the AI's identity. Real version would propagate to all screens.">
+          <TweakRadio label="Tone" value={t.tone} options={["playful","warm","professional"]} onChange={v=>setTweak("tone",v)}/>
+        </TweakSection>
+        <TweakSection title="Accent">
+          <TweakRadio label="Hit color" value={t.accent} options={["cyan","mint","butter"]} onChange={v=>setTweak("accent",v)}/>
+        </TweakSection>
+        <TweakSection title="About" subtitle="Tweaks here are illustrative; not all screens read them yet. The intent is to show what would be live-editable.">
+          <div style={{fontSize: 12, color:"#888"}}>Copilot · {t.copilotName}<br/>Tone · {t.tone}<br/>Accent · {t.accent}</div>
+        </TweakSection>
+      </TweaksPanel>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

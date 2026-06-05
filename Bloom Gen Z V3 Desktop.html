@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloom V3 · Sprout — Desktop</title>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@500;600;700;800;900&display=swap">
+
+<style>
+  @font-face{font-family:"Proxima Soft";src:url("genz/fonts/proxima-nova-soft-regular.ttf") format("truetype");font-weight:400;font-display:swap}
+  @font-face{font-family:"Proxima Soft";src:url("genz/fonts/proxima-nova-soft-medium.ttf") format("truetype");font-weight:500;font-display:swap}
+  @font-face{font-family:"Proxima Soft";src:url("genz/fonts/proxima-nova-soft-semibold.ttf") format("truetype");font-weight:600;font-display:swap}
+  @font-face{font-family:"Proxima Soft";src:url("genz/fonts/proxima-nova-soft-bold.ttf") format("truetype");font-weight:700;font-display:swap}
+  @font-face{font-family:"Filson Soft";src:local("Nunito");font-weight:700}
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body,#root{height:100%;font-family:"Proxima Soft",system-ui,sans-serif}
+  body{background:#EEF0EB;overflow:hidden;color:#022F36}
+  button{cursor:pointer;font-family:inherit;border:none;background:none;color:inherit}
+  input,textarea{font-family:inherit;outline:none}
+
+  @keyframes sprPulse {
+    0%, 100% { opacity:.35; transform:scale(.7); }
+    50%      { opacity:1;   transform:scale(1);  }
+  }
+  @keyframes sprBob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+  @keyframes sprRipple {
+    0%   { transform: scale(0.85); opacity: 0.6; }
+    100% { transform: scale(1.35); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="genz/design-canvas.jsx"></script>
+<script type="text/babel" src="genz/tweaks-panel.jsx"></script>
+<script type="text/babel" src="genz/sprout-shared.jsx"></script>
+<script type="text/babel" src="genz/sprout-desktop-1.jsx"></script>
+<script type="text/babel" src="genz/sprout-desktop-2.jsx"></script>
+<script type="text/babel" src="genz/sprout-desktop-3.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+const {
+  DesignCanvas, DCSection, DCArtboard,
+  TweaksPanel, useTweaks, TweakSection, TweakRadio,
+  sprT, SproutMascot, SproutWordmark,
+  D_Welcome, D_Onboarding, D_Resume,
+  D_ModePicker, D_Activation, D_Home,
+  D_Discovery, D_Review, D_SproutPanel,
+} = window;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "copilotName": "Sprout",
+  "accent": "cyan",
+  "tone": "playful"
+}/*EDITMODE-END*/;
+
+// Moodboard at the top
+function DesktopMoodboard() {
+  return (
+    <div style={{
+      width: 1400, padding: 48, background: sprT.cream, borderRadius: 28,
+      display:"flex", gap: 48, fontFamily: window.fontBody,
+    }}>
+      <div style={{flex: 1.4, minWidth: 0}}>
+        <div style={{fontSize: 12, fontWeight: 700, color: sprT.muted, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom: 14}}>BLOOM V3 · DESKTOP · GEN Z RETHINK</div>
+        <div style={{fontFamily: window.fontDisplay, fontSize: 88, fontWeight: 700, lineHeight: 0.92, letterSpacing:"-0.04em", color: sprT.ink, marginBottom: 24}}>
+          From <span style={{color: sprT.muted, textDecoration:"line-through", textDecorationThickness: 6, textDecorationColor: sprT.flame}}>enterprise dashboard</span><br/>
+          to <span style={{color: sprT.cyanInk}}>your AI buddy.</span>
+        </div>
+        <div style={{fontSize: 19, lineHeight: 1.5, color: sprT.inkSoft, fontWeight: 500, maxWidth: 680, marginBottom: 36}}>
+          Same desktop product. Rebuilt around a single named copilot (<b>Sprout</b>), chat-first onboarding, a 3-mode picker, and a momentum-led home that feels closer to Duolingo + Cursor than an ATS.
+        </div>
+
+        <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap: 14, marginBottom: 32}}>
+          {[
+            {h:"Chat replaces forms", b:"Onboarding is 3 tap-driven conversations: who you are → drop résumé → pick driving style."},
+            {h:"One named copilot", b:"Sprout has a face, a voice, and lives in the left rail. No multi-agent admin."},
+            {h:"Modes, not settings", b:"Cruise / Co-pilot / Manual — answer one question instead of 20 toggles."},
+            {h:"Momentum > dashboard", b:"\"You slept, I applied to 7 jobs.\" ROI lives on every screen as a felt outcome."},
+            {h:"Cursor-style review", b:"Applications are documents you edit by chatting with Sprout. Inline-highlighted edits."},
+            {h:"⌘K for everything", b:"A single command palette to summon Sprout from anywhere. No deep menus."},
+          ].map(p => (
+            <div key={p.h} style={{background:"#fff", border: `1px solid ${sprT.hairline}`, borderRadius: 18, padding: 18}}>
+              <div style={{fontSize: 16, fontWeight: 700, color: sprT.ink, marginBottom: 6, fontFamily: window.fontDisplay, letterSpacing:"-0.01em"}}>{p.h}</div>
+              <div style={{fontSize: 13, color: sprT.inkSoft, fontWeight: 500, lineHeight: 1.45}}>{p.b}</div>
+            </div>
+          ))}
+        </div>
+
+        <div>
+          <div style={{fontSize: 11, fontWeight: 800, color: sprT.muted, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom: 14}}>Palette</div>
+          <div style={{display:"flex", gap: 12}}>
+            {[
+              [sprT.ink,"Ink"],[sprT.cream,"Cream"],[sprT.cyan,"Cyan · hit"],
+              [sprT.mint,"Mint · success"],[sprT.butter,"Butter · attention"],[sprT.flame,"Flame · alert"],[sprT.lilac,"Lilac · self"],
+            ].map(([c,n]) => (
+              <div key={n} style={{display:"flex", flexDirection:"column", alignItems:"center", gap: 8}}>
+                <div style={{width: 64, height: 64, borderRadius: 18, background: c, border:`1px solid rgba(0,0,0,0.06)`}}/>
+                <div style={{fontSize: 11, fontWeight: 700, color: sprT.ink}}>{n}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Right column: Sprout card */}
+      <div style={{width: 380, flexShrink: 0, display:"flex", flexDirection:"column", gap: 18}}>
+        <div style={{background: sprT.ink, color:"#fff", borderRadius: 26, padding: 28, position:"relative", overflow:"hidden"}}>
+          <div style={{position:"absolute", top:-40, right:-40, width: 220, height: 220, borderRadius:"50%", background: sprT.cyan, opacity: 0.18, filter:"blur(24px)"}}/>
+          <div style={{display:"flex", justifyContent:"center", padding:"12px 0 20px", position:"relative"}}>
+            <SproutMascot size={140}/>
+          </div>
+          <div style={{fontFamily: window.fontDisplay, fontSize: 22, fontWeight: 700, letterSpacing:"-0.02em", marginBottom: 6, textAlign:"center"}}>Sprout</div>
+          <div style={{fontSize: 13, opacity: 0.7, textAlign:"center", lineHeight: 1.45, fontWeight: 500}}>Friendly, eager, slightly nerdy. Always says "gm." Never says "leverage."</div>
+
+          <div style={{marginTop: 18, padding: 14, background:"rgba(255,255,255,0.06)", borderRadius: 14, border:"1px solid rgba(255,255,255,0.08)"}}>
+            <div style={{fontSize: 11, fontWeight: 800, color: sprT.cyan, letterSpacing:"0.06em", marginBottom: 6}}>SPROUT, NOW</div>
+            <div style={{fontSize: 13.5, lineHeight: 1.45, fontWeight: 500}}>"gm! I queued 7 apps overnight. Linear's already viewing your profile ✨"</div>
+          </div>
+        </div>
+
+        <div style={{background:"#fff", borderRadius: 22, padding: 20, border: `1px solid ${sprT.hairline}`}}>
+          <div style={{fontSize: 11, fontWeight: 800, color: sprT.muted, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom: 12}}>Tone of voice</div>
+          {[
+            ["✅", "\"this one's a stretch but I think you'd crush it\""],
+            ["✅", "\"saved you 3h 20m today 💪\""],
+            ["🚫", "\"Application has been successfully submitted.\""],
+            ["🚫", "\"Leverage AI to optimize your candidacy.\""],
+          ].map(([k,v],i) => (
+            <div key={i} style={{display:"flex", gap: 8, fontSize: 13, color: sprT.ink, lineHeight: 1.4, padding:"4px 0"}}>
+              <span style={{flexShrink: 0}}>{k}</span>
+              <span style={{opacity: k === "🚫" ? 0.5 : 1, textDecoration: k === "🚫" ? "line-through" : "none", fontWeight: 500}}>{v}</span>
+            </div>
+          ))}
+        </div>
+
+        <div style={{fontSize: 12, color: sprT.muted, fontWeight: 600, textAlign:"center", padding:"0 20px", lineHeight: 1.45}}>
+          Each artboard below shows the desktop product at <b>1280×800</b> inside a browser chrome. Scroll →
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  return (
+    <>
+      <DesignCanvas storageKey="bloom-v3-sprout-desktop">
+
+        <DCSection
+          id="moodboard"
+          title="① Direction"
+          subtitle="What changed, who Sprout is, and how the desktop product feels different."
+        >
+          <DCArtboard id="sys" label="The new system" width={1400} height={760}>
+            <DesktopMoodboard/>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="entry"
+          title="② Entry · Welcome"
+          subtitle="A consumer-first marketing/auth moment. Big mascot, ROI headline, one CTA."
+        >
+          <DCArtboard id="welcome" label="Welcome / signup splash · 1280×800" width={1280} height={820}>
+            <D_Welcome/>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="onboarding"
+          title="③ Onboarding — three conversations, not three forms"
+          subtitle="Chat about you → drop résumé → pick driving style. ~90 seconds end-to-end."
+        >
+          <DCArtboard id="ob-chat" label="Step 1 · Chat onboarding · tap chips, not dropdowns" width={1280} height={820}>
+            <D_Onboarding/>
+          </DCArtboard>
+          <DCArtboard id="ob-resume" label="Step 2 · Drop résumé · Sprout summarises live" width={1280} height={820}>
+            <D_Resume/>
+          </DCArtboard>
+          <DCArtboard id="ob-mode" label="Step 3 · Pick driving style · 3-up comparison" width={1280} height={840}>
+            <D_ModePicker/>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="activation"
+          title="④ Activation — the magic moment"
+          subtitle="Sprout wakes up. Dark, dramatic, ROI-forward. The before/after pivot."
+        >
+          <DCArtboard id="activating" label="Sprout is reading 12,400 roles for you…" width={1280} height={820}>
+            <D_Activation/>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="app"
+          title="⑤ The main app — momentum, not dashboard"
+          subtitle="Three core surfaces: Home, Discover, Review. The Sprout dock and ⌘K palette live across all of them."
+        >
+          <DCArtboard id="home" label="Home · \u201cYou slept, I applied to 7 jobs\u201d" width={1280} height={920}>
+            <D_Home/>
+          </DCArtboard>
+          <DCArtboard id="discovery" label="Discover · focused card + Sprout's take" width={1280} height={920}>
+            <D_Discovery/>
+          </DCArtboard>
+          <DCArtboard id="review" label="Review · Cursor-style: draft on left, chat with Sprout on right" width={1280} height={900}>
+            <D_Review/>
+          </DCArtboard>
+          <DCArtboard id="palette" label="⌘K Sprout palette · summon from anywhere" width={1280} height={820}>
+            <D_SproutPanel/>
+          </DCArtboard>
+        </DCSection>
+
+      </DesignCanvas>
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection title="Copilot tone" subtitle="Live-edit Sprout's personality. Real version would propagate.">
+          <TweakRadio label="Tone" value={t.tone} options={["playful","warm","professional"]} onChange={v=>setTweak("tone",v)}/>
+        </TweakSection>
+        <TweakSection title="Accent">
+          <TweakRadio label="Hit color" value={t.accent} options={["cyan","mint","butter"]} onChange={v=>setTweak("accent",v)}/>
+        </TweakSection>
+      </TweaksPanel>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

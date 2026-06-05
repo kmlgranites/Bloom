@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloom V2 — Agent System (Print)</title>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-regular.ttf");font-weight:400}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-medium.ttf");font-weight:500}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-semibold.ttf");font-weight:600}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-bold.ttf");font-weight:700}
+
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html,body{font-family:"Proxima Soft",system-ui,sans-serif;background:#F0F3F7;color:#022F36}
+  button{cursor:pointer;font-family:"Proxima Soft",sans-serif;border:none;background:none;color:inherit}
+  input{font-family:"Proxima Soft",sans-serif;border:none;outline:none;background:transparent}
+  textarea{font-family:"Proxima Soft",sans-serif;outline:none}
+  .num{font-family:"Inter",sans-serif;font-feature-settings:"tnum"}
+
+  @keyframes bv2spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+  @keyframes bv2pulse {
+    0%   { box-shadow: 0 0 0 0 currentColor; opacity: 1; }
+    70%  { box-shadow: 0 0 0 8px transparent; opacity: .8; }
+    100% { box-shadow: 0 0 0 0 transparent; opacity: 1; }
+  }
+
+  input[type="range"]{ -webkit-appearance:none; appearance:none; height:4px; background:#E2E8F0; border-radius:99px; }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none; width:18px; height:18px;
+    border-radius:50%; background:#022F36;
+  }
+
+  /* ─── Print page layout ─── */
+  @page { size: 1320px 940px; margin: 0; }
+
+  .print-page {
+    width: 1320px; min-height: 940px;
+    page-break-after: always; break-after: page;
+    background: #F0F3F7;
+    padding: 28px 20px 20px;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .print-page:last-child { page-break-after: auto; break-after: auto; }
+
+  .ph {
+    display: flex; align-items: center; gap: 14px;
+    padding: 0 14px 14px;
+    border-bottom: 1px solid #E6E5E1;
+    margin-bottom: 20px;
+  }
+  .ph-brand{
+    display:flex; align-items:center; gap:8px;
+    font-family:"Filson Soft","Proxima Soft",sans-serif;
+    font-weight:700; font-size:18px; letter-spacing:-.02em; color:#022F36;
+  }
+  .ph-brand .logo{
+    width:26px; height:26px; border-radius:50%; background:#022F36; position:relative;
+    display:flex; align-items:flex-end; justify-content:center; padding-bottom:5px;
+  }
+  .ph-brand .logo::before, .ph-brand .logo::after{
+    content:""; position:absolute; top:-3px; width:5px; height:5px;
+    border-radius:50%; background:#5AEBEB;
+  }
+  .ph-brand .logo::before{ left:5px; } .ph-brand .logo::after{ right:5px; }
+  .ph-brand .logo span{ width:9px; height:5px; border-radius:0 0 9px 9px; background:#fff; }
+
+  .ph-divider { width:1px; height:24px; background:#D5DCE2; }
+  .ph-section { font-size:11px; font-weight:700; color:#7B8794; letter-spacing:.1em; text-transform:uppercase; }
+  .ph-label {
+    flex:1;
+    font-family:"Filson Soft","Proxima Soft",sans-serif;
+    font-size:18px; font-weight:700; color:#022F36; letter-spacing:-.01em;
+  }
+  .ph-num { font-family:"Inter",sans-serif; font-size:12px; font-weight:700; color:#7B8794; }
+
+  .stage {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+
+  /* ─── Cover ─── */
+  .cover {
+    background: linear-gradient(135deg, #022F36 0%, #1D484F 100%);
+    color: #fff; padding: 80px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: relative; overflow: hidden;
+  }
+  .cover::before{
+    content:""; position:absolute; right:-150px; top:-150px;
+    width:600px; height:600px; border-radius:50%;
+    background: radial-gradient(circle, rgba(90,235,235,.18) 0%, transparent 70%);
+  }
+  .cover-eyebrow { font-size:14px; font-weight:700; color:#5AEBEB; letter-spacing:.12em; text-transform:uppercase; }
+  .cover-title {
+    font-family:"Filson Soft","Proxima Soft",sans-serif;
+    font-size:96px; font-weight:700; letter-spacing:-.03em; line-height:1.02; margin-top:20px;
+  }
+  .cover-sub { font-size:22px; color:rgba(255,255,255,.7); margin-top:20px; max-width:760px; line-height:1.4; }
+  .cover-foot { display:flex; align-items:center; gap:30px; }
+  .cover-tag { font-size:14px; color:rgba(255,255,255,.55); }
+  .cover-toc { display:flex; flex-direction:column; gap:8px; }
+  .cover-toc-row {
+    display:flex; gap:14px; align-items:baseline; font-size:14px; color:rgba(255,255,255,.85);
+  }
+  .cover-toc-num {
+    font-family:"Inter",sans-serif;
+    font-weight:700; color:#5AEBEB; min-width:30px;
+  }
+  .cover-toc-label { font-weight:600; }
+  .cover-toc-meta { color:rgba(255,255,255,.5); font-size:12.5px; margin-left:auto; }
+
+  /* Artboard styling — each screen at native size, fit to page */
+  .ab-card {
+    background:#fff; border-radius:14px; overflow:hidden;
+    border:1px solid #E6E5E1; box-shadow:0 4px 20px rgba(2,47,54,.08);
+  }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel" src="bv2/shared.jsx"></script>
+<script type="text/babel" src="bv2/Onboarding.jsx"></script>
+<script type="text/babel" src="bv2/Dashboard.jsx"></script>
+<script type="text/babel" src="bv2/ActivityFeed.jsx"></script>
+<script type="text/babel" src="bv2/BlockingQuestion.jsx"></script>
+<script type="text/babel" src="bv2/ConfirmAssumptions.jsx"></script>
+<script type="text/babel" src="bv2/SavedAnswers.jsx"></script>
+<script type="text/babel" src="bv2/NotificationHub.jsx"></script>
+<script type="text/babel" src="bv2/Settings.jsx"></script>
+<script type="text/babel" src="bv2/EmailDigest.jsx"></script>
+<script type="text/babel" src="bv2/Timeline.jsx"></script>
+<script type="text/babel" src="bv2/Badges.jsx"></script>
+<script type="text/babel" src="bv2/JobsQueue.jsx"></script>
+<script type="text/babel" src="bv2/JobDetail.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+
+const SCREENS = [
+  { section:"① Onboarding & Controls",       label:"Auto-Apply Setup",                  Comp: () => <window.BV2_Onboarding /> },
+  { section:"① Onboarding & Controls",       label:"Settings — pause, threshold, rules", Comp: () => <window.BV2_Settings /> },
+  { section:"② Daily home",                  label:"Dashboard — agent status hub",      Comp: () => <window.BV2_Dashboard /> },
+  { section:"② Daily home",                  label:"Activity Feed — live + history",    Comp: () => <window.BV2_ActivityFeed /> },
+  { section:"② Daily home",                  label:"Notification Hub — right sheet",    Comp: () => <window.BV2_NotificationHub /> },
+  { section:"③ Agent decision moments",      label:"Blocking Question — center modal",  Comp: () => <window.BV2_BlockingQuestion /> },
+  { section:"③ Agent decision moments",      label:"Confirm Assumptions — async review",Comp: () => <window.BV2_ConfirmAssumptions /> },
+  { section:"③ Agent decision moments",      label:"Saved Answers — memory library",    Comp: () => <window.BV2_SavedAnswers /> },
+  { section:"④ Outside the app",             label:"Daily Email Digest",                Comp: () => <window.BV2_EmailDigest /> },
+  { section:"④ Outside the app",             label:"Per-job Application Timeline",      Comp: () => <window.BV2_Timeline /> },
+  { section:"⑤ Jobs — the agentic workflow", label:"Jobs Queue — Up next / Borderline", Comp: () => <window.BV2_JobsQueue /> },
+  { section:"⑤ Jobs — the agentic workflow", label:"Job detail — What I'll send",       Comp: () => <window.BV2_JobDetail /> },
+  { section:"⑥ System",                      label:"Application Status Badges",         Comp: () => <window.BV2_BadgeSystem /> },
+];
+
+function Cover() {
+  return (
+    <section className="print-page cover">
+      <div style={{position:"relative"}}>
+        <div className="cover-eyebrow">BloomHQ V2</div>
+        <div className="cover-title">The agent<br/>does the<br/>applying.</div>
+        <div className="cover-sub">
+          A 13-screen system designing the autonomous job-application experience —
+          from first-time setup to daily digest, from blocking questions to the radical
+          transparency of "what I'll send."
+        </div>
+      </div>
+      <div className="cover-foot" style={{position:"relative", flexDirection:"column", alignItems:"flex-start", gap:18}}>
+        <div className="cover-toc">
+          <div className="cover-toc-row"><span className="cover-toc-num">①</span><span className="cover-toc-label">Onboarding & Controls</span><span className="cover-toc-meta">2 screens</span></div>
+          <div className="cover-toc-row"><span className="cover-toc-num">②</span><span className="cover-toc-label">Daily home</span><span className="cover-toc-meta">3 screens</span></div>
+          <div className="cover-toc-row"><span className="cover-toc-num">③</span><span className="cover-toc-label">Agent decision moments</span><span className="cover-toc-meta">3 screens</span></div>
+          <div className="cover-toc-row"><span className="cover-toc-num">④</span><span className="cover-toc-label">Outside the app</span><span className="cover-toc-meta">2 screens</span></div>
+          <div className="cover-toc-row"><span className="cover-toc-num">⑤</span><span className="cover-toc-label">Jobs — agentic workflow</span><span className="cover-toc-meta">2 screens</span></div>
+          <div className="cover-toc-row"><span className="cover-toc-num">⑥</span><span className="cover-toc-label">System — status badges</span><span className="cover-toc-meta">1 screen</span></div>
+        </div>
+        <div style={{display:"flex", alignItems:"center", gap:24}}>
+          <div style={{
+            width:44, height:44, borderRadius:"50%", background:"#022F36", position:"relative",
+            display:"flex", alignItems:"flex-end", justifyContent:"center", paddingBottom:7,
+            border:"2px solid #fff",
+          }}>
+            <div style={{position:"absolute", top:-4, left:7, width:8, height:8, borderRadius:"50%", background:"#5AEBEB"}} />
+            <div style={{position:"absolute", top:-4, right:7, width:8, height:8, borderRadius:"50%", background:"#5AEBEB"}} />
+            <div style={{width:15, height:7, borderRadius:"0 0 15px 15px", background:"#fff"}} />
+          </div>
+          <div style={{
+            fontFamily:'"Filson Soft","Proxima Soft",sans-serif',
+            fontWeight:700, fontSize:30, color:"#fff", letterSpacing:"-.02em",
+          }}>bloom</div>
+          <div style={{width:1, height:30, background:"rgba(255,255,255,.2)"}} />
+          <div className="cover-tag">Design system handoff · May 2026</div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PrintPage({ screen, idx, total }) {
+  const C = screen.Comp;
+  return (
+    <section className="print-page">
+      <div className="ph">
+        <div className="ph-brand">
+          <div className="logo"><span></span></div>
+          bloom
+        </div>
+        <div className="ph-divider" />
+        <div className="ph-section">{screen.section}</div>
+        <div className="ph-divider" />
+        <div className="ph-label">{screen.label}</div>
+        <div className="ph-num">{String(idx).padStart(2,"0")} / {String(total).padStart(2,"0")}</div>
+      </div>
+      <div className="stage">
+        <div className="ab-card"><C /></div>
+      </div>
+    </section>
+  );
+}
+
+function App() {
+  return (
+    <>
+      <Cover />
+      {SCREENS.map((s, i) => (
+        <PrintPage key={i} screen={s} idx={i+1} total={SCREENS.length} />
+      ))}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+/* Auto-print: wait for fonts, render, then print */
+(async () => {
+  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch (e) {}
+  // Extra time for Babel + React tree to fully mount
+  setTimeout(() => window.print(), 1800);
+})();
+</script>
+</body>
+</html>

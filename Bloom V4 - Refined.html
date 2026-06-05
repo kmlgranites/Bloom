@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloom V4 · Refined — Two modes, conversational review</title>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@500;600;700;800;900&display=swap">
+
+<style>
+  @font-face{font-family:"Proxima Soft";src:url("genz/fonts/proxima-nova-soft-regular.ttf") format("truetype");font-weight:400;font-display:swap}
+  @font-face{font-family:"Proxima Soft";src:url("genz/fonts/proxima-nova-soft-medium.ttf") format("truetype");font-weight:500;font-display:swap}
+  @font-face{font-family:"Proxima Soft";src:url("genz/fonts/proxima-nova-soft-semibold.ttf") format("truetype");font-weight:600;font-display:swap}
+  @font-face{font-family:"Proxima Soft";src:url("genz/fonts/proxima-nova-soft-bold.ttf") format("truetype");font-weight:700;font-display:swap}
+  @font-face{font-family:"Filson Soft";src:local("Nunito");font-weight:700}
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body,#root{height:100%;font-family:"Proxima Soft",system-ui,sans-serif}
+  body{background:#EEF0EB;overflow:hidden;color:#022F36}
+  button{cursor:pointer;font-family:inherit;border:none;background:none;color:inherit}
+  input,textarea{font-family:inherit;outline:none}
+
+  @keyframes sprPulse {
+    0%, 100% { opacity:.35; transform:scale(.7); }
+    50%      { opacity:1;   transform:scale(1);  }
+  }
+  @keyframes sprBob {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-8px); }
+  }
+  @keyframes sprRipple {
+    0%   { transform: scale(0.85); opacity: 0.6; }
+    100% { transform: scale(1.35); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="genz/design-canvas.jsx"></script>
+<script type="text/babel" src="genz/tweaks-panel.jsx"></script>
+<script type="text/babel" src="genz/sprout-shared.jsx"></script>
+<script type="text/babel" src="genz/sprout-desktop-1.jsx"></script>
+<script type="text/babel" src="genz/sprout-desktop-2.jsx"></script>
+<script type="text/babel" src="genz/sprout-desktop-3.jsx"></script>
+<script type="text/babel" src="genz/sprout-desktop-4.jsx"></script>
+<script type="text/babel" src="genz/sprout-desktop-5.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+const {
+  DesignCanvas, DCSection, DCArtboard,
+  TweaksPanel, useTweaks, TweakSection, TweakRadio,
+  sprT, SproutMascot, fontDisplay, fontBody,
+  // v3 (kept for reference if needed)
+  D_Activation, D_Resume, D_SproutPanel, D_Discovery,
+  // v4
+  D_Welcome_v4, D_Onboarding_v4, D_ModePicker_v4,
+  D_Review_v4, D_Home_v4,
+} = window;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "tone": "playful",
+  "accent": "cyan"
+}/*EDITMODE-END*/;
+
+// ─────────────────────────────────────────────────────────────────────
+// Changelog moodboard — explicit "what we changed and why"
+// ─────────────────────────────────────────────────────────────────────
+function V4Moodboard() {
+  return (
+    <div style={{
+      width: 1400, padding: 48, background: sprT.cream, borderRadius: 28,
+      display:"flex", gap: 40, fontFamily: fontBody,
+    }}>
+      <div style={{flex: 1.4, minWidth: 0}}>
+        <div style={{fontSize: 12, fontWeight: 700, color: sprT.muted, textTransform:"uppercase", letterSpacing:"0.08em", marginBottom: 12}}>BLOOM V4 · REFINED</div>
+        <div style={{fontFamily: fontDisplay, fontSize: 76, fontWeight: 700, lineHeight: 0.94, letterSpacing:"-0.04em", color: sprT.ink, marginBottom: 22}}>
+          One copilot.<br/>
+          Two driving styles.<br/>
+          <span style={{color: sprT.cyanInk}}>Zero forms.</span>
+        </div>
+        <div style={{fontSize: 18, lineHeight: 1.5, color: sprT.inkSoft, fontWeight: 500, maxWidth: 720, marginBottom: 28}}>
+          V4 carries over the V3 system (Sprout, momentum-led home, chat onboarding) and acts on the product changes you flagged: a single agent, only two modes, and a review flow that actually feels conversational.
+        </div>
+
+        {/* What changed table */}
+        <div style={{background:"#fff", borderRadius: 18, border:`1px solid ${sprT.hairline}`, padding: 0, overflow:"hidden", marginBottom: 28}}>
+          {[
+            {
+              tag:"#1", area:"Modes",
+              before:"3 modes (Cruise / Co-pilot / Manual) — too many ideas competing.",
+              after:"2 modes only — Auto Apply and Review Before Submit. The choice is now binary: do I send, or do you?",
+              tint: sprT.butter,
+            },
+            {
+              tag:"#2", area:"Application review",
+              before:"Doc-on-left, chat-on-right. Felt like editing an ATS form.",
+              after:"Sprout walks you through a stream of small review cards. Each card has pill actions (👍 / make warmer / try another). No text fields unless you ask for one.",
+              tint: sprT.cyan,
+            },
+            {
+              tag:"#3", area:"Single copilot framing",
+              before:"V3 already named the agent 'Sprout' — but multi-agent language leaked through.",
+              after:"Everywhere: 'Sprout', 'one assistant', 'your copilot'. No 'agents' plural. Never.",
+              tint: sprT.mint,
+            },
+            {
+              tag:"#4", area:"Voice & ROI",
+              before:"Mixed — partly enterprise, partly playful.",
+              after:"Five B2C pillars on every surface: time saved · less stress · more interviews · you in control · AI does the work.",
+              tint: sprT.lilac,
+            },
+            {
+              tag:"#5", area:"Onboarding",
+              before:"Chat-first but still 'configuration'-feeling.",
+              after:"Reframed as 'Teaching Sprout about you' — 60 seconds of tap-driven Q&A. No form fields.",
+              tint: sprT.blush,
+            },
+          ].map((r, i, arr) => (
+            <div key={r.tag} style={{
+              display:"grid", gridTemplateColumns:"60px 180px 1fr 1fr", gap: 14,
+              padding: "16px 18px", alignItems:"start",
+              borderBottom: i < arr.length-1 ? `1px solid ${sprT.hairline}` : "none",
+            }}>
+              <div style={{display:"flex", alignItems:"center", justifyContent:"center", width: 40, height: 40, borderRadius: 12, background: r.tint, fontFamily: fontDisplay, fontWeight: 700, fontSize: 16, color: sprT.ink, letterSpacing:"-0.02em"}}>{r.tag}</div>
+              <div>
+                <div style={{fontFamily: fontDisplay, fontWeight: 700, fontSize: 16, color: sprT.ink, letterSpacing:"-0.01em"}}>{r.area}</div>
+              </div>
+              <div>
+                <div style={{fontSize: 10.5, fontWeight: 800, color: sprT.muted, letterSpacing:"0.06em", marginBottom: 4}}>BEFORE</div>
+                <div style={{fontSize: 13, color: sprT.inkSoft, lineHeight: 1.45, fontWeight: 500}}>{r.before}</div>
+              </div>
+              <div>
+                <div style={{fontSize: 10.5, fontWeight: 800, color: sprT.cyanInk, letterSpacing:"0.06em", marginBottom: 4}}>NOW</div>
+                <div style={{fontSize: 13, color: sprT.ink, lineHeight: 1.45, fontWeight: 500}}>{r.after}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Mode comparison strip */}
+        <div>
+          <div style={{fontSize: 11, fontWeight: 800, color: sprT.muted, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom: 12}}>The two modes at a glance</div>
+          <div style={{display:"grid", gridTemplateColumns:"1fr 1fr", gap: 14}}>
+            <div style={{background: sprT.cyan, borderRadius: 18, padding: 18}}>
+              <div style={{fontSize: 11, fontWeight: 800, color: sprT.ink, letterSpacing:"0.05em", marginBottom: 6}}>🚀 MODE 1 · AUTO APPLY</div>
+              <div style={{fontFamily: fontDisplay, fontWeight: 700, fontSize: 20, color: sprT.ink, letterSpacing:"-0.02em", marginBottom: 10}}>Sprout handles the whole thing</div>
+              <div style={{display:"flex", alignItems:"center", gap: 6, fontSize: 11.5, fontWeight: 700, color: sprT.ink}}>
+                <span style={{padding:"4px 8px", background:"#fff", borderRadius: 6}}>Find</span>
+                <span>→</span>
+                <span style={{padding:"4px 8px", background:"#fff", borderRadius: 6}}>Fill</span>
+                <span>→</span>
+                <span style={{padding:"4px 8px", background: sprT.ink, color:"#fff", borderRadius: 6}}>Send</span>
+              </div>
+              <div style={{fontSize: 12.5, color: sprT.ink, opacity: 0.7, fontWeight: 600, marginTop: 12, lineHeight: 1.45}}>
+                AI submits automatically. You get a recap.
+              </div>
+            </div>
+            <div style={{background: sprT.butter, borderRadius: 18, padding: 18}}>
+              <div style={{fontSize: 11, fontWeight: 800, color: sprT.ink, letterSpacing:"0.05em", marginBottom: 6}}>✋ MODE 2 · REVIEW BEFORE SUBMIT</div>
+              <div style={{fontFamily: fontDisplay, fontWeight: 700, fontSize: 20, color: sprT.ink, letterSpacing:"-0.02em", marginBottom: 10}}>Sprout drafts, you press send</div>
+              <div style={{display:"flex", alignItems:"center", gap: 4, fontSize: 11, fontWeight: 700, color: sprT.ink, flexWrap:"wrap"}}>
+                <span style={{padding:"4px 7px", background:"#fff", borderRadius: 6}}>Find</span>
+                <span>→</span>
+                <span style={{padding:"4px 7px", background:"#fff", borderRadius: 6}}>Fill</span>
+                <span>→</span>
+                <span style={{padding:"4px 7px", background: sprT.ink, color:"#fff", borderRadius: 6}}>You approve</span>
+                <span>→</span>
+                <span style={{padding:"4px 7px", background:"#fff", borderRadius: 6}}>Sent</span>
+              </div>
+              <div style={{fontSize: 12.5, color: sprT.ink, opacity: 0.7, fontWeight: 600, marginTop: 12, lineHeight: 1.45}}>
+                The default. ~90s to review each application via pill actions.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right column: Sprout + tone of voice */}
+      <div style={{width: 380, flexShrink: 0, display:"flex", flexDirection:"column", gap: 16}}>
+        <div style={{background: sprT.ink, color:"#fff", borderRadius: 26, padding: 28, position:"relative", overflow:"hidden"}}>
+          <div style={{position:"absolute", top:-40, right:-40, width: 220, height: 220, borderRadius:"50%", background: sprT.cyan, opacity: 0.18, filter:"blur(24px)"}}/>
+          <div style={{display:"flex", justifyContent:"center", padding:"12px 0 18px", position:"relative"}}>
+            <SproutMascot size={140}/>
+          </div>
+          <div style={{fontFamily: fontDisplay, fontSize: 22, fontWeight: 700, letterSpacing:"-0.02em", marginBottom: 6, textAlign:"center"}}>Sprout</div>
+          <div style={{fontSize: 13, opacity: 0.7, textAlign:"center", lineHeight: 1.45, fontWeight: 500}}>Your one AI copilot. Friendly, eager. Says "I" never "we". Never says "agent" or "leverage".</div>
+
+          <div style={{marginTop: 18, padding: 14, background:"rgba(255,255,255,0.06)", borderRadius: 14, border:"1px solid rgba(255,255,255,0.08)"}}>
+            <div style={{fontSize: 11, fontWeight: 800, color: sprT.cyan, letterSpacing:"0.06em", marginBottom: 6}}>SPROUT, REVIEWING WITH YOU</div>
+            <div style={{fontSize: 13.5, lineHeight: 1.45, fontWeight: 500}}>"I drafted your Linear app — 9 of 10 answers are ready. One needs you. Tap once and I'll send it."</div>
+          </div>
+        </div>
+
+        <div style={{background:"#fff", borderRadius: 22, padding: 20, border: `1px solid ${sprT.hairline}`}}>
+          <div style={{fontSize: 11, fontWeight: 800, color: sprT.muted, letterSpacing:"0.08em", textTransform:"uppercase", marginBottom: 12}}>The 5 things every screen says</div>
+          {[
+            ["⏱","\"Saved you 3h 20m today\""],
+            ["💆","\"You don't have to do this manually anymore\""],
+            ["📈","\"3.4× more interviews\""],
+            ["🎚","\"You're in control — flip Auto on or off any time\""],
+            ["🧠","\"I learn from every edit\""],
+          ].map(([k,v],i) => (
+            <div key={i} style={{display:"flex", gap: 10, fontSize: 13, color: sprT.ink, lineHeight: 1.4, padding:"5px 0", fontWeight: 500}}>
+              <span style={{flexShrink: 0, fontSize: 16}}>{k}</span>
+              <span>{v}</span>
+            </div>
+          ))}
+        </div>
+
+        <div style={{fontSize: 12, color: sprT.muted, fontWeight: 600, textAlign:"center", padding:"0 20px", lineHeight: 1.45}}>
+          Each artboard below shows the desktop product at <b>1280×800</b>. Scroll →
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  return (
+    <>
+      <DesignCanvas storageKey="bloom-v4-refined">
+
+        <DCSection
+          id="changelog"
+          title="① What changed in V4"
+          subtitle="Five product/UX changes from your brief, mapped to screens below."
+        >
+          <DCArtboard id="moodboard" label="V4 direction · before → after" width={1400} height={840}>
+            <V4Moodboard/>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="entry"
+          title="② Welcome — refreshed B2C messaging"
+          subtitle="Five emotional pillars on the surface. One copilot, by name."
+        >
+          <DCArtboard id="welcome" label="Welcome · five-pillar strip + Sprout's draft preview" width={1280} height={820}>
+            <D_Welcome_v4/>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="onboarding"
+          title="③ Onboarding — teaching Sprout, not filling a form"
+          subtitle="Reframed: 'Teach me about you · 60 seconds'. Tap-only. Then résumé. Then mode."
+        >
+          <DCArtboard id="ob-chat" label="Step 1 · Teach Sprout · chips only, no fields" width={1280} height={820}>
+            <D_Onboarding_v4/>
+          </DCArtboard>
+          <DCArtboard id="ob-resume" label="Step 2 · Drop résumé · unchanged from V3 — works well" width={1280} height={820}>
+            <D_Resume/>
+          </DCArtboard>
+          <DCArtboard id="ob-mode" label="Step 3 · NEW · Two modes only" width={1280} height={840}>
+            <D_ModePicker_v4/>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="activation"
+          title="④ Activation — the magic moment (unchanged)"
+          subtitle="Dark, ROI-forward. Sprout wakes up."
+        >
+          <DCArtboard id="activating" label="Sprout is reading 12,400 roles for you…" width={1280} height={820}>
+            <D_Activation/>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="home"
+          title="⑤ Home — queue-forward, B2C copy"
+          subtitle="Hero changes based on mode. In Review mode it leads with 'X drafts are ready when you are.'"
+        >
+          <DCArtboard id="home-v4" label="Home · Review Before Submit mode · 'ready when you are'" width={1280} height={920}>
+            <D_Home_v4/>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="review"
+          title="⑥ Conversational Review — the biggest change"
+          subtitle="No more form-on-left/chat-on-right. Sprout walks you through a stream of review cards. Each card resolves with a pill tap. The whole review is ~90 seconds."
+        >
+          <DCArtboard id="review-v4" label="NEW · Conversational review · pill-driven, no text fields unless you want them" width={1280} height={1240}>
+            <D_Review_v4/>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="ambient"
+          title="⑦ Same Sprout, everywhere"
+          subtitle="Discover and ⌘K palette unchanged from V3 — they already match the new direction."
+        >
+          <DCArtboard id="discovery" label="Discover · focused card + Sprout's take (V3, still good)" width={1280} height={920}>
+            <D_Discovery/>
+          </DCArtboard>
+          <DCArtboard id="palette" label="⌘K Sprout palette · summon from anywhere (V3, still good)" width={1280} height={820}>
+            <D_SproutPanel/>
+          </DCArtboard>
+        </DCSection>
+
+      </DesignCanvas>
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection title="Sprout's voice" subtitle="Lock in the tone for the next polish pass.">
+          <TweakRadio label="Tone" value={t.tone} options={["playful","warm","professional"]} onChange={v=>setTweak("tone",v)}/>
+        </TweakSection>
+        <TweakSection title="Accent">
+          <TweakRadio label="Hit color" value={t.accent} options={["cyan","mint","butter"]} onChange={v=>setTweak("accent",v)}/>
+        </TweakSection>
+      </TweaksPanel>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

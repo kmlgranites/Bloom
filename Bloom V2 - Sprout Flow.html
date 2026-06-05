@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloom V2 — Sprout Flow (Onboarding · Sprout · Applications)</title>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Nunito:wght@700;800&display=swap">
+
+<style>
+  /* Local fonts — Bloom design system */
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-regular.ttf") format("truetype");font-weight:400;font-display:swap}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-medium.ttf") format("truetype");font-weight:500;font-display:swap}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-semibold.ttf") format("truetype");font-weight:600;font-display:swap}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-bold.ttf") format("truetype");font-weight:700;font-display:swap}
+  /* Filson Soft fallback — Nunito has similar rounded display feel */
+  @font-face{font-family:"Filson Soft";src:local("Nunito");font-weight:700;font-display:swap}
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body,#root{height:100%;font-family:"Proxima Soft",system-ui,sans-serif;color:#022F36}
+  body{background:#EEF2F5;overflow:hidden}
+  button{cursor:pointer;font-family:"Proxima Soft",sans-serif;border:none;background:none;color:inherit}
+  input,textarea,select{font-family:"Proxima Soft",sans-serif;outline:none}
+
+  @keyframes bv2spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+  @keyframes bv2pulse {
+    0%, 100% { opacity:.4; transform:scale(.85); }
+    50%      { opacity:1;  transform:scale(1); }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="bv2/design-canvas.jsx"></script>
+<script type="text/babel" src="bv2/tweaks-panel.jsx"></script>
+<script type="text/babel" src="bv2/cf-shared.jsx"></script>
+<script type="text/babel" src="bv2/cf-onboarding.jsx"></script>
+<script type="text/babel" src="bv2/cf-config.jsx"></script>
+<script type="text/babel" src="bv2/cf-app.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+const { DesignCanvas, DCSection, DCArtboard, TweaksPanel, useTweaks, TweakSection, TweakRadio, TweakToggle } = window;
+
+// Default tweaks — kept simple per "less tokens" direction
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "agentLabel": "Copilot",
+  "showSavedColumn": true
+}/*EDITMODE-END*/;
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const label = t.agentLabel;
+
+  return (
+    <>
+      <DesignCanvas storageKey="bloom-v2-sprout-flow">
+
+        <DCSection
+          id="onboarding"
+          title="① Onboarding"
+          subtitle="Signup → land on the “Set up your sprout” page. ~30 seconds before they hit the configuration wizard."
+        >
+          <DCArtboard id="ob-signup"  label="1.1 — Sign up · email + name + country" width={1280} height={820}>
+            <window.CFOnboardSignup agentLabel={label}/>
+          </DCArtboard>
+          <DCArtboard id="ob-setup"   label="1.2 — Setup landing · prompt to create first sprout" width={1280} height={820}>
+            <window.CFOnboardLanding agentLabel={label}/>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="sprout-setup"
+          title={`② ${label} Setup`}
+          subtitle="3 steps + activation animation + pricing. Bloom adds an Autonomy choice (full auto / review-high-stakes / approve-each) that JobCopilot doesn’t have."
+        >
+          <DCArtboard id="cfg-1"  label="2.1 — Step 1 · Location, job types, titles" width={1280} height={900}>
+            <window.CFConfigStep1 agentLabel={label}/>
+          </DCArtboard>
+          <DCArtboard id="cfg-2"  label="2.2 — Step 2 · Match strength + Autonomy (Bloom-only)" width={1280} height={1000}>
+            <window.CFConfigStep2 agentLabel={label}/>
+          </DCArtboard>
+          <DCArtboard id="cfg-3"  label="2.3 — Step 3 · Resume + screening memory" width={1280} height={1000}>
+            <window.CFConfigStep3 agentLabel={label}/>
+          </DCArtboard>
+          <DCArtboard id="cfg-load" label="2.4 — Engagement loader · sprout coming to life" width={1280} height={820}>
+            <window.CFActivating agentLabel={label}/>
+          </DCArtboard>
+          <DCArtboard id="cfg-pricing" label="2.5 — Pricing · activate to start applying" width={1280} height={900}>
+            <window.CFPricing agentLabel={label}/>
+          </DCArtboard>
+        </DCSection>
+
+        <DCSection
+          id="app"
+          title="③ Main App"
+          subtitle="Live product. Nav: Sprouts · Applications · Tools · Settings. Saved column is optional — toggle via Tweaks."
+        >
+          <DCArtboard id="app-home"  label="3.1 — Sprout dashboard · post-activation home" width={1280} height={980}>
+            <window.CFSproutDashboard agentLabel={label}/>
+          </DCArtboard>
+          <DCArtboard id="app-track" label="3.2 — Application tracker · kanban" width={1440} height={820}>
+            <window.CFApplicationsTracker agentLabel={label} showSaved={t.showSavedColumn}/>
+          </DCArtboard>
+          <DCArtboard id="app-review" label="3.3 — Application review · edit answers to train sprout" width={1280} height={820}>
+            <window.CFApplicationReview agentLabel={label}/>
+          </DCArtboard>
+        </DCSection>
+      </DesignCanvas>
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection title="Agent name" subtitle="What does Bloom call its auto-apply agent?">
+          <TweakRadio
+            value={t.agentLabel}
+            options={["Sprout","Bloom Agent","Copilot"]}
+            onChange={v => setTweak("agentLabel", v)}
+          />
+        </TweakSection>
+        <TweakSection title="Applications tracker" subtitle="You weren't sure about a Saved column — try it on/off.">
+          <TweakToggle
+            label="Show Saved column"
+            value={t.showSavedColumn}
+            onChange={v => setTweak("showSavedColumn", v)}
+          />
+        </TweakSection>
+      </TweaksPanel>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+</script>
+</body>
+</html>

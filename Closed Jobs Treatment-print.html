@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bloom — Closed Jobs: 3 Treatment Options (Print)</title>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-regular.ttf");font-weight:400}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-medium.ttf");font-weight:500}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-semibold.ttf");font-weight:600}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-bold.ttf");font-weight:700}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{font-family:"Proxima Soft",system-ui,sans-serif;background:#E8EAED}
+  body{padding:24px 0}
+  button{cursor:default;font-family:"Proxima Soft",sans-serif;border:none;background:none}
+  input{font-family:"Proxima Soft",sans-serif;border:none;outline:none}
+  .num{font-family:"Inter",sans-serif;font-feature-settings:"tnum"}
+  .page{
+    width:1280px;margin:0 auto 24px;background:#fff;
+    box-shadow:0 4px 18px rgba(0,0,0,.08);overflow:hidden;
+    position:relative;
+  }
+  .page-label{
+    padding:14px 32px;background:#022F36;color:#fff;
+    font-family:"Filson Soft","Proxima Soft",sans-serif;font-weight:700;font-size:18px;
+    letterSpacing:"-.01em";display:flex;align-items:center;gap:14px;
+  }
+  .page-label .tag{
+    display:inline-block;padding:3px 10px;border-radius:6px;
+    background:#5AEBEB;color:#022F36;font-size:11px;font-weight:700;letter-spacing:.08em;
+  }
+  @page{size:1340px 1400px;margin:0}
+  @media print{
+    html,body{background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{padding:0}
+    .page{
+      margin:0;box-shadow:none;page-break-after:always;break-after:page;
+      page-break-inside:avoid;break-inside:avoid;
+    }
+    .page:last-child{page-break-after:auto;break-after:auto}
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="ApplicationsPage.jsx"></script>
+<script type="text/babel">
+const { useState } = React;
+
+function IntroBoard() {
+  return (
+    <div style={{padding:"70px 64px",fontFamily:'"Proxima Soft",sans-serif',background:"#fff",width:1280,height:720}}>
+      <div style={{
+        display:"inline-block",padding:"4px 12px",borderRadius:6,
+        background:"#FEEAAE",fontSize:12,fontWeight:700,letterSpacing:".06em",
+        color:"#7A5500",marginBottom:22
+      }}>THE PROBLEM</div>
+      <h1 style={{fontFamily:'"Filson Soft","Proxima Soft",sans-serif',fontSize:48,
+          fontWeight:700,color:"#022F36",lineHeight:1.12,marginBottom:22,letterSpacing:"-.02em"}}>
+        Closed jobs are getting<br/>mislabeled as "Manual Apply."
+      </h1>
+      <p style={{fontSize:20,color:"#4A5464",lineHeight:1.5,marginBottom:38,maxWidth:900}}>
+        These are two very different states. Conflating them frustrates users —
+        they click expecting a form, find a closed listing, and lose trust in the queue.
+      </p>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:24,marginBottom:30}}>
+        <div style={{padding:"22px 24px",borderRadius:14,background:"#FFF7ED",border:"1px solid #FED7AA"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+            <i className="ti ti-edit" style={{fontSize:22,color:"#C2410C"}} />
+            <div style={{fontSize:17,fontWeight:700,color:"#7C2D12"}}>Manual Apply Required</div>
+          </div>
+          <div style={{fontSize:15,color:"#7C2D12",lineHeight:1.55}}>
+            Bloom can't auto-submit (e.g. assessment, login wall, captcha).
+            <strong> User action: fill out the form yourself.</strong>
+          </div>
+        </div>
+        <div style={{padding:"22px 24px",borderRadius:14,background:"#F1F5F9",border:"1px solid #CBD5E1"}}>
+          <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+            <i className="ti ti-lock" style={{fontSize:22,color:"#475569"}} />
+            <div style={{fontSize:17,fontWeight:700,color:"#0F172A"}}>Closed / Expired</div>
+          </div>
+          <div style={{fontSize:15,color:"#334155",lineHeight:1.55}}>
+            Recruiter pulled the listing. <strong>No action possible — only recovery.</strong>
+            These shouldn't crowd the active queue.
+          </div>
+        </div>
+      </div>
+      <div style={{padding:"18px 22px",borderRadius:12,background:"#022F36",color:"#fff",fontSize:16,lineHeight:1.5}}>
+        <strong style={{color:"#5AEBEB"}}>Goal →</strong> separate the two states, give Closed its own
+        affordances (filter, status, dashboard tile, and a recovery path), and turn the dead-end
+        into a "find similar roles" moment.
+      </div>
+    </div>
+  );
+}
+
+function Page({ label, tag, children, height = 1180 }) {
+  return (
+    <div className="page" style={{height: height + 56}}>
+      <div className="page-label">
+        {tag && <span className="tag">{tag}</span>}
+        <span>{label}</span>
+      </div>
+      <div style={{height, overflow:"hidden"}}>{children}</div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <div>
+      <Page label="Context — the problem we're solving" tag="INTRO" height={720}>
+        <IntroBoard />
+      </Page>
+      <Page label="Treatment A · Inline & Subtle" tag="OPTION A" height={1180}>
+        <ApplicationsPage variant="A" />
+      </Page>
+      <Page label="Treatment B · Recovery Banner (recommended)" tag="OPTION B" height={1260}>
+        <ApplicationsPage variant="B" />
+      </Page>
+      <Page label="Treatment C · Dedicated Tab — Active view" tag="OPTION C" height={1180}>
+        <ApplicationsPage variant="C" />
+      </Page>
+      <Page label="Treatment C · Inside the Closed tab" tag="OPTION C" height={1080}>
+        <ApplicationsPage variant="C" tab="closed" />
+      </Page>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+// Auto-print when ready
+(async () => {
+  try { if (document.fonts && document.fonts.ready) await document.fonts.ready; } catch(e){}
+  await new Promise(r => setTimeout(r, 800));
+  window.print();
+})();
+</script>
+</body>
+</html>

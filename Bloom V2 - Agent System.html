@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bloom V2 — Autonomous Agent System</title>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-regular.ttf");font-weight:400}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-medium.ttf");font-weight:500}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-semibold.ttf");font-weight:600}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-bold.ttf");font-weight:700}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body,#root{height:100%;font-family:"Proxima Soft",system-ui,sans-serif}
+  body{background:#F0F3F7;overflow:hidden}
+  button{cursor:pointer;font-family:"Proxima Soft",sans-serif;border:none;background:none;color:inherit}
+  input{font-family:"Proxima Soft",sans-serif;border:none;outline:none;background:transparent}
+  textarea{font-family:"Proxima Soft",sans-serif;outline:none}
+  .num{font-family:"Inter",sans-serif;font-feature-settings:"tnum"}
+
+  @keyframes bv2spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+  @keyframes bv2pulse {
+    0%   { box-shadow: 0 0 0 0 currentColor; opacity: 1; }
+    70%  { box-shadow: 0 0 0 8px transparent; opacity: .8; }
+    100% { box-shadow: 0 0 0 0 transparent; opacity: 1; }
+  }
+
+  /* range slider */
+  input[type="range"]{
+    -webkit-appearance:none;appearance:none;height:4px;
+    background:#E2E8F0;border-radius:99px;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:18px;height:18px;
+    border-radius:50%;background:#022F36;cursor:pointer;
+    box-shadow:0 1px 3px rgba(0,0,0,.2);
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:18px;height:18px;border-radius:50%;background:#022F36;
+    cursor:pointer;border:none;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="bv2/shared.jsx"></script>
+<script type="text/babel" src="bv2/Onboarding.jsx"></script>
+<script type="text/babel" src="bv2/Dashboard.jsx"></script>
+<script type="text/babel" src="bv2/ActivityFeed.jsx"></script>
+<script type="text/babel" src="bv2/BlockingQuestion.jsx"></script>
+<script type="text/babel" src="bv2/ConfirmAssumptions.jsx"></script>
+<script type="text/babel" src="bv2/SavedAnswers.jsx"></script>
+<script type="text/babel" src="bv2/NotificationHub.jsx"></script>
+<script type="text/babel" src="bv2/Settings.jsx"></script>
+<script type="text/babel" src="bv2/EmailDigest.jsx"></script>
+<script type="text/babel" src="bv2/Timeline.jsx"></script>
+<script type="text/babel" src="bv2/Badges.jsx"></script>
+<script type="text/babel" src="bv2/JobsQueue.jsx"></script>
+<script type="text/babel" src="bv2/JobDetail.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+const { DesignCanvas, DCSection, DCArtboard } = window;
+
+function App() {
+  return (
+    <DesignCanvas storageKey="bloom-v2-agent">
+      <DCSection id="onboard" title="① Onboarding & Controls" subtitle="First-time setup and ongoing settings.">
+        <DCArtboard id="onboarding" label="Auto-Apply Setup · 3-step intro" width={1280} height={800}>
+          <window.BV2_Onboarding />
+        </DCArtboard>
+        <DCArtboard id="settings" label="Settings · Pause, threshold, rules" width={1280} height={800}>
+          <window.BV2_Settings />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="home" title="② Daily home — what's happening" subtitle="Where users land each session. Hero stat + 1-2 inline actions.">
+        <DCArtboard id="dashboard" label="Dashboard · Agent status hub" width={1280} height={800}>
+          <window.BV2_Dashboard />
+        </DCArtboard>
+        <DCArtboard id="activity" label="Activity Feed · Live + history" width={1280} height={800}>
+          <window.BV2_ActivityFeed />
+        </DCArtboard>
+        <DCArtboard id="notifications" label="Notification Hub · Right-side sheet" width={1280} height={800}>
+          <window.BV2_NotificationHub />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="moments" title="③ Agent decision moments" subtitle="The few times the agent earns the user's attention.">
+        <DCArtboard id="blocking" label="Blocking Question · Center modal" width={1280} height={800}>
+          <window.BV2_BlockingQuestion />
+        </DCArtboard>
+        <DCArtboard id="confirm" label="Confirm Assumptions · Async review" width={1280} height={800}>
+          <window.BV2_ConfirmAssumptions />
+        </DCArtboard>
+        <DCArtboard id="saved" label="Saved Answers · Memory library" width={1280} height={800}>
+          <window.BV2_SavedAnswers />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="outside" title="④ Outside the app" subtitle="Email is the primary daily touchpoint — users don't log in every day.">
+        <DCArtboard id="email" label="Daily Email Digest" width={720} height={880}>
+          <window.BV2_EmailDigest />
+        </DCArtboard>
+        <DCArtboard id="timeline" label="Per-job Application Timeline" width={1280} height={800}>
+          <window.BV2_Timeline />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="jobs" title="⑤ Jobs — the agentic workflow" subtitle="Jobs is no longer a board to manually apply from. It's the agent's queue: see what's about to go out, override anything.">
+        <DCArtboard id="jobs-queue" label="Jobs · Queue, Borderline, Discover" width={1280} height={800}>
+          <window.BV2_JobsQueue />
+        </DCArtboard>
+        <DCArtboard id="job-detail" label="Job detail · What I'll send (radical transparency)" width={1280} height={800}>
+          <window.BV2_JobDetail />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="system" title="⑥ System — status badges" subtitle="Plain-language statuses replace tier jargon.">
+        <DCArtboard id="badges" label="Application Status Badges" width={780} height={900}>
+          <window.BV2_BadgeSystem />
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
