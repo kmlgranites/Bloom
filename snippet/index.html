@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Apply Blast Feed — usage</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    min-height:100vh;font-family:"Proxima Soft",system-ui,-apple-system,sans-serif;
+    background:#022F36;
+    background-image:radial-gradient(rgba(90,235,235,.07) 1px, transparent 1px);
+    background-size:22px 22px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:48px 24px;gap:26px;
+  }
+  h1{font-size:30px;font-weight:700;color:#fff;line-height:1.22;text-align:center;max-width:380px;text-wrap:pretty;}
+  .proof{font-size:14px;font-weight:600;color:#B9D3D6;letter-spacing:.02em;}
+  .strip{
+    display:flex;align-items:center;gap:10px;
+    background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+    border-radius:9999px;padding:10px 18px;
+  }
+  .dot{width:8px;height:8px;border-radius:50%;background:#5AEBEB;animation:blink 1.4s ease-in-out infinite;}
+  .strip span{font-size:14px;font-weight:600;color:#DDECEE;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+  code{background:rgba(255,255,255,.1);color:#5AEBEB;padding:2px 7px;border-radius:5px;font-size:13px;}
+  .note{font-size:13px;color:#8FB2B6;text-align:center;max-width:460px;line-height:1.6;}
+</style>
+</head>
+<body>
+
+  <h1>Get hired faster with AI that applies for you</h1>
+  <div class="proof">Trusted by over 500K job seekers</div>
+
+  <!-- ▼▼ the snippet ▼▼ -->
+  <apply-blast-feed interval="5.5" cta="#18D1D1" style="max-width:430px;"></apply-blast-feed>
+  <!-- ▲▲ the snippet ▲▲ -->
+
+  <div class="strip"><span class="dot"></span><span>1,284 applications sent in the last hour</span></div>
+
+  <p class="note">
+    Drop <code>apply-blast-feed.js</code> next to your page and add the
+    <code>&lt;apply-blast-feed&gt;</code> tag. Pass your own roles with a
+    <code>jobs='[…]'</code> JSON attribute, or edit <code>DEFAULT_JOBS</code> in the file.
+  </p>
+
+<script src="apply-blast-feed.js"></script>
+</body>
+</html>
