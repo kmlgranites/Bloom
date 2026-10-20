@@ -1,0 +1,2209 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <rect width="120" height="120" rx="24" fill="#022F36"/>
+    <rect x="30" y="34" width="60" height="12" rx="6" fill="#5AEBEB"/>
+    <rect x="30" y="56" width="44" height="10" rx="5" fill="#18D1D1" opacity=".7"/>
+    <rect x="30" y="74" width="52" height="10" rx="5" fill="#F76638" opacity=".85"/>
+  </svg>
+</template>
+<helmet>
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.525.0/font/lucide.css">
+<style>
+  @font-face { font-family:"Proxima Soft"; src:url("fonts/proxima-nova-soft-regular.ttf"); font-weight:400; }
+  @font-face { font-family:"Proxima Soft"; src:url("fonts/proxima-nova-soft-medium.ttf"); font-weight:500; }
+  @font-face { font-family:"Proxima Soft"; src:url("fonts/proxima-nova-soft-semibold.ttf"); font-weight:600; }
+  @font-face { font-family:"Proxima Soft"; src:url("fonts/proxima-nova-soft-bold.ttf"); font-weight:700; }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-thumb{background:#CBD2D9;border-radius:5px;}
+  ::-webkit-scrollbar-track{background:transparent;}
+
+  @keyframes sbShrink{from{width:100%;}to{width:0%;}}
+  .tip{position:relative;}
+  .tip .tipbox{position:absolute;bottom:calc(100% + 10px);right:0;width:250px;background:#0D0D0F;color:#fff;border-radius:14px;padding:12px 15px;font-size:13.5px;line-height:1.45;font-weight:500;opacity:0;visibility:hidden;transition:opacity .15s;pointer-events:none;z-index:65;text-align:left;white-space:normal;}
+  .tip:hover .tipbox{opacity:1;visibility:visible;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.45;transform:scale(0.8);}}
+  @keyframes sbIn{from{opacity:0;transform:translate(-50%,16px);}to{opacity:1;transform:translate(-50%,0);}}
+  /* ---- responsive: phones/tablets ---- */
+  @media (max-width:1260px){
+    .promo-pill{display:none !important;}
+  }
+  @media (max-width:1050px){
+    .credits-label{display:none !important;}
+  }
+  @media (max-width:900px){
+    .app-header{gap:10px !important;padding:0 14px !important;}
+    .nav-label{display:none !important;}
+  }
+  @media (max-width:760px){
+    .jobs-page{padding:16px 14px 90px !important;}
+    .jobs-head h1{font-size:20px !important;}
+    .job-card{padding:20px 16px !important;border-radius:18px !important;}
+    .job-grid{grid-template-columns:1fr !important;gap:22px !important;}
+    .job-title{font-size:24px !important;}
+    .card-actions{width:100%;flex-wrap:wrap;}
+    .card-actions button{flex:1 1 auto;justify-content:center;}
+    .card-actions .apply-btn{flex-basis:100%;order:-1;padding-top:13px !important;padding-bottom:13px !important;}
+    .next-arrow{position:fixed !important;right:18px !important;bottom:78px !important;top:auto !important;transform:none !important;z-index:26;width:54px !important;height:54px !important;}
+    .saved-row{flex-wrap:wrap !important;gap:12px !important;padding:16px !important;}
+    .saved-meta{flex-basis:calc(100% - 64px) !important;}
+    .saved-actions{flex-basis:100% !important;}
+    .saved-actions button{flex:1;justify-content:center;}
+    .info-strip{align-items:flex-start !important;}
+  }
+</style>
+</helmet>
+<sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Login" style="position:fixed;inset:0;z-index:500;overflow:auto;background:#FFFFFF;">
+    <dc-import name="Bloom Login" on-sign-in="{{ onSignIn }}" hint-size="100%,100vh"></dc-import>
+  </div>
+</sc-if>
+
+<div style="height:100vh;width:100%;display:flex;flex-direction:column;font-family:'Proxima Soft',system-ui,sans-serif;background:#EEF4FA;overflow:hidden;color:#23262E;">
+
+  <!-- ===== HEADER ===== -->
+  <header class="app-header" style="flex-shrink:0;background:#FFFFFF;border-bottom:1px solid #ECECEC;height:76px;display:flex;align-items:center;gap:18px;padding:0 26px;z-index:30;">
+    <img src="assets/bloom-logo.svg" alt="Bloom" style="height:32px;flex-shrink:0;">
+
+    <nav style="display:flex;align-items:stretch;height:100%;gap:2px;margin-left:6px;">
+      <sc-for list="{{ navItems }}" as="tab" hint-placeholder-count="4">
+        <button onClick="{{ tab.onClick }}" style="{{ tab.style }}">
+          <i class="{{ tab.iconClass }}" style="{{ tab.iconStyle }}"></i>
+          <span class="nav-label">{{ tab.label }}</span>
+        </button>
+      </sc-for>
+    </nav>
+
+    <div style="flex:1;display:flex;justify-content:flex-end;align-items:center;gap:12px;">
+      <sc-if value="{{ promoShow }}" hint-placeholder-val="{{ true }}">
+        <div class="promo-pill" style="display:flex;align-items:center;gap:11px;border:1px solid #ECECEC;border-radius:9999px;padding:6px 7px 6px 16px;">
+          <span style="font-size:14px;color:#23262E;white-space:nowrap;"><i class="icon icon-sparkles" style="font-size:12px;color:#F76638;margin-right:5px;"></i>Get <b>100+</b> Job Auto Applies at <b>Just $29</b></span>
+          <button onClick="{{ onUpgrade }}" style="border:double 2px transparent;border-radius:9999px;background-image:linear-gradient(#fff,#fff),linear-gradient(95deg,#5AEBEB,#7C8BFF,#F76638);background-origin:border-box;background-clip:padding-box,border-box;padding:6px 15px;font-family:inherit;font-size:14px;font-weight:700;color:#022F36;cursor:pointer;white-space:nowrap;">Upgrade Now</button>
+        </div>
+      </sc-if>
+
+      <button onClick="{{ goBilling }}" title="Manage subscription" style="{{ headerBadgeStyle }}">
+        <i class="{{ sc.headerBadge.icon }}" style="font-size:13px;"></i>
+        <span>{{ sc.headerBadge.label }}</span>
+      </button>
+
+      <div style="position:relative;" onMouseEnter="{{ onCreditsEnter }}" onMouseLeave="{{ onCreditsLeave }}">
+        <div style="display:flex;align-items:center;gap:7px;border:1px solid #ECECEC;border-radius:9999px;padding:5px 7px 5px 14px;cursor:default;">
+          <i class="icon icon-sparkles" style="font-size:13px;color:#022F36;"></i>
+          <span class="credits-label" style="font-size:14px;font-weight:600;color:#23262E;white-space:nowrap;">Apply Credits</span>
+          <span style="background:#E0FAFA;color:#022F36;font-weight:700;border-radius:9999px;padding:4px 12px;font-size:13px;">{{ sc.credits }}</span>
+        </div>
+
+        <sc-if value="{{ creditsHover }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:32px;right:0;width:340px;height:16px;"></div>
+          <div style="position:absolute;top:46px;right:0;width:340px;background:#fff;border:1px solid #E5E7EB;border-radius:16px;box-shadow:0 16px 40px rgba(0,0,0,0.16);padding:18px;z-index:60;">
+
+            <!-- ZONE 1 · CREDITS (billing cycle) -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:15px;font-weight:700;color:#0D0D0F;">Apply Credits</span>
+                <span style="{{ credPlanPill }}">{{ credInfo.planLabel }}</span>
+              </div>
+              <span style="font-size:12px;font-weight:700;color:#7A8694;text-transform:uppercase;letter-spacing:0.04em;">{{ credCycleTag }}</span>
+            </div>
+            <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:10px;">
+              <span style="{{ credInfo.bigStyle }}">{{ credInfo.bigLeft }}</span>
+              <span style="font-size:15px;font-weight:700;color:#0D0D0F;">{{ credInfo.leftWord }}</span>
+            </div>
+            <div style="height:8px;border-radius:9999px;background:#EDF0F2;overflow:hidden;margin-bottom:8px;"><div style="{{ credInfo.barStyle }}"></div></div>
+            <div style="font-size:13px;color:#7A8694;">{{ credInfo.contextLine }}</div>
+
+            <!-- upgrade nudge (free plan) -->
+            <sc-if value="{{ credInfo.showUpgrade }}" hint-placeholder-val="{{ false }}">
+              <div style="{{ credUpgradeBox }}">
+                <div style="font-size:14px;font-weight:700;color:#0D0D0F;margin-bottom:2px;">{{ credInfo.upgradeTitle }}</div>
+                <div style="font-size:13px;color:#4A5464;margin-bottom:11px;">{{ credInfo.upgradeSub }}</div>
+                <button onClick="{{ onUpgrade }}" style="{{ credUpgradeBtn }}"><i class="icon icon-crown" style="font-size:15px;"></i>{{ credInfo.upgradeCta }}</button>
+              </div>
+            </sc-if>
+
+            <div style="height:1px;background:#EDEEF0;margin:15px 0;"></div>
+
+            <!-- ZONE 2 · APPLICATIONS (all time) -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:15px;font-weight:700;color:#0D0D0F;">Your Applications</span>
+              <span style="font-size:15px;font-weight:700;color:#0D0D0F;">{{ credInfo.allTime }}</span>
+            </div>
+            <div style="font-size:12px;font-weight:600;color:#7A8694;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:12px;">All time · across every plan</div>
+            <div style="display:flex;gap:10px;">
+              <div style="flex:1;display:flex;align-items:center;gap:9px;background:#F5F8FA;border:1px solid #ECEEF0;border-radius:12px;padding:11px 13px;">
+                <span style="width:10px;height:10px;border-radius:3px;background:#1D484F;flex-shrink:0;"></span>
+                <div><div style="font-size:20px;font-weight:700;color:#0D0D0F;line-height:1;">{{ credInfo.inProgress }}</div><div style="font-size:12.5px;color:#4A5464;margin-top:3px;">In Progress</div></div>
+              </div>
+              <div style="flex:1;display:flex;align-items:center;gap:9px;background:#F1FBF4;border:1px solid #CFEBD9;border-radius:12px;padding:11px 13px;">
+                <span style="width:10px;height:10px;border-radius:3px;background:#00B16B;flex-shrink:0;"></span>
+                <div><div style="font-size:20px;font-weight:700;color:#00824D;line-height:1;">{{ credInfo.completed }}</div><div style="font-size:12.5px;color:#4A5464;margin-top:3px;">Completed</div></div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:7px;margin-top:11px;font-size:13px;color:#4A5464;">
+              <i class="icon icon-layers" style="font-size:14px;color:#7A8694;"></i>{{ credInfo.breakdown }}
+            </div>
+
+            <!-- bridge explainer -->
+            <div style="display:flex;align-items:flex-start;gap:8px;background:#F5F8FA;border-radius:10px;padding:10px 12px;margin-top:14px;">
+              <i class="icon icon-info" style="font-size:15px;color:#7A8694;flex-shrink:0;margin-top:1px;"></i>
+              <span style="font-size:12.5px;line-height:1.5;color:#4A5464;">Credits are your allowance for the current cycle and reset each period. Applications are every job you've ever applied to — across all plans and past cycles — so this total keeps growing and can be higher than your credits.</span>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+
+      <button style="position:relative;background:none;border:none;cursor:pointer;padding:6px;color:#23262E;">
+        <i class="icon icon-megaphone" style="font-size:20px;"></i>
+        <span style="position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:#F76638;border:1.5px solid #fff;"></span>
+      </button>
+
+      <div style="position:relative;">
+        <button onClick="{{ onAvatar }}" style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#1D484F,#3C5356);border:2px solid #E0FAFA;color:#fff;font-weight:700;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;">D</button>
+        <sc-if value="{{ avatarMenu }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;top:50px;right:0;width:218px;background:#fff;border:1px solid #E5E7EB;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,0.16);padding:6px;z-index:50;">
+            <div style="padding:10px 12px 11px;border-bottom:1px solid #F0F1F3;margin-bottom:4px;">
+              <div style="font-size:14px;font-weight:700;color:#022F36;">Dillan Fernando</div>
+              <div style="font-size:12px;color:#A5A5A5;margin-top:2px;">{{ sc.headerBadge.label }} plan</div>
+            </div>
+            <button onClick="{{ goAccount }}" style="width:100%;text-align:left;display:flex;align-items:center;gap:10px;background:none;border:none;border-radius:9px;padding:10px 12px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;" style-hover="background:#F5F6F7;"><i class="icon icon-circle-user" style="font-size:16px;color:#4A5464;"></i>Manage account</button>
+            <button onClick="{{ goBilling }}" style="width:100%;text-align:left;display:flex;align-items:center;gap:10px;background:none;border:none;border-radius:9px;padding:10px 12px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;" style-hover="background:#F5F6F7;"><i class="icon icon-credit-card" style="font-size:16px;color:#4A5464;"></i>Plan &amp; billing</button>
+            <button onClick="{{ onSignOut }}" style="width:100%;text-align:left;display:flex;align-items:center;gap:10px;background:none;border:none;border-radius:9px;padding:10px 12px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;" style-hover="background:#F5F6F7;"><i class="icon icon-log-out" style="font-size:16px;color:#4A5464;"></i>Sign out</button>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== GLOBAL BANNER (shows on every screen) ===== -->
+  <sc-if value="{{ bannerShow }}" hint-placeholder-val="{{ false }}">
+    <div style="{{ bannerStyle }}">
+      <div style="flex:1;text-align:center;font-size:15px;font-weight:600;padding-left:120px;">{{ sc.banner.text }}</div>
+      <div style="display:flex;align-items:center;gap:12px;flex-shrink:0;">
+        <button onClick="{{ onBannerCta }}" style="{{ bannerCtaStyle }}">{{ sc.banner.cta }}</button>
+        <sc-if value="{{ bannerDismissable }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ onDismiss }}" title="Dismiss" style="background:none;border:none;cursor:pointer;color:inherit;opacity:0.6;padding:4px;display:flex;align-items:center;"><i class="icon icon-x" style="font-size:18px;"></i></button>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== BODY ===== -->
+  <main style="flex:1;overflow-y:auto;position:relative;{{ mainScrollLockStyle }}">
+
+    <!-- ============ JOBS ============ -->
+    <sc-if value="{{ isJobs }}" hint-placeholder-val="{{ true }}">
+      <div data-screen-label="Jobs" class="jobs-page" style="max-width:1180px;margin:0 auto;padding:24px 32px 90px;">
+        <!-- header row -->
+        <div class="jobs-head" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <h1 style="font-size:24px;font-weight:700;color:#022F36;">{{ jobsHeading }}</h1>
+            <sc-if value="{{ isMatches }}" hint-placeholder-val="{{ true }}">
+              <span style="display:inline-flex;align-items:center;gap:6px;background:#022F36;color:#fff;border-radius:9999px;padding:5px 13px;font-size:13px;font-weight:700;"><i class="icon icon-sparkles" style="font-size:13px;color:#5AEBEB;"></i>30+ matches</span>
+            </sc-if>
+          </div>
+          <sc-if value="{{ isMatches }}" hint-placeholder-val="{{ true }}">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <button onClick="{{ onOpenPrefs }}" title="Change where you're looking" style="display:flex;align-items:center;gap:7px;background:#F0FCFF;border:1px solid #B8EAF5;border-radius:9999px;padding:9px 14px;font-family:inherit;font-size:14px;font-weight:600;color:#022F36;cursor:pointer;white-space:nowrap;" style-hover="background:#E0F7FB;"><i class="icon icon-map-pin" style="font-size:15px;color:#1D484F;"></i>{{ locChip }}<span style="color:#1D484F;font-weight:700;margin-left:2px;">Edit</span></button>
+            <button onClick="{{ onOpenPrefs }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E5E7EB;border-radius:9999px;padding:9px 16px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;"><i class="icon icon-sliders-horizontal" style="font-size:15px;color:#1D484F;"></i>Match Preference</button>
+            </div>
+          </sc-if>
+        </div>
+
+        <!-- back to saved (detail) -->
+        <sc-if value="{{ isSavedDetail }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ backToSaved }}" style="display:flex;align-items:center;gap:8px;background:none;border:none;padding:0;margin-bottom:14px;font-family:inherit;font-size:14px;font-weight:700;color:#1D484F;cursor:pointer;"><i class="icon icon-arrow-left" style="font-size:17px;"></i>Back to saved jobs</button>
+        </sc-if>
+
+        <!-- tabs + actions (single row) -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:18px;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div style="display:flex;align-items:center;gap:6px;background:#E4EAF0;border-radius:9999px;padding:4px;">
+              <button onClick="{{ showMatches }}" style="{{ segMatchesStyle }}"><i class="icon icon-sparkles" style="font-size:14px;"></i>Matches</button>
+              <button onClick="{{ showSaved }}" style="{{ segSavedStyle }}"><i class="icon icon-bookmark" style="font-size:14px;"></i>Saved <span style="opacity:.6;">{{ savedCount }}</span></button>
+            </div>
+            <sc-if value="{{ showMomentum }}" hint-placeholder-val="{{ false }}">
+              <span style="display:inline-flex;align-items:center;gap:7px;background:#E3F7EC;color:#00824D;border-radius:9999px;padding:7px 14px;font-size:13px;font-weight:700;"><i class="icon icon-circle-check-big" style="font-size:15px;"></i>{{ reviewedCount }} reviewed today</span>
+            </sc-if>
+          </div>
+          <sc-if value="{{ showCard }}" hint-placeholder-val="{{ true }}">
+            <div class="card-actions" style="display:flex;align-items:center;gap:12px;">
+              <button onClick="{{ onNotInterested }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E5E7EB;border-radius:9999px;padding:10px 18px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;"><i class="icon icon-x" style="font-size:17px;"></i>Pass</button>
+              <button onClick="{{ onSave }}" style="{{ saveBtnStyle }}"><i class="{{ saveBtnIcon }}" style="font-size:16px;"></i>{{ saveBtnLabel }}</button>
+              <button onClick="{{ onApply }}" class="apply-btn" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;border:2px solid #0D0D0F;border-radius:9999px;padding:9px 22px;font-family:inherit;font-size:15px;font-weight:700;color:#0D0D0F;cursor:pointer;box-shadow:0 2px 0 #0D0D0F;"><i class="icon icon-badge-check" style="font-size:17px;color:#F76638;"></i>APPLY NOW</button>
+            </div>
+          </sc-if>
+        </div>
+
+        <!-- ===== MATCHES VIEW / SAVED DETAIL (shared card) ===== -->
+        <sc-if value="{{ showCard }}" hint-placeholder-val="{{ true }}">
+          <div style="position:relative;">
+
+            <!-- stack depth (matches only) -->
+            <sc-if value="{{ isMatches }}" hint-placeholder-val="{{ true }}">
+              <div style="position:absolute;left:26px;right:26px;bottom:-16px;height:44px;background:#fff;border:1px solid #E8EAEC;border-radius:22px;box-shadow:0 6px 16px rgba(0,0,0,0.05);z-index:0;"></div>
+              <div style="position:absolute;left:14px;right:14px;bottom:-8px;height:44px;background:#fff;border:1px solid #EDEEF0;border-radius:22px;box-shadow:0 4px 12px rgba(0,0,0,0.04);z-index:1;"></div>
+            </sc-if>
+
+            <!-- job card -->
+            <div class="job-card" style="position:relative;z-index:2;background:#fff;border:1px solid #EDEEF0;border-radius:22px;box-shadow:0 4px 16px rgba(0,0,0,0.05);padding:34px 38px;">
+              <div class="job-grid" style="display:grid;grid-template-columns:1fr 290px;gap:34px;">
+                <!-- LEFT -->
+                <div>
+                  <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+                    <div style="width:46px;height:46px;border-radius:11px;background:{{ job.logoBg }};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:20px;">{{ job.logoChar }}</div>
+                    <span style="font-size:17px;font-weight:700;color:#0D0D0F;">{{ job.company }}</span>
+                    <span style="width:4px;height:4px;border-radius:50%;background:#C4C4C4;"></span>
+                    <span style="display:inline-flex;align-items:center;gap:5px;font-size:14px;color:#4A5464;"><i class="icon icon-clock" style="font-size:14px;"></i>Posted {{ job.posted }}</span>
+                  </div>
+                  <sc-if value="{{ el.has }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;margin:-6px 0 14px;">
+                      <sc-for list="{{ el.flags }}" as="fl" hint-placeholder-count="2">
+                        <span title="{{ fl.tip }}" style="{{ fl.style }}"><i class="{{ fl.icon }}" style="font-size:13px;"></i>{{ fl.text }}</span>
+                      </sc-for>
+                    </div>
+                  </sc-if>
+                  <sc-if value="{{ el.blocked }}" hint-placeholder-val="{{ false }}">
+                    <div style="display:flex;align-items:flex-start;gap:9px;background:#FFF4EF;border:1px solid #F9D9CB;border-radius:12px;padding:11px 14px;margin:0 0 16px;font-size:13.5px;line-height:1.45;color:#7C2D12;"><i class="icon icon-triangle-alert" style="font-size:16px;color:#C2410C;flex-shrink:0;margin-top:1px;"></i><span>{{ el.blockText }}</span></div>
+                  </sc-if>
+                  <h2 class="job-title" style="font-size:30px;font-weight:700;color:#0D0D0F;letter-spacing:-0.02em;margin-bottom:18px;">{{ job.title }}</h2>
+                  <div style="display:flex;flex-wrap:wrap;gap:22px;margin-bottom:18px;">
+                    <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;color:#23262E;"><i class="icon icon-map-pin" style="font-size:16px;color:#4A5464;"></i>{{ job.location }}</span>
+                    <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;color:#23262E;"><i class="icon icon-house" style="font-size:16px;color:#4A5464;"></i>{{ job.mode }}</span>
+                    <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;color:#23262E;"><i class="icon icon-crown" style="font-size:16px;color:#4A5464;"></i>{{ job.level }}</span>
+                    <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;color:#23262E;"><i class="icon icon-calendar" style="font-size:16px;color:#4A5464;"></i>{{ job.exp }}</span>
+                  </div>
+                  <div style="display:flex;flex-wrap:wrap;gap:10px;">
+                    <span style="display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #E6E8EB;border-radius:9px;padding:9px 14px;font-size:14px;color:#23262E;"><i class="icon icon-graduation-cap" style="font-size:15px;color:#4A5464;"></i>{{ job.degree }}</span>
+                    <span style="display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #E6E8EB;border-radius:9px;padding:9px 14px;font-size:14px;color:#23262E;"><i class="icon icon-globe" style="font-size:15px;color:#4A5464;"></i>{{ job.onsite }}</span>
+                    <span style="display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #E6E8EB;border-radius:9px;padding:9px 14px;font-size:14px;color:#23262E;"><i class="icon icon-briefcase" style="font-size:15px;color:#4A5464;"></i>{{ job.type }}</span>
+                    <span style="display:inline-flex;align-items:center;gap:7px;background:#F5F6F7;border:1px solid #E6E8EB;border-radius:9px;padding:9px 14px;font-size:14px;color:#A5A5A5;"><i class="icon icon-ban" style="font-size:15px;"></i>Sponsorship Not Available</span>
+                  </div>
+                  <div style="height:1px;background:#EDEEF0;margin:26px 0;"></div>
+                <!-- company -->
+                <div style="margin-top:6px;">
+                  <h3 style="display:flex;align-items:center;gap:10px;font-size:21px;font-weight:700;color:#0D0D0F;margin-bottom:12px;"><i class="icon icon-contact" style="font-size:20px;color:#1D484F;"></i>Company</h3>
+                  <p style="font-size:15px;line-height:1.7;color:#3C4450;max-width:760px;">{{ job.about }}</p>
+                  <a style="display:inline-block;margin-top:12px;font-size:15px;font-weight:600;color:#1D6FB8;cursor:pointer;text-decoration:underline;">Show Original Job Description</a>
+                  <div style="background:#F8F9FA;border:1px solid #EDEEF0;border-radius:12px;padding:16px 20px;margin-top:16px;max-width:430px;">
+                    <div style="font-size:15px;font-weight:600;color:#23262E;margin-bottom:8px;">Compensation Overview</div>
+                    <div style="display:flex;align-items:center;gap:10px;"><span style="width:26px;height:26px;border-radius:50%;background:#5AEBEB;display:flex;align-items:center;justify-content:center;color:#022F36;font-weight:800;font-size:14px;">$</span><span style="font-size:16px;font-weight:700;color:#0D0D0F;">{{ job.comp }}</span></div>
+                  </div>
+                  <div style="display:flex;flex-wrap:wrap;gap:9px;margin-top:16px;max-width:760px;">
+                    <sc-for list="{{ job.tags }}" as="t" hint-placeholder-count="6"><span style="background:#E0FAFA;color:#0A3D44;border-radius:9999px;padding:7px 15px;font-size:13.5px;font-weight:600;">{{ t }}</span></sc-for>
+                  </div>
+                </div>
+
+                <div style="height:1px;background:#EDEEF0;margin:28px 0;"></div>
+
+                <!-- responsibilities -->
+                <div>
+                  <h3 style="display:flex;align-items:center;gap:10px;font-size:21px;font-weight:700;color:#0D0D0F;margin-bottom:18px;"><i class="icon icon-scan-text" style="font-size:20px;color:#1D484F;"></i>Responsibilities</h3>
+                  <div style="font-size:15px;font-weight:700;color:#0D0D0F;margin-bottom:6px;">Summary</div>
+                  <p style="font-size:15px;line-height:1.7;color:#3C4450;max-width:900px;margin-bottom:22px;">The Software Engineer will design, build, and maintain scalable services and customer-facing features. They translate product requirements into reliable code, collaborate across functions, and uphold engineering quality and best practices.</p>
+                  <div style="font-size:15px;font-weight:700;color:#0D0D0F;margin-bottom:8px;">Required</div>
+                  <ul style="margin:0 0 22px 20px;padding:0;font-size:15px;line-height:1.85;color:#3C4450;max-width:900px;">
+                    <li>4+ years of professional experience building production software</li>
+                    <li>Proficiency in a modern language and framework (TypeScript/React, Go, or Python)</li>
+                    <li>Strong systems thinking and meticulous attention to detail</li>
+                    <li>Clear communication — you can articulate the "why" behind technical choices</li>
+                  </ul>
+                  <div style="font-size:15px;font-weight:700;color:#0D0D0F;margin-bottom:8px;">Minimum Skills</div>
+                  <ul style="margin:0 0 0 20px;padding:0;font-size:15px;line-height:1.85;color:#3C4450;max-width:900px;">
+                    <li>Excellent problem solving and the ability to think strategically</li>
+                    <li>Strong proficiency with version control and CI/CD workflows</li>
+                    <li>Ability to multi-task and thrive in a fast-paced, changing environment</li>
+                    <li>Ability to uphold high standards of code quality and integrity</li>
+                  </ul>
+                </div>
+                </div>
+                <!-- RIGHT rail -->
+                <div style="display:flex;flex-direction:column;gap:16px;">
+                  <div style="background:linear-gradient(160deg,#0C2A2C 0%,#0E2F31 40%,#16615A 100%);border-radius:18px;padding:22px;color:#fff;text-align:center;">
+                    <div style="width:96px;height:96px;border-radius:50%;margin:0 auto 8px;background:conic-gradient(#5AEBEB {{ job.matchDeg }},rgba(255,255,255,0.14) 0);display:flex;align-items:center;justify-content:center;">
+                      <div style="width:78px;height:78px;border-radius:50%;background:#0C2A2C;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;">{{ job.match }}%</div>
+                    </div>
+                    <div style="{{ mx.labelStyle }}">{{ mx.label }}</div>
+                    <div style="font-size:12.5px;color:#BFD6D8;margin:-8px 0 16px;">{{ mx.summary }}</div>
+                    <div style="display:flex;justify-content:space-between;gap:8px;">
+                      <div style="flex:1;"><div style="width:50px;height:50px;border-radius:50%;margin:0 auto 5px;border:3px solid #5AEBEB;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;">{{ job.expPct }}</div><div style="font-size:11px;color:#9FBEC0;">Exp. Level</div></div>
+                      <div style="flex:1;"><div style="width:50px;height:50px;border-radius:50%;margin:0 auto 5px;border:3px solid #5AEBEB;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;">{{ job.skillPct }}</div><div style="font-size:11px;color:#9FBEC0;">Skill</div></div>
+                      <div style="flex:1;"><div style="width:50px;height:50px;border-radius:50%;margin:0 auto 5px;border:3px solid rgba(90,235,235,0.4);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;">{{ job.indPct }}</div><div style="font-size:11px;color:#9FBEC0;">Industry Exp.</div></div>
+                    </div>
+                    <div style="text-align:left;margin-top:16px;font-size:13px;line-height:1.9;"><div>✓ Growth Opportunities</div><div>✓ H1B Sponsor Likely</div></div>
+                  </div>
+                  <!-- skills breakdown -->
+                  <div style="background:#fff;border:1px solid #EDEEF0;border-radius:16px;padding:18px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                      <span style="font-size:15px;font-weight:700;color:#0D0D0F;">Required skills</span>
+                      <span style="font-size:13px;font-weight:700;color:#4A5464;">{{ mx.reqCount }}</span>
+                    </div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+                      <sc-for list="{{ mx.required }}" as="sk" hint-placeholder-count="5">
+                        <span title="{{ sk.tip }}" style="{{ sk.style }}"><i class="{{ sk.icon }}" style="font-size:13px;"></i>{{ sk.name }}</span>
+                      </sc-for>
+                    </div>
+                    <sc-if value="{{ mx.hasSyn }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:12.5px;color:#4A5464;margin-bottom:12px;line-height:1.5;">{{ mx.synNote }}</div>
+                    </sc-if>
+                    <div style="font-size:13px;font-weight:700;color:#4A5464;margin-bottom:8px;">Nice to have</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+                      <sc-for list="{{ mx.nice }}" as="sk" hint-placeholder-count="3">
+                        <span style="{{ sk.style }}"><i class="{{ sk.icon }}" style="font-size:13px;"></i>{{ sk.name }}</span>
+                      </sc-for>
+                    </div>
+                    <sc-if value="{{ mx.hasMissing }}" hint-placeholder-val="{{ false }}">
+                      <button onClick="{{ goSkills }}" style="margin-top:14px;width:100%;display:flex;align-items:center;justify-content:center;gap:7px;background:#F5F6F7;border:1px solid #E5E7EB;border-radius:9999px;padding:9px 14px;font-family:inherit;font-size:13.5px;font-weight:600;color:#1D484F;cursor:pointer;"><i class="icon icon-plus" style="font-size:14px;"></i>Have it? Add to your skills</button>
+                    </sc-if>
+                  </div>
+                  <div style="background:#fff;border:1px solid #EDEEF0;border-radius:16px;padding:18px;">
+                    <button style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E5E7EB;border-radius:9999px;padding:8px 16px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;margin-bottom:16px;"><i class="icon icon-external-link" style="font-size:15px;color:#1D484F;"></i>Website</button>
+                    <div style="display:flex;gap:9px;margin-bottom:16px;">
+                      <div style="width:34px;height:34px;border-radius:9px;background:#0D0D0F;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;">X</div>
+                      <div style="width:34px;height:34px;border-radius:9px;background:#0A66C2;color:#fff;display:flex;align-items:center;justify-content:center;"><i class="icon icon-linkedin" style="font-size:16px;"></i></div>
+                      <div style="width:34px;height:34px;border-radius:9px;background:#0D0D0F;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;">cb</div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:11px;font-size:14px;color:#23262E;">
+                      <span style="display:flex;align-items:center;gap:9px;"><i class="icon icon-users" style="font-size:16px;color:#4A5464;"></i>{{ job.employees }}</span>
+                      <span style="display:flex;align-items:center;gap:9px;"><i class="icon icon-calendar" style="font-size:16px;color:#4A5464;"></i>{{ job.founded }}</span>
+                      <span style="display:flex;align-items:center;gap:9px;"><i class="icon icon-map-pin" style="font-size:16px;color:#4A5464;"></i>{{ job.hq }}</span>
+                      <span style="display:flex;align-items:center;gap:9px;"><i class="icon icon-link" style="font-size:16px;color:#4A5464;"></i>{{ job.url }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- next arrow (matches only) -->
+              <sc-if value="{{ isMatches }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ onNext }}" title="Next match" class="next-arrow" style="position: absolute; top: 20%; right: -22px; transform: translateY(-50%); width: 48px; height: 48px; border-radius: 50%; background: #1D484F; border: 4px solid #EEF4FA; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.18)"><i class="icon icon-chevron-right" style="font-size:24px;"></i></button>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== CAUGHT-UP END STATE ===== -->
+        <sc-if value="{{ caughtUp }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #EDEEF0;border-radius:22px;box-shadow:0 4px 16px rgba(0,0,0,0.05);padding:56px 40px;text-align:center;max-width:760px;margin:0 auto;">
+            <div style="width:84px;height:84px;border-radius:50%;margin:0 auto 22px;background:#E3F7EC;display:flex;align-items:center;justify-content:center;"><i class="icon icon-circle-check-big" style="font-size:40px;color:#00B16B;"></i></div>
+            <h2 style="font-size:28px;font-weight:700;color:#0D0D0F;letter-spacing:-0.02em;margin-bottom:10px;">You're all caught up</h2>
+            <p style="font-size:16px;line-height:1.6;color:#4A5464;max-width:460px;margin:0 auto 8px;">You've seen all of today's top matches. Bloom adds fresh roles throughout the day — new matches will land here as they're found.</p>
+            <sc-if value="{{ hasSkipped }}" hint-placeholder-val="{{ false }}">
+              <p style="font-size:15px;line-height:1.55;color:#7A8694;max-width:420px;margin:6px auto 28px;">{{ skippedCount }} you skipped are still waiting — review them again, or decide later.</p>
+            </sc-if>
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px;">
+              <button onClick="{{ onOpenPrefs }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E5E7EB;border-radius:9999px;padding:12px 22px;font-family:inherit;font-size:15px;font-weight:600;color:#23262E;cursor:pointer;"><i class="icon icon-sliders-horizontal" style="font-size:16px;color:#1D484F;"></i>Adjust match filters</button>
+              <sc-if value="{{ hasSkipped }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ onRefreshMatches }}" style="display:flex;align-items:center;gap:8px;background:#1D484F;border:none;border-radius:9999px;padding:12px 24px;font-family:inherit;font-size:15px;font-weight:700;color:#fff;cursor:pointer;" style-hover="background:#022F36;"><i class="icon icon-rotate-cw" style="font-size:16px;"></i>Review skipped</button>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- ===== SAVED LIST ===== -->
+        <sc-if value="{{ isSavedList }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <div class="info-strip" style="display:flex;align-items:center;gap:9px;background:#EAF6FF;border:1px solid #CDE8FB;border-radius:12px;padding:12px 16px;margin-bottom:18px;font-size:14px;color:#0A3D5A;"><i class="icon icon-info" style="font-size:17px;flex-shrink:0;"></i>Saved jobs are your shortlist — review and apply before they expire. Applied jobs move to <b style="margin:0 3px;">Applications</b>.</div>
+            <sc-if value="{{ hasSaved }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:14px;">
+                <sc-for list="{{ savedJobs }}" as="s" hint-placeholder-count="3">
+                  <div class="saved-row" style="display:flex;align-items:center;gap:18px;background:#fff;border:1px solid #EDEEF0;border-radius:16px;padding:18px 22px;box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+                    <div style="width:46px;height:46px;border-radius:11px;background:{{ s.logoBg }};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:19px;flex-shrink:0;">{{ s.logoChar }}</div>
+                    <div onClick="{{ s.onOpen }}" class="saved-meta" style="flex:1;min-width:0;cursor:pointer;">
+                      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;"><span style="font-size:17px;font-weight:700;color:#0D0D0F;">{{ s.title }}</span><span style="display:inline-flex;align-items:center;gap:5px;background:#E3F7EC;color:#00824D;border-radius:9999px;padding:3px 10px;font-size:12px;font-weight:700;">{{ s.match }}% match</span></div>
+                      <div style="display:flex;align-items:center;gap:14px;margin-top:5px;font-size:14px;color:#4A5464;flex-wrap:wrap;"><span>{{ s.company }}</span><span style="width:3px;height:3px;border-radius:50%;background:#C4C4C4;"></span><span>{{ s.location }}</span><span style="width:3px;height:3px;border-radius:50%;background:#C4C4C4;"></span><span style="color:#A5A5A5;">Saved {{ s.savedAgo }}</span></div>
+                    </div>
+                    <div class="saved-actions" style="display:flex;align-items:center;gap:10px;">
+                      <button onClick="{{ s.onRemove }}" style="display:flex;align-items:center;gap:7px;background:#fff;border:1px solid #E5E7EB;border-radius:9999px;padding:9px 16px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;"><i class="icon icon-trash-2" style="font-size:15px;"></i>Remove</button>
+                      <button onClick="{{ s.onOpen }}" style="display:flex;align-items:center;gap:7px;background:#1D484F;border:none;border-radius:9999px;padding:10px 20px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;" style-hover="background:#022F36;"><i class="icon icon-eye" style="font-size:15px;"></i>View &amp; apply</button>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noSaved }}" hint-placeholder-val="{{ false }}">
+              <div style="text-align:center;padding:80px 20px;color:#8A93A0;"><i class="icon icon-bookmark" style="font-size:42px;color:#C4CDD6;"></i><div style="font-size:18px;font-weight:700;color:#4A5464;margin-top:14px;">No saved jobs yet</div><div style="font-size:14px;margin-top:6px;">Tap <b>Save</b> on a match to shortlist it here.</div></div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <!-- ============ PROFILE ============ -->
+    <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Profile" style="max-width:1340px;margin:0 auto;padding:24px 32px 90px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+          <span style="font-size:18px;font-weight:600;color:#23262E;">Your profile data is kept private and secure.</span>
+          <i class="icon icon-badge-help" style="font-size:19px;color:#4A5464;"></i>
+        </div>
+        <div style="display:flex;gap:6px;padding:16px 32px 12px;border-bottom:1px solid #F0F1F3;position:sticky;top:0;background:#F4F7FA;z-index:30;margin:0 -32px 18px;">
+          <sc-for list="{{ profTabs }}" as="pt" hint-placeholder-count="5">
+            <button onClick="{{ pt.onClick }}" style="{{ pt.style }}">{{ pt.label }}</button>
+          </sc-for>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 388px;gap:24px;align-items:start;position:relative;overflow:hidden;">
+          <!-- profile card -->
+          <div style="background:#fff;border:1px solid #EDEEF0;border-radius:18px;box-shadow:0 2px 6px rgba(0,0,0,0.04);overflow:hidden;transition:transform .25s ease;{{ profCardShiftStyle }}">
+            <div style="padding:28px;">
+
+              <!-- PERSONAL -->
+              <div id="sec-personal">
+                  <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                    <h1 style="font-size:29px;font-weight:700;color:#0D0D0F;letter-spacing:-0.02em;">Vinodh Kumar</h1>
+                    <i class="icon icon-pencil" onClick="{{ onOpenPersonalPanel }}" style="font-size:18px;color:#23262E;cursor:pointer;"></i>
+                  </div>
+                  <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:20px;">
+                    <div style="display:flex;align-items:center;gap:10px;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-size:15px;color:#23262E;"><i class="icon icon-mail" style="font-size:16px;color:#4A5464;"></i>vkpixelsart@gmail.com</div>
+                    <div style="display:flex;align-items:center;gap:10px;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-size:15px;color:#23262E;"><i class="icon icon-phone" style="font-size:16px;color:#4A5464;"></i>+91 72999 11652</div>
+                    <div style="display:flex;align-items:center;gap:10px;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-size:15px;color:#23262E;"><i class="icon icon-linkedin" style="font-size:16px;color:#4A5464;"></i>linkedin.com/in/ma…</div>
+                  </div>
+                  <div style="height:1px;background:#F0F1F3;margin:26px 0;"></div>
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <h2 style="font-size:23px;font-weight:700;color:#0D0D0F;">Address</h2>
+                    <i class="icon icon-pencil" onClick="{{ onOpenAddressPanel }}" style="margin-left:auto;font-size:18px;color:#23262E;cursor:pointer;"></i>
+                  </div>                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-top:18px;">
+                    <div><div style="font-size:14px;color:#A5A5A5;margin-bottom:6px;">City</div><div style="font-size:16px;color:#23262E;">Chennai</div></div>
+                    <div><div style="font-size:14px;color:#A5A5A5;margin-bottom:6px;">Country</div><div style="font-size:16px;color:#23262E;">India</div></div>
+                    <div><div style="font-size:14px;color:#A5A5A5;margin-bottom:6px;">Postal Code</div><div style="font-size:16px;color:#23262E;">600041</div></div>
+                  </div>
+
+                  <div style="height:1px;background:#F0F1F3;margin:26px 0;"></div>
+
+                  <!-- Compensation — where Expected Salary lives -->
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <h2 style="font-size:23px;font-weight:700;color:#0D0D0F;">Compensation</h2>
+                  </div>
+                  <p style="font-size:13px;color:#7A8694;margin-top:6px;margin-bottom:16px;">Used to answer "expected salary" questions during auto-apply — one of the most common reasons an application needs your input.</p>
+
+                  <div style="{{ salaryCardStyle }}">
+                    <div style="width:44px;height:44px;border-radius:11px;background:{{ salaryIconBg }};display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-wallet" style="font-size:19px;color:{{ salaryIconFg }};"></i></div>
+                    <div style="flex:1;min-width:0;">
+                      <div style="font-size:13px;font-weight:600;color:#7A8694;margin-bottom:3px;">Expected Salary</div>
+                      <sc-if value="{{ notEditingSalary }}" hint-placeholder-val="{{ true }}">
+                        <div style="font-size:17px;font-weight:700;color:{{ salaryColor }};">{{ salaryDisplay }}</div>
+                      </sc-if>
+                      <sc-if value="{{ editingSalary }}" hint-placeholder-val="{{ false }}">
+                        <div style="display:flex;align-items:center;gap:10px;margin-top:2px;">
+                          <div style="display:flex;align-items:center;gap:6px;background:#fff;border:1px solid #E5E7EB;border-radius:10px;padding:10px 14px;max-width:220px;">
+                            <span style="color:#7A8694;font-size:15px;">$</span>
+                            <input value="{{ salaryDraft }}" onChange="{{ onSalaryDraftChange }}" placeholder="e.g. 95,000" style="border:none;outline:none;background:none;font-family:inherit;font-size:15px;color:#23262E;width:100%;" />
+                            <span style="color:#A5A5A5;font-size:13px;white-space:nowrap;">/ yr</span>
+                          </div>
+                          <button onClick="{{ onSaveSalary }}" style="background:#1D484F;border:none;border-radius:9999px;padding:10px 18px;font-family:inherit;font-size:13px;font-weight:700;color:#fff;cursor:pointer;">Save</button>
+                        </div>
+                      </sc-if>
+                    </div>
+                    <sc-if value="{{ salaryMissing }}" hint-placeholder-val="{{ true }}">
+                      <button onClick="{{ onEditSalary }}" style="flex-shrink:0;display:flex;align-items:center;gap:7px;background:#0C2A2C;border:none;border-radius:9999px;padding:10px 18px;font-family:inherit;font-size:13px;font-weight:700;color:#fff;cursor:pointer;"><i class="icon icon-plus" style="font-size:14px;"></i>Add</button>
+                    </sc-if>
+                    <sc-if value="{{ salaryFilled }}" hint-placeholder-val="{{ false }}">
+                      <i class="icon icon-pencil" onClick="{{ onEditSalary }}" style="flex-shrink:0;font-size:17px;color:#7A8694;cursor:pointer;"></i>
+                    </sc-if>
+                  </div>
+              </div>
+              <div style="height:1px;background:#F0F1F3;margin:26px 0;"></div>
+
+              <!-- EDUCATION -->
+              <div id="sec-education">
+                  <div style="display:flex;align-items:center;gap:12px;">
+                    <h2 style="font-size:23px;font-weight:700;color:#0D0D0F;">Education</h2>
+                    <i class="icon icon-pencil" onClick="{{ onOpenEducationPanel }}" style="margin-left:auto;font-size:18px;color:#23262E;cursor:pointer;"></i>
+                  </div>
+                  <sc-for list="{{ eduRows }}" as="ed" hint-placeholder-count="2">
+                  <div style="margin-top:16px;">
+                  <div style="{{ ed.cardStyle }}">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                      <div>
+                        <div style="font-size:13px;color:#7A8694;margin-bottom:4px;">{{ ed.dates }} · {{ ed.country }}</div>
+                        <div style="font-size:17px;font-weight:700;color:#0D0D0F;">{{ ed.degree }}, {{ ed.field }}</div>
+                        <div style="font-size:14px;color:#5A6B72;margin-top:2px;">{{ ed.institution }}</div>
+                      </div>
+                      <i class="icon icon-pencil" onClick="{{ onOpenEducationPanel }}" style="font-size:17px;color:#23262E;cursor:pointer;"></i>
+                    </div>
+                    <div style="height:1px;background:#E5E7EB;margin:16px 0;"></div>
+                    <div style="display:flex;align-items:center;gap:12px;">
+                      <div style="width:36px;height:36px;border-radius:9px;background:{{ ed.cgpaIconBg }};display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-graduation-cap" style="font-size:16px;color:{{ ed.cgpaIconFg }};"></i></div>
+                      <div style="flex:1;min-width:0;">
+                        <div style="font-size:12px;font-weight:600;color:#7A8694;">{{ ed.scaleLabel }}</div>
+                        <div style="font-size:16px;font-weight:700;color:{{ ed.cgpaColor }};cursor:pointer;" onClick="{{ onOpenEducationPanel }}">{{ ed.cgpaDisplay }}</div>
+                      </div>
+                      <sc-if value="{{ ed.cgpaMissing }}" hint-placeholder-val="{{ true }}">
+                        <button onClick="{{ onOpenEducationPanel }}" style="flex-shrink:0;display:flex;align-items:center;gap:6px;background:#0C2A2C;border:none;border-radius:9999px;padding:8px 15px;font-family:inherit;font-size:13px;font-weight:700;color:#fff;cursor:pointer;"><i class="icon icon-plus" style="font-size:13px;"></i>Add</button>
+                      </sc-if>
+                    </div>
+                  </div>
+                  </div>
+                  </sc-for>
+                  <p style="font-size:13px;color:#7A8694;margin-top:12px;">Each degree keeps its own score, scaled to the grading system of its country — out of 10 in India, out of 4.0 in the US. This lets Bloom fill the right scale for every application.</p>
+              </div>
+              <div style="height:1px;background:#F0F1F3;margin:26px 0;"></div>
+
+              <!-- WORK EXPERIENCE -->
+              <div id="sec-work">
+                  <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
+                    <h2 style="font-size:23px;font-weight:700;color:#0D0D0F;">Work Experience</h2>
+                    <i class="icon icon-pencil" onClick="{{ onOpenWorkPanel }}" style="margin-left:auto;font-size:18px;color:#23262E;cursor:pointer;"></i>
+                  </div>
+                  <sc-for list="{{ workHistory }}" as="w" hint-placeholder-count="4">
+                    <div style="display:flex;gap:14px;margin-bottom:22px;">
+                      <div style="width:11px;height:11px;border-radius:50%;border:2px solid #0D0D0F;margin-top:6px;flex-shrink:0;"></div>
+                      <div>
+                        <div style="font-size:13px;color:#7A8694;">{{ w.dates }}</div>
+                        <div style="font-size:17px;font-weight:700;color:#0D0D0F;margin-top:2px;">{{ w.title }}</div>
+                        <div style="font-size:14px;color:#5A6B72;">{{ w.company }} · {{ w.type }}</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              <div style="height:1px;background:#F0F1F3;margin:26px 0;"></div>
+
+              <!-- SKILLS -->
+              <div id="sec-skills">
+                  <h2 style="font-size:23px;font-weight:700;color:#0D0D0F;margin-bottom:18px;">Skills</h2>
+                  <div style="display:flex;flex-wrap:wrap;gap:10px;">
+                    <sc-for list="{{ skillsList }}" as="sk" hint-placeholder-count="10">
+                      <span style="background:#F5F6F7;border:1px solid #ECEEF0;border-radius:9px;padding:9px 16px;font-size:15px;color:#23262E;">{{ sk }}</span>
+                    </sc-for>
+                  </div>
+                </div>
+              <div style="height:1px;background:#F0F1F3;margin:26px 0;"></div>
+
+              <!-- EMPLOYMENT (EEO) -->
+              <div id="sec-employment">
+                  <h2 style="font-size:23px;font-weight:700;color:#0D0D0F;margin-bottom:18px;">Equal Employment</h2>
+                  <div style="display:flex;flex-direction:column;gap:18px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:15px;color:#23262E;">Are you authorized to work in the US?</span><span style="font-size:15px;font-weight:600;color:#0D0D0F;">No</span></div>
+                    <div style="height:1px;background:#F0F1F3;"></div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:15px;color:#23262E;">Will you now or in the future require sponsorship?</span><span style="font-size:15px;font-weight:600;color:#0D0D0F;">Yes</span></div>
+                  </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- right sidebar column -->
+          <div style="display:flex;flex-direction:column;gap:20px;">
+          <!-- subscription status card -->
+          <div style="{{ card.wrapStyle }}">
+            <div style="font-size:13px;font-weight:600;color:#7A8694;margin-bottom:12px;">{{ card.caption }}</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">
+              <span style="font-size:20px;font-weight:700;color:#0D0D0F;">{{ card.title }}</span>
+              <span style="{{ card.badgeStyle }}"><i class="{{ card.badgeIcon }}" style="font-size:13px;"></i>{{ card.badge }}</span>
+            </div>
+            <sc-if value="{{ card.showProgress }}" hint-placeholder-val="{{ true }}">
+              <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;">
+                  <span style="font-size:13px;font-weight:600;color:#7A8694;">Auto-apply credits</span>
+                  <span style="{{ card.pctStyle }}">{{ card.pctText }}</span>
+                </div>
+                <div style="height:9px;border-radius:9999px;background:#E2E8EC;overflow:hidden;margin-bottom:10px;"><div style="{{ card.barStyle }}"></div></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                  <span style="font-size:14px;font-weight:600;color:#23262E;">{{ card.creditLine }}</span>
+                  <span style="{{ card.creditStyle }}">{{ card.creditRight }}</span>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-top:9px;border-top:1px solid rgba(0,0,0,0.06);">
+                  <span style="font-size:13px;font-weight:600;color:#7A8694;">{{ card.leftLabel }}</span>
+                  <span style="{{ card.rightStyle }}">{{ card.rightLabel }}</span>
+                </div>
+              </div>
+            </sc-if>
+            <sc-if value="{{ card.hideProgress }}" hint-placeholder-val="{{ false }}">
+              <div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;">
+                  <span style="font-size:14px;font-weight:600;color:#4A5464;">{{ card.leftLabel }}</span>
+                  <span style="font-size:14px;font-weight:600;color:#00824D;">{{ card.rightLabel }}</span>
+                </div>
+                <div style="height:9px;border-radius:9999px;background:#E2E8EC;margin-bottom:11px;"></div>
+                <div style="font-size:14px;color:#4A5464;margin-bottom:20px;">{{ card.subLine }}</div>
+              </div>
+            </sc-if>
+            <button onClick="{{ card.onPrimary }}" style="width:100%;display:flex;align-items:center;justify-content:center;gap:9px;background:#0C2A2C;color:#fff;border:none;border-radius:12px;padding:14px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;" style-hover="background:#022F36;"><i class="{{ card.primaryIcon }}" style="font-size:16px;"></i>{{ card.primaryLabel }}</button>
+            <sc-if value="{{ card.hasSecondary }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ card.onSecondary }}" style="width:100%;background:none;border:none;margin-top:10px;font-family:inherit;font-size:14px;font-weight:600;color:#1D484F;cursor:pointer;text-decoration:underline;">{{ card.secondaryLabel }}</button>
+            </sc-if>
+          </div>
+
+          <!-- My Profile Strength -->
+          <div style="background:#EEF1F4;border-radius:18px;padding:24px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
+              <span style="font-size:19px;font-weight:700;color:#0D0D0F;">My Profile Strength</span>
+              <button onClick="{{ onToggleStrength }}" style="width:32px;height:32px;flex-shrink:0;border-radius:8px;background:#fff;border:1px solid #E5E7EB;display:flex;align-items:center;justify-content:center;cursor:pointer;"><i class="{{ strengthChevron }}" style="font-size:15px;color:#4A5464;"></i></button>
+            </div>
+            <sc-if value="{{ strengthExpanded }}" hint-placeholder-val="{{ true }}">
+            <div>
+            <p style="font-size:14px;color:#5A6B72;margin-top:8px;line-height:1.5;">Complete your profile to autofill job applications effortlessly!</p>
+            <div style="font-size:14px;color:#4A5464;margin-top:20px;margin-bottom:9px;">Profile completion</div>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <div style="flex:1;height:10px;border-radius:9999px;background:#D9DEE3;overflow:hidden;"><div style="height:100%;width:{{ strengthPct }}%;background:#1D484F;border-radius:9999px;"></div></div>
+              <span style="font-size:19px;font-weight:700;color:#0D0D0F;">{{ strengthPct }}%</span>
+            </div>
+            <div style="margin-top:20px;display:flex;flex-direction:column;gap:16px;">
+              <sc-for list="{{ strengthItems }}" as="si" hint-placeholder-count="5">
+                <div style="display:flex;align-items:center;gap:12px;">
+                  <span style="{{ si.dotStyle }}"><sc-if value="{{ si.done }}" hint-placeholder-val="{{ true }}"><i class="icon icon-check" style="font-size:12px;color:#fff;"></i></sc-if></span>
+                  <span style="{{ si.textStyle }}">{{ si.label }}</span>
+                  <span style="margin-left:auto;font-size:15px;font-weight:700;color:#23B5DE;">+{{ si.pct }}%</span>
+                </div>
+              </sc-for>
+            </div>
+            <button onClick="{{ onOpenEducationPanel }}" style="width:100%;margin-top:22px;background:#0C2A2C;border:none;border-radius:12px;padding:14px;font-family:inherit;font-size:15px;font-weight:700;color:#fff;cursor:pointer;">Complete Profile</button>
+            </div>
+            </sc-if>
+          </div>
+
+          <!-- quick links -->
+          <div style="background:#fff;border:1px solid #EDEEF0;border-radius:16px;overflow:hidden;">
+            <button style="width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;padding:18px 20px;font-family:inherit;font-size:16px;color:#23262E;cursor:pointer;border-bottom:1px solid #F0F1F3;"><i class="icon icon-file-text" style="font-size:18px;color:#4A5464;"></i>Manage My Resume<i class="icon icon-chevron-right" style="margin-left:auto;font-size:16px;color:#A5A5A5;"></i></button>
+            <button onClick="{{ onOpenPrefs }}" style="width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;padding:18px 20px;font-family:inherit;font-size:16px;color:#23262E;cursor:pointer;"><i class="icon icon-file-cog" style="font-size:18px;color:#4A5464;"></i>Update Job Preference<i class="icon icon-chevron-right" style="margin-left:auto;font-size:16px;color:#A5A5A5;"></i></button>
+          </div>
+          </div>
+        </div>
+
+        <!-- ===== EDIT SIDE PANEL (Education / Work Experience) ===== -->
+        <sc-if value="{{ editPanelOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:fixed;top:0;right:0;bottom:0;width:min(560px,58%);background:#fff;border-left:1px solid #E5E7EB;box-shadow:-16px 0 40px rgba(0,0,0,0.08);z-index:60;overflow-y:auto;">
+            <div style="display:flex;align-items:center;gap:16px;padding:20px 26px;border-bottom:1px solid #F0F1F3;position:sticky;top:0;background:#fff;z-index:2;">
+              <i class="icon icon-chevron-right" onClick="{{ onClosePanel }}" style="font-size:19px;color:#23262E;cursor:pointer;transform:rotate(180deg);"></i>
+              <h2 style="font-size:22px;font-weight:700;color:#0D0D0F;">{{ panelTitle }}</h2>
+              <div style="margin-left:auto;display:flex;align-items:center;gap:10px;">
+                <sc-if value="{{ isWorkPanel }}" hint-placeholder-val="{{ false }}">
+                  <button style="background:#fff;border:1px solid #E5E7EB;border-radius:9999px;padding:9px 16px;font-family:inherit;font-size:14px;font-weight:700;color:#23262E;cursor:pointer;">Add Experience</button>
+                </sc-if>
+                <button onClick="{{ onClosePanel }}" style="background:#0C2A2C;border:none;border-radius:9999px;padding:10px 22px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;">{{ panelSaveLabel }}</button>
+              </div>
+            </div>
+
+            <!-- Personal panel body -->
+            <sc-if value="{{ isPersonalPanel }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:24px 26px;">
+                <div style="font-size:15px;font-weight:700;color:#0D0D0F;margin-bottom:16px;">Basic Info</div>
+                <div style="margin-bottom:16px;"><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">Full Name</div><input value="Vinodh Kumar" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div>
+                <div style="margin-bottom:16px;"><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">Email</div><input value="vkpixelsart@gmail.com" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;"><div><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">Phone</div><input value="+91 72999 11652" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div><div><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">LinkedIn</div><input value="linkedin.com/in/ma…" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div></div>
+              </div>
+            </sc-if>
+
+            <!-- Address panel body -->
+            <sc-if value="{{ isAddressPanel }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:24px 26px;">
+                <div style="font-size:15px;font-weight:700;color:#0D0D0F;margin-bottom:16px;">Address</div>
+                <div style="margin-bottom:16px;"><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">Address Line</div><input value="4/29, Thiruvanmiyur, 2nd street, Thiruveedhi amman koil street" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;">
+                  <div><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">City</div><input value="Chennai" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div>
+                  <div><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">Country</div><input value="India" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div>
+                  <div><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">Postal Code</div><input value="600041" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div>
+                </div>
+              </div>
+            </sc-if>
+
+            <!-- Education panel body -->
+            <sc-if value="{{ isEducationPanel }}" hint-placeholder-val="{{ false }}">
+              <sc-for list="{{ eduPanelRows }}" as="ed" hint-placeholder-count="2">
+                <div style="padding:24px 26px;border-bottom:1px solid #F0F1F3;">
+                  <div style="font-size:15px;font-weight:700;color:#0D0D0F;margin-bottom:16px;">{{ ed.degree }}, {{ ed.field }}</div>
+                  <div style="margin-bottom:16px;"><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">Institution</div><input value="{{ ed.institution }}" onChange="{{ ed.onInstitution }}" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px;">
+                    <div><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">Degree</div><input value="{{ ed.degree }}" onChange="{{ ed.onDegree }}" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div>
+                    <div><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">Field of Study</div><input value="{{ ed.field }}" onChange="{{ ed.onField }}" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div>
+                  </div>
+                  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:22px;">
+                    <div><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">Start Date</div><input value="{{ ed.start }}" onChange="{{ ed.onStart }}" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div>
+                    <div><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">End Date</div><input value="{{ ed.end }}" onChange="{{ ed.onEnd }}" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div>
+                    <div><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">Country</div>
+                      <select value="{{ ed.country }}" onChange="{{ ed.onCountry }}" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 14px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;">
+                        <sc-for list="{{ countryOptions }}" as="co" hint-placeholder-count="3"><option value="{{ co }}">{{ co }}</option></sc-for>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div style="height:1px;background:#F0F1F3;margin-bottom:22px;"></div>
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                    <div style="font-size:15px;font-weight:700;color:#0D0D0F;">{{ ed.scaleLabel }}</div>
+                    <sc-if value="{{ ed.cgpaMissing }}" hint-placeholder-val="{{ true }}"><span style="display:inline-flex;align-items:center;gap:5px;background:#FDF4DC;color:#8A6100;border-radius:9999px;padding:4px 10px;font-size:12px;font-weight:700;"><i class="icon icon-triangle-alert" style="font-size:11px;"></i>Add this</span></sc-if>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <input value="{{ ed.cgpa }}" onChange="{{ ed.onCgpa }}" placeholder="{{ ed.cgpaPlaceholder }}" style="width:140px;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" />
+                    <span style="font-size:14px;color:#A5A5A5;">out of {{ ed.scaleMax }}</span>
+                  </div>
+                  <p style="font-size:13px;color:#7A8694;margin-top:10px;max-width:420px;">Bloom uses the country to know which grading scale to fill in on employer applications — out of 10 for {{ ed.country }} institutions, out of 4.0 for US ones.</p>
+                </div>
+              </sc-for>
+            </sc-if>
+
+            <!-- Work Experience panel body -->
+            <sc-if value="{{ isWorkPanel }}" hint-placeholder-val="{{ false }}">
+              <div>
+                <sc-for list="{{ workHistory }}" as="w" hint-placeholder-count="4">
+                  <div style="border-bottom:1px solid #F0F1F3;padding:20px 26px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:{{ w.expandedMargin }};">
+                      <div style="font-size:16px;font-weight:700;color:#0D0D0F;">{{ w.title }}</div>
+                      <div style="display:flex;align-items:center;gap:14px;">
+                        <i class="icon icon-trash-2" style="font-size:16px;color:#7A8694;cursor:pointer;"></i>
+                        <i class="{{ w.chevronClass }}" onClick="{{ w.onToggle }}" style="font-size:17px;color:#23262E;cursor:pointer;"></i>
+                      </div>
+                    </div>
+                    <sc-if value="{{ w.expanded }}" hint-placeholder-val="{{ false }}">
+                      <div>
+                        <div style="margin-bottom:14px;"><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">Job Title</div><input value="{{ w.title }}" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+                          <div><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">Company</div><input value="{{ w.company }}" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div>
+                          <div><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">Job Type</div><input value="{{ w.type }}" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div>
+                        </div>
+                        <div style="margin-bottom:14px;"><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">Dates</div><input value="{{ w.dates }}" style="width:100%;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;" /></div>
+                        <div><div style="font-size:13px;font-weight:600;color:#5A6B72;margin-bottom:7px;">Experience Summary</div><textarea placeholder="Describe your experience and achievements…" style="width:100%;min-height:80px;border:1px solid #E5E7EB;background:#F5F6F7;border-radius:10px;padding:13px 16px;font-family:inherit;font-size:15px;color:#23262E;box-sizing:border-box;resize:vertical;"></textarea></div>
+                      </div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+    <sc-if value="{{ isApplications }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Applications" style="max-width:1180px;margin:0 auto;padding:24px 32px 90px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <h1 style="font-size:24px;font-weight:700;color:#022F36;">Applications</h1>
+        </div>
+        <p style="font-size:15px;color:#5A6B72;margin-bottom:20px;">Your Bloom agent applies in the background — most applications are submitted within 24 hours.</p>
+
+        <!-- total + Active/Closed tabs -->
+        <div style="display:flex;align-items:center;gap:26px;border-bottom:1px solid #E1E6EB;margin-bottom:18px;">
+          <span style="font-size:19px;font-weight:700;color:#0D0D0F;padding-bottom:12px;">{{ totalJobs }} Total Jobs</span>
+          <button onClick="{{ onAppsTabActive }}" style="{{ appsTabActiveStyle }}">Active</button>
+          <button onClick="{{ onAppsTabClosed }}" style="{{ appsTabClosedStyle }}">Closed <span style="opacity:.6;">{{ closedCount }}</span></button>
+        </div>
+
+        <!-- search + filters (compact) -->
+        <sc-if value="{{ isAppsActive }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E5E7EB;border-radius:9999px;padding:8px 14px;flex:1;min-width:200px;max-width:320px;">
+            <i class="icon icon-search" style="font-size:15px;color:#7A8694;"></i>
+            <input value="{{ fSearch }}" onChange="{{ onSearch }}" placeholder="Search for Jobs or Companies" style="border:none;outline:none;background:none;font-family:inherit;font-size:14px;color:#23262E;width:100%;" />
+          </div>
+          <div style="position:relative;">
+            <button onClick="{{ onToggleDate }}" style="{{ pillDateStyle }}">{{ dateLabel }}<i class="icon icon-chevron-down" style="font-size:14px;color:#7A8694;"></i></button>
+            <sc-if value="{{ dateOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:44px;left:0;min-width:190px;background:#fff;border:1px solid #E5E7EB;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,0.14);padding:6px;z-index:55;">
+                <sc-for list="{{ dateOpts }}" as="o" hint-placeholder-count="6">
+                  <button onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:11px;width:100%;background:none;border:none;border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F5F6F7;">
+                    <span style="{{ o.radioStyle }}"><sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;border-radius:50%;background:#022F36;"></span></sc-if></span>{{ o.label }}
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+          <div style="position:relative;">
+            <button onClick="{{ onToggleType }}" style="{{ pillTypeStyle }}">{{ typeLabel }}<i class="icon icon-chevron-down" style="font-size:14px;color:#7A8694;"></i></button>
+            <sc-if value="{{ typeOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:44px;left:0;min-width:170px;background:#fff;border:1px solid #E5E7EB;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,0.14);padding:6px;z-index:55;">
+                <sc-for list="{{ typeOpts }}" as="o" hint-placeholder-count="3">
+                  <button onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:11px;width:100%;background:none;border:none;border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F5F6F7;">
+                    <span style="{{ o.radioStyle }}"><sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;border-radius:50%;background:#022F36;"></span></sc-if></span>{{ o.label }}
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+          <div style="position:relative;">
+            <button onClick="{{ onToggleStatus }}" style="{{ pillStatusStyle }}">{{ statusLabel }}<i class="icon icon-chevron-down" style="font-size:14px;color:#7A8694;"></i></button>
+            <sc-if value="{{ statusOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:44px;right:0;min-width:190px;background:#fff;border:1px solid #E5E7EB;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,0.14);padding:6px;z-index:55;">
+                <sc-for list="{{ statusOpts }}" as="o" hint-placeholder-count="4">
+                  <button onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:11px;width:100%;background:none;border:none;border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F5F6F7;">
+                    <span style="{{ o.radioStyle }}"><sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;border-radius:50%;background:#022F36;"></span></sc-if></span>{{ o.label }}
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+          <button onClick="{{ onClearFilters }}" title="Clear filters" style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:#5AC8E0;border:none;color:#fff;cursor:pointer;flex-shrink:0;" style-hover="background:#3BB5D0;"><i class="icon icon-funnel-x" style="font-size:16px;"></i></button>
+        </div>
+        </sc-if>
+
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <sc-for list="{{ appsList }}" as="a" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #EDEEF0;border-radius:16px;padding:18px 22px;box-shadow:0 2px 6px rgba(0,0,0,0.04);">
+              <div style="width:44px;height:44px;border-radius:11px;background:{{ a.logoBg }};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;flex-shrink:0;">{{ a.logoChar }}</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:16px;font-weight:700;color:#0D0D0F;">{{ a.title }}</div>
+                <div style="font-size:14px;color:#5A6B72;margin-top:2px;">{{ a.company }} · {{ a.meta }}</div>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:7px;min-width:0;">
+                <sc-if value="{{ a.isManual }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:14px;background:#F0FCFF;border:1px solid #B8EAF5;border-radius:12px;padding:9px 10px 9px 14px;">
+                    <span class="tip" style="display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:700;color:#0E93B5;white-space:nowrap;"><i class="icon icon-file-warning" style="font-size:17px;"></i>Apply directly on the company site<span class="tipbox">{{ a.tipText }}</span></span>
+                    <button style="display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #23262E;border-radius:9999px;padding:9px 18px;font-family:inherit;font-size:14px;font-weight:700;color:#0D0D0F;cursor:pointer;white-space:nowrap;" style-hover="background:#F5F6F7;">Apply on your own<i class="icon icon-arrow-up-right" style="font-size:15px;"></i></button>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ a.notManual }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <sc-if value="{{ a.isNeeds }}" hint-placeholder-val="{{ false }}">
+                    <button style="display:flex;align-items:center;gap:7px;background:#1D484F;border:none;border-radius:9999px;padding:8px 16px;font-family:inherit;font-size:13px;font-weight:700;color:#fff;cursor:pointer;" style-hover="background:#022F36;">Add info<i class="icon icon-arrow-right" style="font-size:14px;"></i></button>
+                  </sc-if>
+                  <span class="tip" style="{{ a.badgeStyle }}"><span style="{{ a.dotStyle }}"></span>{{ a.badgeLabel }}<i class="icon icon-info" style="font-size:13px;opacity:0.55;"></i><span class="tipbox">{{ a.tipText }}</span></span>
+                </div>
+                </sc-if>
+                <sc-if value="{{ a.isApplying }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:7px;font-size:13px;color:#0C5A5A;max-width:340px;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:#5AEBEB;flex-shrink:0;"></span>
+                    <span style="font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.tickText }}…</span>
+                    
+                  </div>
+                </sc-if>
+                <sc-if value="{{ a.hasSub }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:13px;color:{{ a.subColor }};max-width:340px;text-align:right;">{{ a.subText }}</div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ MANAGE ACCOUNT (Profile / Security / Plan & Billing) ============ -->
+    <sc-if value="{{ isAccount }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Manage Account" style="max-width:1040px;margin:0 auto;padding:24px 32px 90px;">
+        <h1 style="font-size:24px;font-weight:700;color:#022F36;margin-bottom:6px;">Manage account</h1>
+        <p style="font-size:15px;color:#5A6B72;margin-bottom:20px;">Profile, security and your subscription — all in one place.</p>
+        <!-- tabs -->
+        <div style="display:flex;gap:4px;border-bottom:1px solid #E1E6EB;margin-bottom:26px;">
+          <button onClick="{{ acctGoProfile }}" style="{{ acctTabProfileStyle }}"><i class="icon icon-circle-user" style="font-size:16px;"></i>Profile</button>
+          <button onClick="{{ acctGoSecurity }}" style="{{ acctTabSecurityStyle }}"><i class="icon icon-shield-check" style="font-size:16px;"></i>Security</button>
+          <button onClick="{{ acctGoBilling }}" style="{{ acctTabBillingStyle }}"><i class="icon icon-credit-card" style="font-size:16px;"></i>Plan &amp; Billing</button>
+        </div>
+
+        <!-- PROFILE TAB -->
+        <sc-if value="{{ acctIsProfile }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #EDEEF0;border-radius:16px;padding:28px;max-width:620px;">
+            <h2 style="font-size:19px;font-weight:700;color:#0D0D0F;margin-bottom:20px;">Account details</h2>
+            <div style="display:flex;flex-direction:column;gap:16px;">
+              <div><div style="font-size:13px;color:#7A8694;margin-bottom:6px;">Full name</div><div style="background:#F5F6F7;border-radius:10px;padding:13px 16px;font-size:15px;">Dillan Fernando</div></div>
+              <div><div style="font-size:13px;color:#7A8694;margin-bottom:6px;">Email</div><div style="background:#F5F6F7;border-radius:10px;padding:13px 16px;font-size:15px;">dillan.fernando@ideas2it.com</div></div>
+              <div><div style="font-size:13px;color:#7A8694;margin-bottom:6px;">Phone</div><div style="background:#F5F6F7;border-radius:10px;padding:13px 16px;font-size:15px;">+1-234-456-789</div></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- SECURITY TAB -->
+        <sc-if value="{{ acctIsSecurity }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;border:1px solid #EDEEF0;border-radius:16px;padding:28px;max-width:620px;">
+            <h2 style="font-size:19px;font-weight:700;color:#0D0D0F;margin-bottom:20px;">Security</h2>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid #F2F4F6;"><div><div style="font-size:15px;font-weight:600;color:#0D0D0F;">Password</div><div style="font-size:14px;color:#7A8694;margin-top:2px;">Last changed 3 months ago</div></div><button style="background:#fff;border:1px solid #E5E7EB;border-radius:9999px;padding:8px 16px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;">Change</button></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;"><div><div style="font-size:15px;font-weight:600;color:#0D0D0F;">Two-factor authentication</div><div style="font-size:14px;color:#7A8694;margin-top:2px;">Add an extra layer of security</div></div><button style="background:#1D484F;color:#fff;border:none;border-radius:9999px;padding:8px 16px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;">Enable</button></div>
+          </div>
+        </sc-if>
+
+        <!-- PLAN & BILLING TAB (the missing surface) -->
+        <sc-if value="{{ acctIsBilling }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid;grid-template-columns:1fr 360px;gap:22px;align-items:start;">
+            <!-- left: plan detail -->
+            <div style="display:flex;flex-direction:column;gap:18px;">
+              <sc-if value="{{ billing.hasAlert }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ billing.alertStyle }}"><i class="icon icon-info" style="font-size:18px;margin-top:1px;flex-shrink:0;"></i><span>{{ billing.alertText }}</span></div>
+              </sc-if>
+              <div style="background:#fff;border:1px solid #EDEEF0;border-radius:16px;padding:26px;">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:22px;">
+                  <div>
+                    <div style="font-size:13px;font-weight:600;color:#7A8694;margin-bottom:6px;">Current plan</div>
+                    <div style="display:flex;align-items:baseline;gap:10px;"><span style="font-size:26px;font-weight:800;color:#0D0D0F;">{{ billing.planName }}</span></div>
+                    <div style="font-size:15px;color:#5A6B72;margin-top:4px;"><b style="color:#0D0D0F;">{{ billing.price }}</b> {{ billing.cadence }}</div>
+                  </div>
+                  <span style="{{ billing.statusStyle }}">{{ billing.statusLabel }}</span>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;border-top:1px solid #F2F4F6;padding-top:20px;">
+                  <div><div style="font-size:13px;color:#7A8694;margin-bottom:5px;">{{ billing.renewLabel }}</div><div style="font-size:15px;font-weight:600;color:#0D0D0F;">{{ billing.renewValue }}</div></div>
+                  <div><div style="font-size:13px;color:#7A8694;margin-bottom:5px;">{{ billing.payLabel }}</div><div style="{{ billing.payStyle }}">{{ billing.payValue }}</div></div>
+                </div>
+                <div style="border-top:1px solid #F2F4F6;margin-top:20px;padding-top:20px;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;"><span style="font-size:13px;color:#7A8694;">Auto-apply usage</span><span style="font-size:13px;font-weight:600;color:#4A5464;">{{ billing.usedText }}</span></div>
+                  <div style="height:9px;border-radius:9999px;background:#EDF0F2;overflow:hidden;"><div style="{{ billing.usedBarStyle }}"></div></div>
+                </div>
+                <div style="display:flex;gap:12px;margin-top:24px;">
+                  <button onClick="{{ billing.onPrimary }}" style="display:flex;align-items:center;gap:9px;background:#0C2A2C;color:#fff;border:none;border-radius:11px;padding:13px 22px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;" style-hover="background:#022F36;"><i class="{{ billing.primaryIcon }}" style="font-size:16px;"></i>{{ billing.primaryLabel }}</button>
+                  <sc-if value="{{ billing.hasSecondary }}" hint-placeholder-val="{{ false }}">
+                    <button style="background:#fff;border:1px solid #E5E7EB;border-radius:11px;padding:13px 22px;font-family:inherit;font-size:15px;font-weight:600;color:#23262E;cursor:pointer;">{{ billing.secondaryLabel }}</button>
+                  </sc-if>
+                </div>
+              </div>
+
+              <!-- invoices -->
+              <sc-if value="{{ billing.showInvoices }}" hint-placeholder-val="{{ false }}">
+                <div style="background:#fff;border:1px solid #EDEEF0;border-radius:16px;padding:24px 26px;">
+                  <h3 style="font-size:17px;font-weight:700;color:#0D0D0F;margin-bottom:14px;">Billing history</h3>
+                  <sc-for list="{{ invoices }}" as="inv" hint-placeholder-count="3">
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #F4F6F7;">
+                      <div style="display:flex;align-items:center;gap:12px;"><i class="icon icon-file-text" style="font-size:18px;color:#7A8694;"></i><div><div style="font-size:14.5px;font-weight:600;color:#0D0D0F;">{{ inv.date }}</div><div style="font-size:13px;color:#7A8694;">{{ inv.desc }}</div></div></div>
+                      <div style="display:flex;align-items:center;gap:16px;"><span style="font-size:14.5px;font-weight:600;color:#0D0D0F;">{{ inv.amount }}</span><span style="{{ inv.statusStyle }}">{{ inv.status }}</span><i class="icon icon-download" style="font-size:17px;color:#7A8694;cursor:pointer;"></i></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+
+            <!-- right: portal CTA + perks -->
+            <div style="display:flex;flex-direction:column;gap:18px;">
+              <div style="background:#0C2A2C;border-radius:16px;padding:24px;color:#fff;">
+                <div style="display:flex;align-items:center;gap:9px;font-size:16px;font-weight:700;margin-bottom:8px;"><i class="icon icon-external-link" style="font-size:17px;color:#5AEBEB;"></i>Billing portal</div>
+                <p style="font-size:14px;line-height:1.55;color:#A9CBCC;margin-bottom:18px;">Update payment methods, download invoices, switch plans or cancel — all handled securely.</p>
+                <button onClick="{{ billing.onPrimary }}" style="width:100%;background:#5AEBEB;color:#022F36;border:none;border-radius:11px;padding:13px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;">Open billing portal</button>
+              </div>
+              <div style="background:#fff;border:1px solid #EDEEF0;border-radius:16px;padding:22px 24px;">
+                <div style="font-size:15px;font-weight:700;color:#0D0D0F;margin-bottom:14px;">Pro includes</div>
+                <div style="display:flex;flex-direction:column;gap:11px;font-size:14.5px;color:#3C4450;">
+                  <span style="display:flex;align-items:center;gap:10px;"><i class="icon icon-check" style="font-size:16px;color:#00B16B;"></i>300 auto-applies / month</span>
+                  <span style="display:flex;align-items:center;gap:10px;"><i class="icon icon-check" style="font-size:16px;color:#00B16B;"></i>AI resume tailoring</span>
+                  <span style="display:flex;align-items:center;gap:10px;"><i class="icon icon-check" style="font-size:16px;color:#00B16B;"></i>Priority match ranking</span>
+                  <span style="display:flex;align-items:center;gap:10px;"><i class="icon icon-check" style="font-size:16px;color:#00B16B;"></i>Application tracking</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </sc-if>
+
+  </main>
+
+  <!-- ===== JOB PREFERENCES MODAL ===== -->
+  <sc-if value="{{ prefsOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:80;background:rgba(8,20,22,0.55);display:flex;align-items:center;justify-content:center;padding:28px;">
+      <div style="width:100%;max-width:600px;max-height:min(680px,88vh);background:#fff;border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,0.35);display:flex;flex-direction:column;overflow:hidden;">
+        <div style="padding:20px 24px 0;flex-shrink:0;">
+          <h2 style="font-size:20px;font-weight:700;color:#0D0D0F;letter-spacing:-0.01em;margin-bottom:16px;">Job Preferences</h2>
+        </div>
+
+        <div style="overflow-y:auto;padding:0 24px 4px;flex:1;">
+        <!-- Job Function -->
+        <div class="pref-row" style="display:block;margin-bottom:16px;">
+          <div style="font-size:13px;font-weight:700;color:#0D0D0F;margin-bottom:6px;">Job Function <span style="color:#E5484D;">*</span></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;background:#F5F6F7;border:1px solid #E5E7EB;border-radius:10px;padding:11px 14px;font-size:14px;color:#23262E;cursor:pointer;height:44px;box-sizing:border-box;">{{ prefFunc }}<i class="icon icon-chevron-down" style="font-size:16px;color:#7A8694;"></i></div>
+        </div>
+
+        <!-- Specialization (sub-categories of Software Engineering) -->
+        <div class="pref-row" style="display:block;margin-bottom:16px;">
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:6px;">
+            <span style="font-size:13px;font-weight:700;color:#0D0D0F;">Specialization</span>
+            <span style="font-size:12px;color:#4A5464;">{{ subHint }}</span>
+          </div>
+          <div class="pref-chips" style="display:flex;flex-wrap:wrap;gap:8px;">
+            <sc-for list="{{ subOptions }}" as="sb" hint-placeholder-count="6">
+              <button onClick="{{ sb.onClick }}" style="{{ sb.chipStyle }}" style-hover="{{ sb.chipHover }}" style-focus="{{ sb.chipFocus }}"><i class="{{ sb.checkIcon }}" style="{{ sb.checkIconStyle }}"></i>{{ sb.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- Job Type + Experience Level (paired) -->
+        <div class="pref-pair" style="display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-bottom:16px;">
+          <div class="pref-row" style="display:block;margin-bottom:16px;">
+            <div style="font-size:13px;font-weight:700;color:#0D0D0F;margin-bottom:6px;">Job Type <span style="color:#E5484D;">*</span></div>
+            <div class="pref-chips" style="display:flex;flex-wrap:wrap;gap:8px;">
+              <sc-for list="{{ prefTypes }}" as="t" hint-placeholder-count="3">
+                <button onClick="{{ t.onClick }}" style="{{ t.chipStyle }}" style-hover="{{ t.chipHover }}" style-focus="{{ t.chipFocus }}"><i class="{{ t.checkIcon }}" style="{{ t.checkIconStyle }}"></i>{{ t.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div class="pref-row" style="display:block;margin-bottom:16px;">
+            <div style="font-size:13px;font-weight:700;color:#0D0D0F;margin-bottom:6px;">Experience Level</div>
+            <div class="pref-chips" style="display:flex;flex-wrap:wrap;gap:8px;">
+              <sc-for list="{{ prefLevels }}" as="l" hint-placeholder-count="4">
+                <button onClick="{{ l.onClick }}" style="{{ l.chipStyle }}" style-hover="{{ l.chipHover }}" style-focus="{{ l.chipFocus }}"><i class="{{ l.checkIcon }}" style="{{ l.checkIconStyle }}"></i>{{ l.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <!-- Location + Work Style (paired) -->
+        <div class="pref-pair" style="display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-bottom:16px;">
+          <div class="pref-row" style="display:block;margin-bottom:16px;">
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px;">
+              <span style="font-size:13px;font-weight:700;color:#0D0D0F;">Where can you work? <span style="color:#E5484D;">*</span></span>
+              <span class="tip" style="position:relative;display:inline-flex;cursor:help;">
+                <i class="icon icon-info" style="font-size:13px;color:#A5A5A5;"></i>
+                <span class="tipbox" style="position:absolute;left:50%;bottom:22px;transform:translateX(-50%);width:190px;background:#0C2A2C;color:#fff;font-size:11px;font-weight:500;line-height:1.4;padding:8px 10px;border-radius:8px;opacity:0;visibility:hidden;transition:opacity .15s;z-index:5;">Remote jobs are still hired by a US or Canadian employer.</span>
+              </span>
+            </div>
+            <div class="pref-chips" style="display:flex;flex-wrap:wrap;gap:8px;">
+              <sc-for list="{{ locOptions }}" as="loc" hint-placeholder-count="2">
+                <button onClick="{{ loc.onClick }}" style="{{ loc.chipStyle }}" style-hover="{{ loc.chipHover }}" style-focus="{{ loc.chipFocus }}"><i class="{{ loc.checkIcon }}" style="{{ loc.checkIconStyle }}"></i>{{ loc.flag }} {{ loc.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div class="pref-row" style="display:block;margin-bottom:16px;">
+            <div style="font-size:13px;font-weight:700;color:#0D0D0F;margin-bottom:6px;">How do you want to work?</div>
+            <div class="pref-chips" style="display:flex;flex-wrap:wrap;gap:8px;">
+              <sc-for list="{{ arrangeOptions }}" as="ar" hint-placeholder-count="3">
+                <button onClick="{{ ar.onClick }}" style="{{ ar.chipStyle }}" style-hover="{{ ar.chipHover }}" style-focus="{{ ar.chipFocus }}"><i class="{{ ar.checkIcon }}" style="{{ ar.checkIconStyle }}"></i>{{ ar.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <!-- On-site / hybrid states (hidden when Remote only) -->
+        <sc-if value="{{ pfShowNear }}" hint-placeholder-val="{{ true }}">
+          <div style="margin-bottom:16px;">
+          <div style="border:1px solid #E5E7EB;border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;">
+            <div style="font-size:16px;font-weight:700;color:#022F36;">On-site / hybrid jobs</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <sc-for list="{{ pfNNearModes }}" as="nm" hint-placeholder-count="2">
+                <button onClick="{{ nm.onClick }}" aria-pressed="{{ nm.on }}" style="{{ nm.style }}"><i class="icon icon-circle-check" style="{{ nm.iconStyle }}"></i>{{ nm.label }}</button>
+              </sc-for>
+            </div>
+            <sc-if value="{{ pfNSpecific }}" hint-placeholder-val="{{ true }}">
+              <div style="position:relative;">
+                <button onClick="{{ pfNOnStatesToggle }}" aria-expanded="{{ pfNStatesOpen }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;border:1px solid {{ pfNDdBorder }};border-radius:10px;height:48px;padding:0 16px;font-family:inherit;font-size:15px;color:{{ pfNDdInk }};cursor:pointer;text-align:left;"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ pfNDdLabel }}</span><i class="icon icon-chevron-down" style="font-size:18px;color:#022F36;flex-shrink:0;"></i></button>
+                <sc-if value="{{ pfNStatesOpen }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute;left:0;right:0;top:54px;z-index:30;background:#fff;border:1px solid #CBD3E4;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,0.14);max-height:260px;overflow-y:auto;padding:6px;">
+                    <sc-for list="{{ pfNStateGroups }}" as="g" hint-placeholder-count="1">
+                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">{{ g.name }}</div>
+                      <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="6">
+                        <button onClick="{{ it.onClick }}" role="option" aria-selected="{{ it.on }}" style="width:100%;display:flex;align-items:center;gap:10px;background:none;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F0FCFF;"><span style="{{ it.box }}"><sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:13px;color:#fff;"></i></sc-if></span>{{ it.name }}</button>
+                      </sc-for>
+                    </sc-for>
+                  </div>
+                </sc-if>
+              </div>
+              <sc-if value="{{ pfNHasStates }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                  <sc-for list="{{ pfNStateChips }}" as="c" hint-placeholder-count="1">
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:#F0FCFF;border:1px solid #B8EAF5;color:#022F36;border-radius:9999px;padding:5px 6px 5px 12px;font-size:14px;font-weight:600;">{{ c.name }}<button onClick="{{ c.onRemove }}" aria-label="Remove" style="width:22px;height:22px;border-radius:50%;border:none;background:#fff;color:#4A5464;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="icon icon-x" style="font-size:13px;"></i></button></span>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ pfNDetected }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#4A5464;"><i class="icon icon-locate-fixed" style="font-size:14px;color:#1D484F;"></i>{{ pfNDetectedText }}</div>
+              </sc-if>
+            </sc-if>
+          </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ pfRemoteOnly }}" hint-placeholder-val="{{ false }}">
+          <div style="font-size:12px;color:#4A5464;margin:-6px 0 16px;">Remote only, so location doesn’t apply. Select Hybrid or On-site to pick states.</div>
+        </sc-if>
+
+        <!-- Work Authorization (driven only by Location) -->
+        <div style="height:1px;background:#F0F1F3;margin:4px 0 16px;"></div>
+        <div style="display:flex;align-items:center;gap:5px;margin-bottom:12px;">
+          <span style="font-size:13px;font-weight:700;color:#0D0D0F;">Work Authorization</span>
+          <span class="tip" style="position:relative;display:inline-flex;cursor:help;">
+            <i class="icon icon-info" style="font-size:13px;color:#A5A5A5;"></i>
+            <span class="tipbox" style="position:absolute;left:50%;bottom:22px;transform:translateX(-50%);width:210px;background:#0C2A2C;color:#fff;font-size:11px;font-weight:500;line-height:1.4;padding:8px 10px;border-radius:8px;opacity:0;visibility:hidden;transition:opacity .15s;z-index:5;">Tied to where you'd be legally employed — never to whether the role is remote.</span>
+          </span>
+        </div>
+
+        <sc-for list="{{ authBlocks }}" as="ab" hint-placeholder-count="1">
+          <div style="background:#FAFBFB;border:1px solid #ECEEF0;border-radius:12px;padding:14px 16px;margin-bottom:12px;">
+            <div style="font-size:13px;font-weight:700;color:#23262E;margin-bottom:12px;">{{ ab.title }}</div>
+            <sc-for list="{{ ab.rows }}" as="r" hint-placeholder-count="2">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:10px;">
+                <div style="min-width:0;">
+                  <div style="font-size:13px;font-weight:600;color:#0D0D0F;">{{ r.label }}</div>
+                  <div style="font-size:12px;color:#4A5464;margin-top:2px;">{{ r.hint }}</div>
+                </div>
+                <div style="display:flex;gap:8px;flex-shrink:0;">
+                  <button onClick="{{ r.onYes }}" style="{{ r.yesStyle }}"><span style="{{ r.yesDot }}"><sc-if value="{{ r.isYes }}" hint-placeholder-val="{{ false }}"><span style="width:8px;height:8px;border-radius:50%;background:#00824D;"></span></sc-if></span>Yes</button>
+                  <button onClick="{{ r.onNo }}" style="{{ r.noStyle }}"><span style="{{ r.noDot }}"><sc-if value="{{ r.isNo }}" hint-placeholder-val="{{ false }}"><span style="width:8px;height:8px;border-radius:50%;background:#00824D;"></span></sc-if></span>No</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+
+        <sc-if value="{{ showGlobalAuth }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#F5F6F7;border:1px solid #ECEEF0;border-radius:12px;padding:14px 16px;margin-bottom:8px;">
+            <div style="font-size:13px;font-weight:700;color:#23262E;margin-bottom:10px;">🌍 Authorized in your country of residence?</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+              <button onClick="{{ onGlobalYes }}" style="{{ globalYesStyle }}">
+                <span style="{{ globalYesRadio }}"><sc-if value="{{ globalIsYes }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;border-radius:50%;background:#00824D;"></span></sc-if></span>
+                <span style="font-size:13px;font-weight:600;color:#0D0D0F;">Yes</span>
+              </button>
+              <button onClick="{{ onGlobalNo }}" style="{{ globalNoStyle }}">
+                <span style="{{ globalNoRadio }}"><sc-if value="{{ globalIsNo }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;border-radius:50%;background:#00824D;"></span></sc-if></span>
+                <span style="font-size:13px;font-weight:600;color:#0D0D0F;">No / not sure</span>
+              </button>
+            </div>
+            <input value="{{ residenceCountry }}" onChange="{{ onResidenceChange }}" placeholder="Country of residence" style="width:100%;max-width:240px;border:1px solid #E5E7EB;background:#fff;border-radius:9px;padding:10px 12px;font-family:inherit;font-size:13px;color:#23262E;box-sizing:border-box;" />
+          </div>
+        </sc-if>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;padding:14px 24px;border-top:1px solid #F0F1F3;flex-shrink:0;">
+          <button onClick="{{ onClosePrefs }}" style="background:#fff;border:none;font-family:inherit;font-size:14px;font-weight:700;color:#23262E;padding:11px 18px;border-radius:9999px;cursor:pointer;">Close</button>
+          <button onClick="{{ onUpdatePrefs }}" style="background:#0C2A2C;border:none;font-family:inherit;font-size:14px;font-weight:700;color:#fff;padding:11px 24px;border-radius:9999px;cursor:pointer;" style-hover="background:#022F36;">Update</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== APPLY UNDO-SEND SNACKBAR ===== -->
+  <sc-if value="{{ pendingShow }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:70;background:#0C2A2C;color:#fff;border-radius:14px;box-shadow:0 14px 40px rgba(0,0,0,0.32);padding:14px 16px 0;min-width:340px;animation:sbIn .25s ease;">
+      <div style="display:flex;align-items:center;gap:14px;padding-bottom:14px;">
+        <i class="{{ pendingIcon }}" style="font-size:20px;color:#5AEBEB;"></i>
+        <div style="flex:1;font-size:15px;font-weight:600;">{{ pendingText }}</div>
+        <button onClick="{{ onUndoPending }}" style="display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.12);border:none;border-radius:9999px;padding:8px 16px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;" style-hover="background:rgba(255,255,255,0.22);"><i class="icon icon-rotate-ccw" style="font-size:15px;"></i>Undo</button>
+      </div>
+      <div style="height:3px;border-radius:9999px;background:rgba(255,255,255,0.14);overflow:hidden;"><div style="height:100%;background:#5AEBEB;animation:sbShrink 5s linear forwards;"></div></div>
+    </div>
+  </sc-if>
+
+  <!-- ===== SCENARIO DOCK ===== -->
+  <sc-if value="{{ dockOpen }}" hint-placeholder-val="{{ true }}">
+    <div style="position:fixed;left:18px;bottom:18px;width:280px;background:#0C2A2C;border-radius:16px;box-shadow:0 18px 48px rgba(0,0,0,0.32);padding:14px 14px 16px;z-index:60;color:#fff;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:0.04em;color:#5AEBEB;"><i class="icon icon-flask-conical" style="font-size:15px;"></i>SUBSCRIPTION STATE</div>
+        <button onClick="{{ toggleDock }}" title="Collapse" style="background:rgba(255,255,255,0.12);border:none;color:#fff;cursor:pointer;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;" style-hover="background:rgba(255,255,255,0.24);"><i class="icon icon-x" style="font-size:16px;"></i></button>
+      </div>
+      <div style="font-size:11.5px;color:#8FB3B5;margin-bottom:10px;">Flip a state — banner, header badge, status card &amp; billing all update live.</div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <sc-for list="{{ scenarios }}" as="sx" hint-placeholder-count="9">
+          <button onClick="{{ sx.onClick }}" style="{{ sx.style }}"><span style="width:8px;height:8px;border-radius:50%;background:{{ sx.dot }};flex-shrink:0;"></span>{{ sx.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ dockClosed }}" hint-placeholder-val="{{ false }}">
+    <button onClick="{{ toggleDock }}" style="position:fixed;left:18px;bottom:18px;background:#0C2A2C;color:#fff;border:none;border-radius:9999px;padding:11px 18px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;z-index:60;display:flex;align-items:center;gap:8px;box-shadow:0 10px 28px rgba(0,0,0,0.3);"><i class="icon icon-flask-conical" style="font-size:15px;color:#5AEBEB;"></i>Demo states</button>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+const US_STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
+const CA_PROVINCES = ["Alberta","British Columbia","Manitoba","New Brunswick","Newfoundland and Labrador","Nova Scotia","Ontario","Prince Edward Island","Quebec","Saskatchewan","Northwest Territories","Nunavut","Yukon"];
+class Component extends DCLogic {
+  state = {
+    screen: 'login',
+    scenario: 'free',
+    acctTab: 'billing',
+    jobsTab: 'matches',
+    mPos: 0,
+    passed: [],
+    applied: [],
+    pending: null,
+    avatarMenu: false,
+    creditsHover: false,
+    tickIdx: 0,
+    appsFilter: 'all',
+    appsTab: 'active',
+    appsVersion: 'b',
+    fSearch: '',
+    fDate: 'All time',
+    fType: 'All',
+    fStatus: 'All',
+    openFilter: null,
+    checkoutDismissed: false,
+    dockOpen: false,
+    saved: ['stripe', 'figma'],
+    savedDetailId: null,
+    prefsOpen: false,
+    prefs: {
+      func: 'Software Engineering',
+      subs: { fe: false, be: true, fs: true, mobile: false, devops: false, qa: false },
+      near: { mode: 'specific', states: ['Texas'], detected: true, open: false },
+      types: { full: true, part: false, intern: false },
+      locations: { us: true, ca: false },
+      globalRemote: false,
+      arrangement: { remote: true, hybrid: true, onsite: false },
+      levels: { entry: true, mid: false, senior: false, exec: false },
+      auth: { us: { authorized: 'yes', sponsor: 'no' }, ca: { authorized: '', sponsor: '' } },
+      globalAuth: '',
+      residenceCountry: '',
+    },
+    justSaved: false,
+    profileTab: 'personal',
+    expectedSalary: '',
+    educationList: [
+      { id:'e1', institution:'Anna University', degree:'B.Tech', field:'Computer Science', start:'2012-08', end:'2016-05', country:'India', cgpa:'' },
+      { id:'e2', institution:'San Jose State University', degree:'M.S.', field:'Software Engineering', start:'2016-08', end:'2018-05', country:'United States', cgpa:'' },
+    ],
+    editingSalary: false,
+    salaryDraft: '',
+    editPanel: null,
+    workExpandedIdx: 0,
+    strengthExpanded: true,
+  };
+  static SCALES = { India:10, 'United States':4.0, 'United Kingdom':5 };
+  updateEdu(id, patch) {
+    this.setState(s => ({ educationList: s.educationList.map(ed => ed.id === id ? { ...ed, ...patch } : ed) }));
+  }
+  eduRowVals(ed) {
+    const max = this.constructor.SCALES[ed.country] || 10;
+    const filled = !!ed.cgpa;
+    return {
+      dates: ed.start + ' \u2192 ' + ed.end, country: ed.country, degree: ed.degree, field: ed.field, institution: ed.institution,
+      cardStyle: `border-radius:14px;padding:20px 22px;background:#F5F6F7;border:1px solid #ECEEF0;`,
+      scaleLabel: (max === 4.0 ? 'GPA' : 'CGPA') + ' \u00b7 out of ' + max,
+      cgpaMissing: !filled, cgpaFilled: filled,
+      cgpaDisplay: filled ? (ed.cgpa + ' / ' + max) : 'Not added yet',
+      cgpaColor: filled ? '#0D0D0F' : '#A5A5A5',
+      cgpaCardStyle: `display:flex;align-items:center;gap:16px;border-radius:14px;padding:16px 18px;margin-top:16px;${filled ? 'background:#F5F6F7;border:1px solid #ECEEF0;' : 'background:#FFFBF0;border:1px solid #F3E3C2;'}`,
+      cgpaIconBg: '#E7EAEC',
+      cgpaIconFg: '#4A5464',
+    };
+  }
+  eduPanelVals(ed) {
+    const max = this.constructor.SCALES[ed.country] || 10;
+    return {
+      ...ed,
+      scaleLabel: (max === 4.0 ? 'GPA' : 'CGPA'), scaleMax: max,
+      cgpaMissing: !ed.cgpa, cgpaPlaceholder: max === 4.0 ? 'e.g. 3.7' : 'e.g. 8.4',
+      onInstitution: (e) => this.updateEdu(ed.id, { institution: e.target.value }),
+      onDegree: (e) => this.updateEdu(ed.id, { degree: e.target.value }),
+      onField: (e) => this.updateEdu(ed.id, { field: e.target.value }),
+      onStart: (e) => this.updateEdu(ed.id, { start: e.target.value }),
+      onEnd: (e) => this.updateEdu(ed.id, { end: e.target.value }),
+      onCountry: (e) => this.updateEdu(ed.id, { country: e.target.value }),
+      onCgpa: (e) => this.updateEdu(ed.id, { cgpa: e.target.value }),
+    };
+  }
+
+  // ---- deck state machine ----
+  deckRemaining(s) {
+    s = s || this.state;
+    return this.JOBS.filter(j =>
+      !s.passed.includes(j.id) && !s.applied.includes(j.id) &&
+      (!s.pending || s.pending.id !== j.id));
+  }
+  doSkip(pos) { this.setState(s => ({ mPos: s.mPos + 1 })); }
+  scrollToSection(k) {
+    this.setState({ profileTab: k });
+    const el = document.getElementById('sec-' + k);
+    const scroller = el && el.closest('main');
+    if (el && scroller) scroller.scrollTo({ top: el.offsetTop - 90, behavior: 'smooth' });
+  }
+  doPass(job) { this.startPending('pass', job); }
+  doApply(job) { this.startPending('apply', job); }
+  startPending(type, job) {
+    if (this.state.pending) this.commitPending();
+    this.setState({ pending: { type, id: job.id, company: job.company, title: job.title } });
+    clearTimeout(this._pendT);
+    this._pendT = setTimeout(() => this.commitPending(), 5000);
+  }
+  commitPending() {
+    clearTimeout(this._pendT); this._pendT = null;
+    this.setState(s => {
+      if (!s.pending) return null;
+      return s.pending.type === 'apply'
+        ? { applied: [...s.applied, s.pending.id], pending: null }
+        : { passed: [...s.passed, s.pending.id], pending: null };
+    });
+  }
+  undoPending() {
+    clearTimeout(this._pendT); this._pendT = null;
+    this.setState({ pending: null });
+  }
+  __pfN(st) {
+    return ({
+v: (() => {
+      const loc = st.prefs.near;
+      const set = (patch) => this.setState(s => ({ prefs: { ...s.prefs, near: { ...s.prefs.near, ...patch } } }));
+      const cs = ({ us: !!st.prefs.locations.us || !st.prefs.locations.ca, ca: !!st.prefs.locations.ca });
+      const anyLabel = cs.us && cs.ca ? 'Anywhere in US & Canada' : cs.ca ? 'Anywhere in Canada' : 'Anywhere in United States';
+      const pill = (on) => `display:inline-flex;align-items:center;gap:10px;height:44px;padding:0 20px;border-radius:9999px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap;background:${on ? '#022F36' : '#FFFFFF'};color:${on ? '#FFFFFF' : '#022F36'};border:1.5px solid ${on ? '#022F36' : '#E5E7EB'};`;
+      const groups = [];
+      if (cs.us) groups.push({ name: 'United States', list: US_STATES });
+      if (cs.ca) groups.push({ name: 'Canada', list: CA_PROVINCES });
+      const valid = loc.states.filter(n => groups.some(g => g.list.includes(n)));
+      const box = (on) => `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on ? '#022F36' : '#fff'};border:1.5px solid ${on ? '#022F36' : '#A9B3B9'};`;
+      const toggle = (n) => set({ states: loc.states.includes(n) ? loc.states.filter(x => x !== n) : [...loc.states, n], detected: false });
+      return {
+        NearModes: [['any', anyLabel], ['specific', 'Specific states / provinces']].map(([k, label]) => ({ label, on: loc.mode === k,
+          onClick: () => set({ mode: k, open: false }), style: pill(loc.mode === k),
+          iconStyle: `font-size:18px;color:${loc.mode === k ? '#FFFFFF' : '#7A8694'};` })),
+        Specific: loc.mode === 'specific',
+        StatesOpen: !!loc.open,
+        OnStatesToggle: () => set({ open: !loc.open }),
+        DdLabel: valid.length ? (valid.length + ' selected') : 'Choose states or provinces',
+        DdInk: valid.length ? '#0D0D0F' : '#7A8694',
+        DdBorder: loc.open ? '#1D484F' : '#E5E7EB',
+        StateGroups: groups.map(g => ({ name: g.name, items: g.list.map(n => ({ name: n, on: loc.states.includes(n), onClick: () => toggle(n), box: box(loc.states.includes(n)) })) })),
+        HasStates: valid.length > 0,
+        StateChips: valid.map(n => ({ name: n, onRemove: () => toggle(n) })),
+        Detected: !!loc.detected && valid.length > 0,
+        DetectedText: 'Detected from your network, so you see local jobs first',
+      };
+    })(), }).v;
+  }
+  openPrefs() { this.setState({ prefsOpen: true, avatarMenu: false }); }
+  closePrefs() { this.setState({ prefsOpen: false }); }
+  toggleType(k) { this.setState(s => ({ prefs: { ...s.prefs, types: { ...s.prefs.types, [k]: !s.prefs.types[k] } } })); }
+  toggleLevel(k) { this.setState(s => ({ prefs: { ...s.prefs, levels: { ...s.prefs.levels, [k]: !s.prefs.levels[k] } } })); }
+  toggleLocation(k) { this.setState(s => ({ prefs: { ...s.prefs, locations: { ...s.prefs.locations, [k]: !s.prefs.locations[k] } } })); }
+  toggleGlobalRemote() { this.setState(s => ({ prefs: { ...s.prefs, globalRemote: !s.prefs.globalRemote } })); }
+  toggleArrangement(k) { this.setState(s => ({ prefs: { ...s.prefs, arrangement: { ...s.prefs.arrangement, [k]: !s.prefs.arrangement[k] } } })); }
+  setAuth(country, field, v) { this.setState(s => ({ prefs: { ...s.prefs, auth: { ...s.prefs.auth, [country]: { ...s.prefs.auth[country], [field]: v } } } })); }
+  ynStyle(on) { return `display:flex;align-items:center;justify-content:center;gap:7px;background:${on?'#E9FCFC':'#fff'};border:1.5px solid ${on?'#5AEBEB':'#D8DCE0'};border-radius:9999px;padding:0 16px;font-family:inherit;font-size:13px;font-weight:700;color:#0D0D0F;cursor:pointer;height:40px;box-sizing:border-box;white-space:nowrap;`; }
+  ynDot(on) { return `width:16px;height:16px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid ${on?'#00824D':'#CBD3D6'};`; }
+  chipStyle(on) { return `display:inline-flex;align-items:center;justify-content:flex-start;gap:7px;white-space:nowrap;flex:0 0 auto;background:${on?'#EEFDFD':'#fff'};border:1.5px solid ${on?'#5AEBEB':'#D8DCE0'};border-radius:9999px;padding:0 14px;font-family:inherit;font-size:13px;font-weight:600;color:${on?'#0C2A2C':'#23262E'};cursor:pointer;height:38px;box-sizing:border-box;line-height:1;transition:background .12s,border-color .12s;`; }
+  chipHoverStyle(on) { return on ? 'background:#E2FBFB;' : 'background:#F5F6F7;border-color:#B9C0C7;'; }
+  chipCheckIcon(on) { return 'icon icon-check'; }
+  chipCheckColor(on) { return `flex-shrink:0;width:18px;height:18px;border-radius:50%;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;font-size:11px;${on?'background:#5AEBEB;border:none;color:#0C2A2C;':'background:#fff;border:1.5px solid #CBD3D6;color:transparent;'}`; }
+  chipFocusStyle() { return 'outline:2px solid #1B88FE;outline-offset:2px;'; }
+  toggleSub(k) { this.setState(s => ({ prefs: { ...s.prefs, subs: { ...s.prefs.subs, [k]: !s.prefs.subs[k] } } })); }
+  ELIG = {
+    coinbase: [['Requires US citizenship','x','You haven’t confirmed US citizenship in your profile']],
+    datadog:  [['On-site · New York only','x','Your preferences are set to Remote']],
+    spotify:  [['No visa sponsorship','ok','You don’t need sponsorship — eligible']],
+    stripe:   [['Security clearance','x','This role needs an active clearance']],
+    miro:     [['No visa sponsorship','ok','You don’t need sponsorship — eligible']],
+    vercel:   [['No visa sponsorship','ok','You don’t need sponsorship — eligible']],
+  };
+  eligInfo(job) {
+    const f = this.ELIG[job.id] || [];
+    const bad = f.filter(x => x[1] === 'x');
+    return {
+      has: f.length > 0,
+      flags: f.map(([text, t, tip]) => ({ text, tip,
+        icon: t === 'x' ? 'icon icon-circle-alert' : 'icon icon-circle-check',
+        style: `display:inline-flex;align-items:center;gap:5px;border-radius:9999px;padding:4px 10px;font-size:12.5px;font-weight:600;white-space:nowrap;${t === 'x' ? 'background:#FFF4EF;border:1px solid #F9D9CB;color:#C2410C;' : 'background:#E3F7EC;border:1px solid #CFEBD9;color:#00824D;'}` })),
+      blocked: bad.length > 0,
+      blockText: bad.length ? ('Bloom won’t auto-apply here: ' + bad[0][2].charAt(0).toLowerCase() + bad[0][2].slice(1) + '. You can still apply yourself if you qualify.') : '',
+    };
+  }
+  setGlobalAuth(v) { this.setState(s => ({ prefs: { ...s.prefs, globalAuth: v } })); }
+
+  // full job detail for saved entries that aren't in the matches deck
+  FULL = {
+    stripe:{ company:'Stripe', logoChar:'S', logoBg:'#635BFF', posted:'saved 2 days ago', title:'Backend Engineer',
+      location:'Remote, US', mode:'Remote', level:'Senior Level', exp:'5+ Years Exp',
+      degree:"Bachelor's of Computer Science", onsite:'Remote', type:'Full Time',
+      about:"Stripe builds economic infrastructure for the internet. Businesses of every size use Stripe to accept payments, send payouts, and manage their operations online.",
+      comp:'$160,000 - $220,000 annually, plus equity',
+      tags:['Payments','Fintech','Developer Tools','H1B Sponsor Likely','Equity','Growth Opportunities'],
+      employees:'5,001-10,000 employees', founded:'Founded in 2010', hq:'San Francisco', url:'https://stripe.com/',
+      match:88, expPct:'96%', skillPct:'90%', indPct:'58%', id:'stripe' },
+    figma:{ company:'Figma', logoChar:'F', logoBg:'#0D0D0F', posted:'saved 4 days ago', title:'Product Engineer',
+      location:'San Francisco, CA', mode:'Hybrid', level:'Mid, Senior Level', exp:'4+ Years Exp',
+      degree:"Bachelor's preferred", onsite:'Inperson', type:'Full Time',
+      about:"Figma is the collaborative interface design tool that lets teams design, prototype, and build together in the browser. It is the industry standard for modern product design.",
+      comp:'$150,000 - $200,000 annually, plus equity',
+      tags:['Design Tools','SaaS','Collaboration','Equity','Growth Opportunities'],
+      employees:'1,001-5,000 employees', founded:'Founded in 2012', hq:'San Francisco', url:'https://figma.com/',
+      match:84, expPct:'88%', skillPct:'92%', indPct:'52%', id:'figma' },
+  };
+
+  fullJob(id) { return this.JOBS.find(j => j.id === id) || this.FULL[id]; }
+
+  // ---- match explainability: m = matched, x = missing, s = matched via synonym ----
+  SKILLS = {
+    miro:    { req:[['TypeScript','m'],['React','m'],['Node.js','m'],['REST APIs','m'],['CI/CD','s','GitHub Actions']], nice:[['GraphQL','m'],['AWS','x']] },
+    linear:  { req:[['TypeScript','m'],['React','m'],['CSS','m'],['GraphQL','x']], nice:[['Electron','x'],['Figma','m']] },
+    notion:  { req:[['React','m'],['Node.js','s','NodeJS'],['PostgreSQL','m'],['TypeScript','m'],['System design','x']], nice:[['Kotlin','x']] },
+    vercel:  { req:[['TypeScript','m'],['Node.js','m'],['Kubernetes','m'],['Go','m']], nice:[['Rust','x'],['Next.js','m']] },
+    datadog: { req:[['Go','m'],['Python','m'],['Kafka','x'],['Distributed systems','m']], nice:[['Kubernetes','m']] },
+    ramp:    { req:[['TypeScript','m'],['React','m'],['Python','m'],['PostgreSQL','s','Postgres']], nice:[['Flask','x']] },
+    discord: { req:[['Python','m'],['React','m'],['Rust','x'],['WebSockets','m']], nice:[['Elixir','x']] },
+    coinbase:{ req:[['Go','m'],['PostgreSQL','m'],['Microservices','m'],['Kafka','x'],['AWS','x']], nice:[['Solidity','x']] },
+    airbnb:  { req:[['React','m'],['TypeScript','m'],['GraphQL','m'],['Accessibility','m']], nice:[['React Native','x']] },
+    spotify: { req:[['Java','x'],['Python','m'],['GCP','x'],['Data pipelines','m']], nice:[['Scala','x']] },
+    stripe:  { req:[['Ruby','x'],['Go','m'],['REST APIs','m'],['Distributed systems','m']], nice:[['Payments','m']] },
+    figma:   { req:[['TypeScript','m'],['React','m'],['C++','x']], nice:[['WebGL','x']] },
+  };
+  matchInfo(job) {
+    const d = this.SKILLS[job.id] || { req:[], nice:[] };
+    const chip = ([name, st, via]) => {
+      const S = {
+        m:{ bg:'#E3F7EC', bd:'#CFEBD9', fg:'#00824D', icon:'icon icon-check' },
+        s:{ bg:'#E3F7EC', bd:'#CFEBD9', fg:'#00824D', icon:'icon icon-check' },
+        x:{ bg:'#FFF4EF', bd:'#F9D9CB', fg:'#C2410C', icon:'icon icon-x' },
+      }[st];
+      return { name, icon:S.icon, tip: st === 'x' ? 'Not found on your profile' : st === 's' ? ('Matched via “' + via + '” on your profile') : 'On your profile',
+        style:`display:inline-flex;align-items:center;gap:5px;background:${S.bg};border:1px solid ${S.bd};color:${S.fg};border-radius:9999px;padding:4px 10px;font-size:12.5px;font-weight:600;white-space:nowrap;` };
+    };
+    const missing = d.req.filter(r => r[1] === 'x');
+    const hit = d.req.length - missing.length;
+    const syn = d.req.filter(r => r[1] === 's');
+    const strong = missing.length === 0 && job.match >= 85;
+    const label = missing.length ? 'GOOD MATCH' : strong ? 'STRONG MATCH' : 'GOOD MATCH';
+    const summary = missing.length
+      ? (missing.length === 1 ? ('Missing 1 required skill: ' + missing[0][0]) : ('Missing ' + missing.length + ' required skills'))
+      : 'You have every required skill';
+    return {
+      label, summary,
+      labelStyle:`font-size:15px;font-weight:700;letter-spacing:0.08em;margin-bottom:16px;color:${missing.length ? '#FFB899' : '#FFFFFF'};`,
+      reqCount: hit + ' of ' + d.req.length + ' matched',
+      required: d.req.map(chip), nice: d.nice.map(chip),
+      hasMissing: missing.length > 0,
+      hasSyn: syn.length > 0,
+      synNote: syn.map(r => r[0] + ' matched via “' + r[2] + '”').join(' · ') + ' on your profile',
+    };
+  }
+
+  // ---- job data ----
+  JOBS = [
+    { company:'Miro', logoChar:'M', logoBg:'#FFD02F', posted:'1 minute ago', title:'Software Engineer',
+      location:'Atlanta, GA', mode:'Hybrid', level:'Mid, Senior Level', exp:'4+ Years Exp',
+      degree:"Bachelor's of Computer Science", onsite:'Inperson', type:'Full Time',
+      about:"Miro is an online collaborative whiteboard platform designed for teams to brainstorm, plan, and visualize ideas together in real time. It's widely used for design thinking, project planning, and remote collaboration — a go-to tool for creative and agile workflows.",
+      comp:'$50,500 - $112,500 annually, plus potential',
+      tags:['Consulting','Financial services','Professional Services','Risk Management','Growth Opportunities','H1B Sponsor Likely'],
+      employees:'10,001+ employees', founded:'Founded in 1845', hq:'London', url:'https://miro.com/',
+      match:90, expPct:'100%', skillPct:'84%', indPct:'46%', id:'miro' },
+    { company:'Linear', logoChar:'L', logoBg:'#5E6AD2', posted:'12 minutes ago', title:'Frontend Engineer',
+      location:'Remote, US', mode:'Remote', level:'Mid Level', exp:'3+ Years Exp',
+      degree:"Bachelor's preferred", onsite:'Remote', type:'Full Time',
+      about:"Linear is the issue tracking and project management tool built for high-performance software teams. It is loved for its speed, keyboard-first workflow, and beautifully crafted interface.",
+      comp:'$120,000 - $160,000 annually',
+      tags:['SaaS','Developer Tools','Product','Growth Opportunities','Equity'],
+      employees:'201-500 employees', founded:'Founded in 2019', hq:'San Francisco', url:'https://linear.app/',
+      match:86, expPct:'92%', skillPct:'88%', indPct:'61%', id:'linear' },
+    { company:'Notion', logoChar:'N', logoBg:'#0D0D0F', posted:'1 hour ago', title:'Full Stack Engineer',
+      location:'New York, NY', mode:'Hybrid', level:'Senior Level', exp:'5+ Years Exp',
+      degree:"Bachelor's of Computer Science", onsite:'Inperson', type:'Full Time',
+      about:"Notion is the connected workspace where teams write, plan, and organize. It blends notes, docs, wikis, and databases into one flexible tool used by millions.",
+      comp:'$140,000 - $190,000 annually, plus equity',
+      tags:['Productivity','SaaS','Collaboration','H1B Sponsor Likely','Growth Opportunities'],
+      employees:'501-1,000 employees', founded:'Founded in 2016', hq:'San Francisco', url:'https://notion.so/',
+      match:81, expPct:'78%', skillPct:'90%', indPct:'55%', id:'notion' },
+    { company:'Vercel', logoChar:'V', logoBg:'#0D0D0F', posted:'24 minutes ago', title:'Senior Platform Engineer',
+      location:'Remote, US', mode:'Remote', level:'Senior Level', exp:'5+ Years Exp',
+      degree:"Bachelor's preferred", onsite:'Remote', type:'Full Time',
+      about:"Vercel is the platform for frontend developers, powering the world's best products with Next.js. The team builds the infrastructure that ships the modern web at scale.",
+      comp:'$170,000 - $230,000 annually, plus equity',
+      tags:['Developer Tools','Cloud','Infrastructure','Equity','Growth Opportunities','H1B Sponsor Likely'],
+      employees:'201-500 employees', founded:'Founded in 2015', hq:'San Francisco', url:'https://vercel.com/',
+      match:92, expPct:'98%', skillPct:'94%', indPct:'63%', id:'vercel' },
+    { company:'Datadog', logoChar:'D', logoBg:'#632CA6', posted:'40 minutes ago', title:'Backend Engineer, Metrics',
+      location:'New York, NY', mode:'Hybrid', level:'Mid, Senior Level', exp:'4+ Years Exp',
+      degree:"Bachelor's of Computer Science", onsite:'Inperson', type:'Full Time',
+      about:"Datadog is the monitoring and security platform for cloud applications, bringing together metrics, traces, and logs at massive scale for engineering teams worldwide.",
+      comp:'$155,000 - $205,000 annually, plus equity',
+      tags:['Observability','Cloud','SaaS','H1B Sponsor Likely','Growth Opportunities'],
+      employees:'5,001-10,000 employees', founded:'Founded in 2010', hq:'New York', url:'https://datadoghq.com/',
+      match:87, expPct:'90%', skillPct:'86%', indPct:'58%', id:'datadog' },
+    { company:'Ramp', logoChar:'R', logoBg:'#E5FF44', posted:'1 hour ago', title:'Product Engineer',
+      location:'Remote, US', mode:'Remote', level:'Mid Level', exp:'3+ Years Exp',
+      degree:"Bachelor's preferred", onsite:'Remote', type:'Full Time',
+      about:"Ramp is the finance automation platform helping businesses spend less time and money. The product team ships fast and owns features end-to-end from idea to impact.",
+      comp:'$145,000 - $195,000 annually, plus equity',
+      tags:['Fintech','SaaS','Automation','Equity','Growth Opportunities'],
+      employees:'501-1,000 employees', founded:'Founded in 2019', hq:'New York', url:'https://ramp.com/',
+      match:85, expPct:'88%', skillPct:'89%', indPct:'50%', id:'ramp' },
+    { company:'Discord', logoChar:'D', logoBg:'#5865F2', posted:'2 hours ago', title:'Full Stack Engineer',
+      location:'San Francisco, CA', mode:'Hybrid', level:'Mid, Senior Level', exp:'4+ Years Exp',
+      degree:"Bachelor's of Computer Science", onsite:'Inperson', type:'Full Time',
+      about:"Discord is where the world builds communities and belonging. Engineers build real-time messaging and voice experiences serving hundreds of millions of users.",
+      comp:'$160,000 - $210,000 annually, plus equity',
+      tags:['Social','Real-time','Consumer','H1B Sponsor Likely','Growth Opportunities'],
+      employees:'501-1,000 employees', founded:'Founded in 2015', hq:'San Francisco', url:'https://discord.com/',
+      match:83, expPct:'82%', skillPct:'88%', indPct:'54%', id:'discord' },
+    { company:'Coinbase', logoChar:'C', logoBg:'#0052FF', posted:'3 hours ago', title:'Software Engineer, Backend',
+      location:'Remote, US', mode:'Remote', level:'Senior Level', exp:'5+ Years Exp',
+      degree:"Bachelor's preferred", onsite:'Remote', type:'Full Time',
+      about:"Coinbase is building the cryptoeconomy — a more fair, accessible, efficient, and transparent financial system. Engineers work on secure, high-scale financial infrastructure.",
+      comp:'$165,000 - $225,000 annually, plus equity',
+      tags:['Crypto','Fintech','Blockchain','Equity','Growth Opportunities'],
+      employees:'1,001-5,000 employees', founded:'Founded in 2012', hq:'Remote-first', url:'https://coinbase.com/',
+      match:80, expPct:'84%', skillPct:'82%', indPct:'48%', id:'coinbase' },
+    { company:'Airbnb', logoChar:'A', logoBg:'#FF5A5F', posted:'5 hours ago', title:'Frontend Engineer',
+      location:'San Francisco, CA', mode:'Hybrid', level:'Mid, Senior Level', exp:'4+ Years Exp',
+      degree:"Bachelor's of Computer Science", onsite:'Inperson', type:'Full Time',
+      about:"Airbnb's mission is to create a world where anyone can belong anywhere. Engineers craft the experiences that connect millions of hosts and guests across the globe.",
+      comp:'$158,000 - $208,000 annually, plus equity',
+      tags:['Travel','Consumer','Marketplace','H1B Sponsor Likely','Growth Opportunities'],
+      employees:'5,001-10,000 employees', founded:'Founded in 2008', hq:'San Francisco', url:'https://airbnb.com/',
+      match:78, expPct:'80%', skillPct:'84%', indPct:'52%', id:'airbnb' },
+    { company:'Spotify', logoChar:'S', logoBg:'#1DB954', posted:'8 hours ago', title:'Backend Engineer, Personalization',
+      location:'New York, NY', mode:'Hybrid', level:'Senior Level', exp:'5+ Years Exp',
+      degree:"Bachelor's preferred", onsite:'Inperson', type:'Full Time',
+      about:"Spotify is the world's most popular audio streaming subscription service. Engineers build the recommendation systems and infrastructure behind a personalized listening experience.",
+      comp:'$150,000 - $200,000 annually, plus equity',
+      tags:['Audio','Consumer','ML','Growth Opportunities','Equity'],
+      employees:'5,001-10,000 employees', founded:'Founded in 2006', hq:'Stockholm', url:'https://spotify.com/',
+      match:76, expPct:'76%', skillPct:'80%', indPct:'46%', id:'spotify' },
+  ];
+
+  POOL = {
+    stripe:{ id:'stripe', title:'Backend Engineer', company:'Stripe', logoChar:'S', logoBg:'#635BFF', match:88, location:'Remote, US', savedAgo:'2 days ago' },
+    figma:{ id:'figma', title:'Product Engineer', company:'Figma', logoChar:'F', logoBg:'#0D0D0F', match:84, location:'San Francisco, CA', savedAgo:'4 days ago' },
+    miro:{ id:'miro', title:'Software Engineer', company:'Miro', logoChar:'M', logoBg:'#FFD02F', match:90, location:'Atlanta, GA', savedAgo:'just now' },
+    linear:{ id:'linear', title:'Frontend Engineer', company:'Linear', logoChar:'L', logoBg:'#5E6AD2', match:86, location:'Remote, US', savedAgo:'just now' },
+    notion:{ id:'notion', title:'Full Stack Engineer', company:'Notion', logoChar:'N', logoBg:'#0D0D0F', match:81, location:'New York, NY', savedAgo:'just now' },
+  };
+
+  // ---- subscription scenarios (single source of truth) ----
+  SCEN = {
+    free: {
+      promo:true, credits:'2/5', headerBadge:{label:'Free',tone:'neutral',icon:'icon icon-user'},
+      cycleUnit:'free', apps:{ fromFree:3, fromPaid:0, completed:1 },
+      banner:null,
+      card:{ caption:'Free plan', title:'Subscription Status', badge:'Free', badgeTone:'neutral', badgeIcon:'icon icon-clock',
+        showProgress:true, pct:40, barTone:'green', creditLine:'2 of 5 swipes used', creditRight:'3 left', creditTone:'neutral', leftLabel:'Validity', rightLabel:'No expiry · swipes don’t reset', rightTone:'neutral',
+        primary:{label:'Upgrade to Pro',icon:'icon icon-crown'}, secondary:null },
+      billing:{ planName:'Free', price:'$0', cadence:'forever', statusLabel:'Free', statusTone:'neutral',
+        alert:null, renewLabel:'Auto-apply credits', renewValue:'2 of 5 used this month',
+        payLabel:'Payment method', payValue:'None on file', usedPct:40, usedText:'2 of 5 credits used',
+        primary:{label:'Upgrade to Pro',icon:'icon icon-crown'}, secondary:null, showInvoices:false } },
+
+    active: {
+      promo:false, credits:'120/300', headerBadge:{label:'Pro',tone:'pro',icon:'icon icon-crown'},
+      cycleUnit:'month', resetDate:'Jul 3, 2026', apps:{ fromFree:0, fromPaid:10, completed:4 },
+      banner:null,
+      card:{ caption:'Monthly Plan', title:'Subscription', badge:'Active', badgeTone:'success', badgeIcon:'icon icon-circle-check',
+        showProgress:true, pct:40, barTone:'green', creditLine:'120 of 300 used', creditRight:'180 left', creditTone:'neutral', leftLabel:'Renews on', rightLabel:'Jul 3, 2026', rightTone:'neutral',
+        primary:{label:'Manage subscription',icon:'icon icon-settings'}, secondary:null },
+      billing:{ planName:'Pro — Monthly', price:'$29', cadence:'per month', statusLabel:'Active', statusTone:'success',
+        alert:null, renewLabel:'Next renewal', renewValue:'Jul 3, 2026',
+        payLabel:'Payment method', payValue:'Visa •••• 4242', usedPct:40, usedText:'120 of 300 auto-applies used',
+        primary:{label:'Manage subscription',icon:'icon icon-settings'}, secondary:{label:'Cancel plan'}, showInvoices:true } },
+
+    upgraded: {
+      promo:false, credits:'10/300', headerBadge:{label:'Pro',tone:'pro',icon:'icon icon-crown'},
+      cycleUnit:'month', resetDate:'Jul 28, 2026', apps:{ fromFree:3, fromPaid:10, completed:4 },
+      banner:null,
+      card:{ caption:'Monthly Plan · upgraded from Free', title:'Subscription', badge:'Active', badgeTone:'success', badgeIcon:'icon icon-circle-check',
+        showProgress:true, pct:3, barTone:'green', creditLine:'10 of 300 used', creditRight:'290 left', creditTone:'neutral', leftLabel:'Renews on', rightLabel:'Jul 28, 2026', rightTone:'neutral',
+        primary:{label:'Manage subscription',icon:'icon icon-settings'}, secondary:null },
+      billing:{ planName:'Pro — Monthly', price:'$29', cadence:'per month', statusLabel:'Active', statusTone:'success',
+        alert:{tone:'neutral', text:'You upgraded from Free on Jun 28, 2026. Your 3 earlier Free applies still show in your history, but they don’t count against your 300 Pro credits.'},
+        renewLabel:'Next renewal', renewValue:'Jul 28, 2026',
+        payLabel:'Payment method', payValue:'Visa •••• 4242', usedPct:3, usedText:'10 of 300 auto-applies used',
+        primary:{label:'Manage subscription',icon:'icon icon-settings'}, secondary:{label:'Cancel plan'}, showInvoices:true } },
+
+    quarterly: {
+      promo:false, credits:'240/900', headerBadge:{label:'Pro',tone:'pro',icon:'icon icon-crown'},
+      cycleUnit:'quarter', resetDate:'Sep 1, 2026', apps:{ fromFree:0, fromPaid:240, completed:52 },
+      banner:null,
+      card:{ caption:'Quarterly Plan', title:'Subscription', badge:'Active', badgeTone:'success', badgeIcon:'icon icon-circle-check',
+        showProgress:true, pct:27, barTone:'green', creditLine:'240 of 900 used', creditRight:'660 left', creditTone:'neutral', leftLabel:'Renews on', rightLabel:'Sep 1, 2026', rightTone:'neutral',
+        primary:{label:'Manage subscription',icon:'icon icon-settings'}, secondary:null },
+      billing:{ planName:'Pro — Quarterly', price:'$69', cadence:'per quarter', statusLabel:'Active', statusTone:'success',
+        alert:null, renewLabel:'Next renewal', renewValue:'Sep 1, 2026',
+        payLabel:'Payment method', payValue:'Visa •••• 4242', usedPct:27, usedText:'240 of 900 auto-applies used',
+        primary:{label:'Manage subscription',icon:'icon icon-settings'}, secondary:{label:'Cancel plan'}, showInvoices:true } },
+
+    cancelling: {
+      promo:false, credits:'180/300', headerBadge:{label:'Cancelling',tone:'warn',icon:'icon icon-clock'},
+      banner:null,
+      card:{ caption:'Monthly Plan', title:'Subscription', badge:'Cancelling', badgeTone:'warn', badgeIcon:'icon icon-clock',
+        showProgress:true, pct:60, barTone:'green', creditLine:'180 of 300 used', creditRight:'120 left', creditTone:'neutral', leftLabel:'Access until', rightLabel:'Jul 3, 2026', rightTone:'neutral',
+        primary:{label:'Reactivate — $29/mo',icon:'icon icon-rotate-ccw'}, secondary:{label:'Manage subscription'} },
+      billing:{ planName:'Pro — Monthly', price:'$29', cadence:'per month', statusLabel:'Cancelling', statusTone:'warn',
+        alert:{tone:'warn', text:"Auto-renew is off. Your plan stays active until Jul 3, 2026 — after that you'll move to the Free tier."},
+        renewLabel:'Access ends', renewValue:'Jul 3, 2026',
+        payLabel:'Payment method', payValue:'Visa •••• 4242', usedPct:60, usedText:'180 of 300 credits remaining',
+        primary:{label:'Reactivate plan',icon:'icon icon-rotate-ccw'}, secondary:{label:'Manage subscription'}, showInvoices:true } },
+
+    ending_soon: {
+      promo:false, credits:'360/900', headerBadge:{label:'Ending soon',tone:'warn',icon:'icon icon-clock'},
+      banner:null,
+      card:{ caption:'Quarterly Plan', title:'Subscription', badge:'Ending soon', badgeTone:'warn', badgeIcon:'icon icon-clock',
+        showProgress:true, pct:40, barTone:'green', creditLine:'360 of 900 used', creditRight:'540 at risk', creditTone:'orange', leftLabel:'Access until', rightLabel:'Jul 3, 2026', rightTone:'orange',
+        primary:{label:'Reactivate — $49/Quarter',icon:'icon icon-rotate-ccw'}, secondary:{label:'Manage subscription'} },
+      billing:{ planName:'Pro — Quarterly', price:'$49', cadence:'per quarter', statusLabel:'Ending soon', statusTone:'warn',
+        alert:{tone:'warn', text:'Auto-renew is off. 540 unused credits will expire when your plan ends on Jul 3, 2026.'},
+        renewLabel:'Access ends', renewValue:'Jul 3, 2026',
+        payLabel:'Payment method', payValue:'Mastercard •••• 5821', usedPct:40, usedText:'360 of 900 credits used · 540 at risk',
+        primary:{label:'Reactivate plan',icon:'icon icon-rotate-ccw'}, secondary:{label:'Manage subscription'}, showInvoices:true } },
+
+    past_due: {
+      promo:false, credits:'0/0', headerBadge:{label:'Past due',tone:'danger',icon:'icon icon-clock'},
+      banner:{tone:'cream', text:'Payment failed — due Jun 17, 2026. Update your payment method to restore access.', cta:'Update payment', dismissable:false},
+      card:{ caption:'Monthly Plan', title:'Subscription', badge:'Past due', badgeTone:'danger', badgeIcon:'icon icon-clock',
+        showProgress:true, pct:0, barTone:'muted', pctText:'Paused', creditLine:'Auto-apply paused', creditRight:'—', creditTone:'danger', leftLabel:'Payment due', rightLabel:'Jun 17, 2026', rightTone:'danger',
+        primary:{label:'Update payment',icon:'icon icon-credit-card'}, secondary:null },
+      billing:{ planName:'Pro — Monthly', price:'$29', cadence:'per month', statusLabel:'Past due', statusTone:'danger',
+        alert:{tone:'danger', text:'We couldn\u2019t charge your card. Payment was due Jun 17, 2026. Auto-apply is paused until payment succeeds.'},
+        renewLabel:'Payment was due', renewValue:'Jun 17, 2026',
+        payLabel:'Payment method', payValue:'Visa •••• 4242 — declined', payTone:'danger', usedPct:0, usedText:'Auto-apply paused',
+        primary:{label:'Update payment method',icon:'icon icon-credit-card'}, secondary:{label:'Contact support'}, showInvoices:true } },
+
+    setup_failed: {
+      promo:false, credits:'0/0', headerBadge:{label:'Setup failed',tone:'danger',icon:'icon icon-triangle-alert'},
+      banner:{tone:'pink', text:'Subscription setup failed. Please resolve this in the billing portal.', cta:'Open portal', dismissable:false},
+      card:{ caption:'Pro Plan', title:'Subscription Status', badge:'Setup failed', badgeTone:'danger', badgeIcon:'icon icon-triangle-alert',
+        showProgress:true, pct:0, barTone:'muted', pctText:'Inactive', creditLine:'Not activated', creditRight:'—', creditTone:'danger', leftLabel:'Plan status', rightLabel:'Not activated', rightTone:'danger',
+        primary:{label:'Open billing portal',icon:'icon icon-external-link'}, secondary:null },
+      billing:{ planName:'Pro — Monthly', price:'$29', cadence:'per month', statusLabel:'Setup failed', statusTone:'danger',
+        alert:{tone:'danger', text:'Your subscription couldn\u2019t be set up — the initial charge didn\u2019t go through. Resolve it in the billing portal to activate Pro.'},
+        renewLabel:'Status', renewValue:'Not activated',
+        payLabel:'Payment method', payValue:'Card setup incomplete', payTone:'danger', usedPct:0, usedText:'Not activated',
+        primary:{label:'Open billing portal',icon:'icon icon-external-link'}, secondary:{label:'Contact support'}, showInvoices:false } },
+
+    checkout_failed: {
+      promo:true, credits:'0/5', headerBadge:{label:'Free',tone:'neutral',icon:'icon icon-user'},
+      banner:{tone:'pink', text:"Checkout didn't complete. Try again when you're ready.", cta:'Go to billing', dismissable:true},
+      card:{ caption:'Free plan', title:'Subscription Status', badge:'Free', badgeTone:'neutral', badgeIcon:'icon icon-clock',
+        showProgress:true, pct:0, barTone:'green', creditLine:'0 of 5 swipes used', creditRight:'5 left', creditTone:'neutral', leftLabel:'Validity', rightLabel:'No expiry · swipes don’t reset', rightTone:'neutral',
+        primary:{label:'Upgrade to Pro',icon:'icon icon-crown'}, secondary:null },
+      billing:{ planName:'Free', price:'$0', cadence:'forever', statusLabel:'Free', statusTone:'neutral',
+        alert:{tone:'warn', text:'Your last checkout didn\u2019t complete, so no plan was started. You can try upgrading again anytime.'},
+        renewLabel:'Auto-apply credits', renewValue:'0 of 5 used this month',
+        payLabel:'Payment method', payValue:'None on file', usedPct:0, usedText:'0 of 5 credits used',
+        primary:{label:'Try checkout again',icon:'icon icon-crown'}, secondary:{label:'Compare plans'}, showInvoices:false } },
+
+    cancelled: {
+      promo:true, credits:'0/0', headerBadge:{label:'Cancelled',tone:'danger',icon:'icon icon-clock'},
+      banner:{tone:'gray', text:'Your subscription has ended. Resubscribe to keep applying.', cta:'Get Pro Plan', dismissable:false},
+      card:{ caption:'Former Starter user · Free tier', title:'Subscription', badge:'Cancelled', badgeTone:'danger', badgeIcon:'icon icon-circle-x',
+        showProgress:true, pct:0, barTone:'muted', pctText:'Expired', creditLine:'Credits expired', creditRight:'0 left', creditTone:'danger', leftLabel:'Plan ended', rightLabel:'Jun 3, 2026', rightTone:'danger',
+        primary:{label:'Get Pro Plan',icon:'icon icon-crown'}, secondary:null },
+      billing:{ planName:'Free (was Starter)', price:'$0', cadence:'forever', statusLabel:'Cancelled', statusTone:'danger',
+        alert:{tone:'neutral', text:'Your Starter plan ended Jun 3, 2026. You\u2019re on the Free tier now — resubscribe anytime to restore auto-apply.'},
+        renewLabel:'Plan ended', renewValue:'Jun 3, 2026',
+        payLabel:'Payment method', payValue:'Removed', usedPct:0, usedText:'0 autoapply credits remaining',
+        primary:{label:'Get Pro Plan',icon:'icon icon-crown'}, secondary:{label:'View past invoices'}, showInvoices:true } },
+  };
+
+  SCEN_ORDER = [
+    ['free','Free tier','#9AA7B2'],
+    ['active','Pro — active','#00B16B'],
+    ['upgraded','Pro — upgraded from Free','#00B16B'],
+    ['quarterly','Pro — Quarterly (900)','#00B16B'],
+    ['cancelling','Pro — cancelling','#F0B429'],
+    ['ending_soon','Pro — ending soon','#F0B429'],
+    ['past_due','Past due','#F76638'],
+    ['setup_failed','Setup failed','#E5484D'],
+    ['checkout_failed','Checkout failed (session)','#E5484D'],
+    ['cancelled','Cancelled','#E5484D'],
+  ];
+
+  APPS = [
+    { logoChar:'S', logoBg:'#0D0D0F', title:'Backend Engineer', company:'ShutterTech', meta:'Columbus, US · Fulltime', state:'needs', needText:'Answer 2 quick questions', ago:'4h ago' },
+    { logoChar:'C', logoBg:'#7C5CFF', title:'Senior Software Engineer', company:'Compass', meta:'Atlanta, GA · Fulltime', state:'applying', tickOffset:0, ago:'6h ago',
+      ticker:['Opening the application','Signing in and verifying access','Filling your personal info','Adding experience & education','Answering screening questions','Uploading résumé and cover letter','Reviewing your application','Submitting and confirming'] },
+    { logoChar:'M', logoBg:'#FFD02F', title:'Software Engineer', company:'Miro', meta:'Atlanta, GA · Fulltime', state:'queued', ago:'3h ago', afterInfo:true },
+    { logoChar:'H', logoBg:'#FF7A59', title:'Platform Engineer', company:'HubSpot', meta:'Cambridge, MA · Fulltime', state:'applying', careful:true, tickOffset:0, ago:'5h ago',
+      ticker:['Taking extra care on this one','Completing the employer’s custom fields','Double-checking your answers','Final review before submitting'] },
+    { logoChar:'A', logoBg:'#2E77FF', title:'Member of Technical Staff', company:'Astronomer', meta:'Remote, US', state:'queued', tickOffset:1, ago:'Just now',
+      ticker:['Tailoring your résumé to this role','Drafting your application answers','Lining up your Bloom agent'] },
+    { logoChar:'C', logoBg:'#FF6B35', title:'DevOps Engineer', company:'ChargeBee', meta:'Houston, US · Remote', state:'submitted', ago:'2 days ago' },
+    { logoChar:'G', logoBg:'#4285F4', title:'Senior Software Engineer', company:'Google', meta:'Mountain View, CA', state:'submitted', ago:'3 days ago' },
+    { logoChar:'E', logoBg:'#FFCE00', title:'Full Stack Developer', company:'Exness', meta:'Atlanta, GA · Fulltime', state:'failed', failReason:'Job is no longer available', ago:'1 day ago' },
+    { logoChar:'C', logoBg:'#6B7A8F', title:'Cloud Architect', company:'Compass Real Estate', meta:'Houston, US · Fulltime', state:'manual', ago:'5h ago' },
+    { logoChar:'P', logoBg:'#1A1A2E', title:'Platform Engineer', company:'Palantir', meta:'Denver, CO · On-site', state:'failed', failReason:'Employer requires US citizenship', ago:'2 days ago' },
+  ];
+
+  appChip(active) {
+    return `display:flex;align-items:center;gap:7px;background:${active?'#022F36':'#fff'};border:1px solid ${active?'#022F36':'#E5E7EB'};border-radius:9999px;padding:8px 16px;font-family:inherit;font-size:14px;font-weight:${active?'700':'600'};color:${active?'#fff':'#4A5464'};cursor:pointer;white-space:nowrap;`;
+  }
+
+  appsTabChip(active) {
+    return `background:none;border:none;border-bottom:2.5px solid ${active?'#022F36':'transparent'};margin-bottom:-1px;padding:0 2px 12px;font-family:inherit;font-size:15px;font-weight:${active?'700':'600'};color:${active?'#022F36':'#7A8694'};cursor:pointer;white-space:nowrap;`;
+  }
+
+  filterPill(active) {
+    return `display:flex;align-items:center;gap:8px;background:${active?'#F0FCFF':'#fff'};border:1px solid ${active?'#5AC8E0':'#E5E7EB'};border-radius:9999px;padding:8px 16px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;white-space:nowrap;`;
+  }
+
+  filterOpts(options, current, key) {
+    return options.map(o => ({
+      label: o, on: current === o,
+      onClick: () => this.setState({ [key]: o, openFilter: null }),
+      radioStyle: `width:18px;height:18px;border-radius:50%;border:1.5px solid ${current===o?'#022F36':'#CBD3D6'};display:flex;align-items:center;justify-content:center;flex-shrink:0;`,
+    }));
+  }
+
+  verChip(active) {
+    return `background:${active?'#fff':'transparent'};border:none;border-radius:9999px;padding:7px 14px;font-family:inherit;font-size:13px;font-weight:${active?'700':'600'};color:${active?'#022F36':'#5A6B72'};cursor:pointer;white-space:nowrap;${active?'box-shadow:0 1px 3px rgba(0,0,0,0.12);':''}`;
+  }
+
+  acctTabStyle(active) {
+    return `display:flex;align-items:center;gap:8px;background:none;border:none;border-bottom:3px solid ${active?'#022F36':'transparent'};padding:12px 16px;margin-bottom:-1px;font-family:inherit;font-size:15px;font-weight:${active?'700':'500'};color:${active?'#022F36':'#7A8694'};cursor:pointer;`;
+  }
+
+  invoicesFor() {
+    const [sbg,sfg]=this.toneColors('success');
+    const [dbg,dfg]=this.toneColors('danger');
+    const paid = (d,amt) => ({ date:d, desc:'Pro — Monthly', amount:amt, status:'Paid', statusStyle:`background:${sbg};color:${sfg};border-radius:9999px;padding:4px 11px;font-size:12px;font-weight:700;` });
+    const failed = (d,amt) => ({ date:d, desc:'Pro — Monthly', amount:amt, status:'Failed', statusStyle:`background:${dbg};color:${dfg};border-radius:9999px;padding:4px 11px;font-size:12px;font-weight:700;` });
+    if (this.state.scenario==='past_due') return [ failed('Jun 17, 2026','$29.00'), paid('May 17, 2026','$29.00'), paid('Apr 17, 2026','$29.00') ];
+    return [ paid('Jun 3, 2026','$29.00'), paid('May 3, 2026','$29.00'), paid('Apr 3, 2026','$29.00') ];
+  }
+
+  scen() { return this.SCEN[this.state.scenario]; }
+
+  componentDidMount() {
+    this._tickT = setInterval(() => this.setState(s => ({ tickIdx: s.tickIdx + 1 })), 2400);
+  }
+  componentWillUnmount() { clearInterval(this._tickT); clearTimeout(this._pendT); }
+
+  buildApps(st) {
+    const live = st.applied.slice().reverse().map(id => {
+      const j = this.JOBS.find(x => x.id === id) || this.POOL[id] || {};
+      return { logoChar:j.logoChar, logoBg:j.logoBg, title:j.title, company:j.company, meta:j.location||'', state:'queued', tickOffset:0, ago:'Just now',
+        ticker:['Tailoring your résumé to this role','Drafting your application answers','Lining up your Bloom agent'] };
+    });
+    const all = [...live, ...this.APPS];
+    const order = { submitted:0, applying:1, needs:2, queued:3, manual:4, failed:5 };
+    all.sort((a,b) => order[a.state] - order[b.state]);
+    const tabbed = all.filter(a => st.appsTab === 'closed' ? a.state === 'failed' : a.state !== 'failed');
+    const f = st.fStatus;
+    const q = (st.fSearch || '').toLowerCase();
+    const list = tabbed.filter(a => {
+      if (st.appsTab === 'closed') return true;
+      const okStatus = f === 'All' ? true :
+        f === 'Needs you' ? (a.state === 'needs' || a.state === 'manual') :
+        f === 'In progress' ? (a.state === 'applying' || a.state === 'queued') :
+        a.state === 'submitted';
+      const okType = st.fType === 'All' ? true : ((a.meta || '') + ' ' + (a.title || '')).toLowerCase().includes(st.fType.toLowerCase());
+      const okSearch = !q || ((a.title || '') + ' ' + (a.company || '')).toLowerCase().includes(q);
+      return okStatus && okType && okSearch;
+    });
+    return { all, list: list.map(a => this.appRow(a, st)) };
+  }
+
+  appRow(a, st) {
+    const S = {
+      needs:     { label:'Needs you', dot:'#F76638', bg:'#FFF4EF', bd:'#F9D9CB', fg:'#C2410C' },
+      queued:    { label:'Queued', dot:'#F59E0B', bg:'#FFF7E8', bd:'#F3E3C2', fg:'#92400E', pulse: !!a.ticker },
+      applying:  { label:'Submitting', dot:'#1B88FE', bg:'#EFF6FF', bd:'#D3E3FD', fg:'#1041B7', pulse:true },
+      manual:    { label:'Apply on your own', dot:'#0E93B5', bg:'#F0FCFF', bd:'#B8EAF5', fg:'#0E93B5' },
+      submitted: { label:'Submitted', dot:'#00B16B', bg:'#E3F7EC', bd:'#CFEBD9', fg:'#00824D' },
+      failed:    { label:"Couldn't apply", dot:'#8A98A5', bg:'#F5F6F7', bd:'#E5E7EB', fg:'#4A5464' },
+    }[a.state];
+    const tick = (a.state === 'applying' || a.state === 'queued') && a.ticker
+      ? a.ticker[(st.tickIdx + (a.tickOffset || 0)) % a.ticker.length] : '';
+    const subText = a.state === 'needs' ? (a.needText + ' · then submits within 24h')
+             : a.state === 'queued' ? 'In line · submits within 24h'
+             : a.state === 'submitted' ? ('Submitted ' + a.ago)
+             : a.state === 'failed' ? (a.failReason + ' · 1 credit refunded') : '';
+    const tipText = {
+      needs: 'Bloom needs a couple of answers before it can apply. Everything you’ve already answered is saved — finish this and it submits within 24 hours. We’ll also email you.',
+      queued: a.ticker ? 'Bloom is checking everything is ready before submitting. If anything’s missing, we’ll ask you here.' : 'Info received — in line for your Bloom agent. It submits within 24 hours.',
+      applying: a.careful ? 'This employer’s form has a few custom steps, so Bloom is taking extra care to get every answer right. It’ll be submitted within 24 hours.' : 'Your Bloom agent is filling and submitting this application right now.',
+      manual: 'This employer’s site doesn’t support auto-apply — use the link to apply yourself. No credit is used.',
+      submitted: 'Successfully submitted. Bloom tracks any updates here.',
+      failed: 'The employer closed this job before we could submit — your credit is back.',
+    }[a.state];
+    return { ...a,
+      badgeStyle: `display:inline-flex;align-items:center;gap:7px;background:${S.bg};border:1px solid ${S.bd};color:${S.fg};border-radius:9999px;padding:6px 14px;font-size:13px;font-weight:${(a.state==='applying'||a.state==='queued'||a.state==='preparing'||a.state==='submitted')?'600':'700'};white-space:nowrap;`,
+      badgeLabel: S.label,
+      dotStyle: `width:8px;height:8px;border-radius:50%;background:${S.dot};flex-shrink:0;${S.pulse ? 'animation:pulseDot 1.4s ease-in-out infinite;' : ''}`,
+      tipText,
+      isNeeds: a.state === 'needs',
+      isManual: a.state === 'manual',
+      notManual: a.state !== 'manual',
+      isApplying: !!tick,
+      hasSub: !!subText && !tick,
+      subColor: a.state === 'needs' ? '#C2410C' : '#7A8694',
+      tickText: tick,
+      subText,
+    };
+  }
+
+  credInfoPaid(sc) { const t = parseInt(String(sc.credits||'0/0').split('/')[1],10)||0; return t >= 30; }
+  credInfoUrgent(sc) {
+    const p = String(sc.credits||'0/0').split('/');
+    const used = parseInt(p[0],10)||0, total = parseInt(p[1],10)||0, left = Math.max(total-used,0);
+    if (total >= 30) return false;
+    return total === 0 || left <= 2;
+  }
+
+  creditInfo(sc, st) {
+    const parts = String(sc.credits || '0/0').split('/');
+    const used = parseInt(parts[0], 10) || 0;
+    const total = parseInt(parts[1], 10) || 0;
+    const paid = total >= 30;
+    const left = Math.max(total - used, 0);
+    const leftPct = total > 0 ? Math.round((left / total) * 100) : 0;
+    const exhausted = total > 0 && left === 0;
+    const low = !paid && total > 0 && left <= 2;
+    const tone = exhausted ? '#E5484D' : low ? '#F76638' : paid ? '#1D484F' : '#022F36';
+    const cycleUnit = sc.cycleUnit || (paid ? 'month' : 'free');
+    const resetDate = sc.resetDate || 'Jul 1, 2026';
+
+    // applications (all-time, never resets). Per-scenario if given; live applies add to paid bucket.
+    const a = sc.apps || { fromFree: 3, fromPaid: 10, completed: 4 };
+    const fromFree = a.fromFree || 0;
+    const fromPaid = (a.fromPaid || 0) + st.applied.length;
+    const allTime = fromFree + fromPaid;
+    const completed = Math.min(a.completed || 0, allTime);
+    const inProgress = allTime - completed;               // guarantees the two sum to total
+    const mixed = fromFree > 0 && fromPaid > 0;
+
+    return {
+      planLabel: sc.headerBadge.label, paid,
+      used, total, left, leftPct, exhausted, low,
+      hasAllowance: total > 0,
+      bigLeft: total > 0 ? String(left) : '0',
+      leftWord: left === 1 ? 'apply left' : 'applies left',
+      contextLine: !paid
+        ? (total > 0 ? `of ${total} free applies · one-time, no reset` : 'No free applies remaining')
+        : `of ${total} this ${cycleUnit} · resets ${resetDate}`,
+      barStyle: `height:100%;width:${leftPct}%;border-radius:9999px;background:${tone};transition:width .3s;`,
+      bigStyle: `font-size:40px;font-weight:800;line-height:1;color:${tone};letter-spacing:-0.02em;`,
+      showUpgrade: !paid,
+      upgradeTitle: exhausted ? "You're out of free applies"
+                   : low ? `Only ${left} free ${left === 1 ? 'apply' : 'applies'} left`
+                   : 'Want to apply faster?',
+      upgradeSub: 'Pro gives you 300 auto-applies every month.',
+      upgradeCta: exhausted ? 'Upgrade to keep applying' : 'Upgrade to Pro — $29/mo',
+      allTime, inProgress, completed,
+      splitInProgStyle: `width:${allTime>0?Math.round((inProgress/allTime)*100):0}%;background:#1D484F;`,
+      splitDoneStyle: `width:${allTime>0?Math.round((completed/allTime)*100):0}%;background:#00B16B;`,
+      // breakdown line that explains free vs paid applies
+      mixed,
+      breakdown: mixed ? `${fromFree} on Free · ${fromPaid} on ${paid ? 'Pro' : 'current plan'}`
+                : (fromFree > 0 ? 'All on your Free plan' : `All on ${paid ? 'Pro' : 'current plan'}`),
+    };
+  }
+
+  toneColors(t) {
+    const m = { neutral:['#F0F1F3','#4A5464'], pro:['#E0FAFA','#022F36'], success:['#E3F7EC','#00824D'], warn:['#FDF4DC','#8A6100'], danger:['#FCEAEA','#B23B3B'] };
+    return m[t] || m.neutral;
+  }
+
+  set(s) { this.setState({ scenario:s, checkoutDismissed:false, avatarMenu:false }); }
+  go(s) { this.setState({ screen:s, avatarMenu:false }); }
+  goBillingTab() { this.setState({ screen:'account', acctTab:'billing', avatarMenu:false }); }
+
+  renderVals() {
+    const st = this.state;
+    const sc = this.scen();
+    const navDef = [
+      ['jobs','Jobs','icon icon-briefcase'],
+      ['applications','Applications','icon icon-clipboard-list'],
+      ['profile','Profile','icon icon-user'],
+    ];
+    const navItems = navDef.map(([key,label,icon]) => {
+      const active = st.screen === key;
+      return {
+        label, iconClass: icon,
+        onClick: () => this.go(key),
+        iconStyle: `font-size:20px;color:${active ? '#1D484F' : '#7A8694'};`,
+        style: `display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:100%;padding:0 16px;border:none;background:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:${active?'700':'500'};color:${active?'#022F36':'#7A8694'};border-bottom:3px solid ${active?'#022F36':'transparent'};`,
+      };
+    });
+
+    // header badge
+    const [hbg,hfg] = this.toneColors(sc.headerBadge.tone);
+    const headerBadgeStyle = `display:inline-flex;align-items:center;gap:7px;background:${hbg};color:${hfg};border:none;border-radius:9999px;padding:8px 14px;font-family:inherit;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap;`;
+
+    // banner
+    const bTones = {
+      cream:{ bg:'#FCF4DD', fg:'#7A5A00', btn:'outline', bd:'#E7CE8A' },
+      pink:{ bg:'#FCECEC', fg:'#B23B3B', btn:'outline', bd:'#F0C9C9' },
+      gray:{ bg:'#E9EDF1', fg:'#23262E', btn:'dark', bd:'#D4DBE2' },
+    };
+    let bannerShow = false, bannerStyle = '', bannerCtaStyle = '', bannerDismissable = false;
+    if (sc.banner) {
+      const isSession = sc.banner.dismissable;
+      bannerShow = !(isSession && st.checkoutDismissed);
+      bannerDismissable = !!sc.banner.dismissable;
+      const t = bTones[sc.banner.tone];
+      bannerStyle = `display:flex;align-items:center;gap:16px;padding:13px 26px;background:${t.bg};color:${t.fg};flex-shrink:0;border-bottom:1px solid ${t.bd};`;
+      bannerCtaStyle = t.btn === 'dark'
+        ? `background:#022F36;color:#fff;border:none;border-radius:9999px;padding:9px 20px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;`
+        : `background:#fff;border:1px solid ${t.bd};color:${t.fg};border-radius:9999px;padding:8px 18px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;`;
+    }
+
+    // status card (build display object)
+    const c = sc.card;
+    const [cbg2,cfg2] = this.toneColors(c.badgeTone);
+    const cardWrap = { success:['#F1FBF4','#BFE9CC'], pro:['#EFFCFC','#B6E9E9'], neutral:['#F6F8FA','#E3E8ED'], warn:['#FEF8E9','#F0DCA6'], danger:['#FDF1F1','#F2CFCF'] }[c.badgeTone] || ['#F6F8FA','#E3E8ED'];
+    const card = {
+      wrapStyle: `background:${cardWrap[0]};border:1.5px solid ${cardWrap[1]};border-radius:18px;padding:24px;`,
+      caption: c.caption, title: c.title, badge: c.badge, badgeIcon: c.badgeIcon,
+      badgeStyle: `display:inline-flex;align-items:center;gap:6px;background:${cbg2};color:${cfg2};border-radius:9999px;padding:6px 13px;font-size:13px;font-weight:700;`,
+      showProgress: c.showProgress, hideProgress: !c.showProgress,
+      pct: c.pct,
+      barStyle: `height:100%;border-radius:9999px;width:${c.pct}%;background:${c.barTone==='green'?'#5FD0A8':'#D6DBE0'};`,
+      leftLabel: c.leftLabel, rightLabel: c.rightLabel,
+      rightStyle: `font-size:13px;font-weight:700;color:${c.rightTone==='orange'?'#F76638':c.rightTone==='danger'?'#B23B3B':'#0D0D0F'};`,
+      creditLine: c.creditLine || '', creditRight: c.creditRight || '',
+      creditStyle: `font-size:14px;font-weight:700;color:${c.creditTone==='orange'?'#F76638':c.creditTone==='danger'?'#B23B3B':'#4A5464'};`,
+      pctText: c.pctText || `${c.pct}% used`,
+      pctStyle: `font-size:13px;font-weight:700;color:${c.rightTone==='orange'?'#F76638':c.rightTone==='danger'?'#B23B3B':'#1D484F'};`,
+      hasSubLine: !!c.subLine, subLine: c.subLine || '',
+      primaryLabel: c.primary.label, primaryIcon: c.primary.icon,
+      hasSecondary: !!c.secondary, secondaryLabel: c.secondary ? c.secondary.label : '',
+      onPrimary: () => this.goBillingTab(),
+      onSecondary: () => this.goBillingTab(),
+    };
+
+    // billing object
+    const b = sc.billing;
+    const [sbg,sfg] = this.toneColors(b.statusTone);
+    const aTone = b.alert ? { info:['#EAF6FF','#0A5A8A','#CDE8FB'], warn:['#FDF4DC','#7A5A00','#EBD8A0'], danger:['#FCECEC','#B23B3B','#F2CFCF'], neutral:['#F2F4F6','#4A5464','#E3E7EB'] }[b.alert.tone] : null;
+    const billing = {
+      planName:b.planName, price:b.price, cadence:b.cadence,
+      statusLabel:b.statusLabel,
+      statusStyle:`display:inline-flex;align-items:center;gap:6px;background:${sbg};color:${sfg};border-radius:9999px;padding:6px 14px;font-size:13px;font-weight:700;`,
+      hasAlert: !!b.alert, alertText: b.alert ? b.alert.text : '',
+      alertStyle: b.alert ? `display:flex;align-items:flex-start;gap:11px;background:${aTone[0]};color:${aTone[1]};border:1px solid ${aTone[2]};border-radius:12px;padding:14px 16px;font-size:14.5px;line-height:1.5;font-weight:500;` : '',
+      renewLabel:b.renewLabel, renewValue:b.renewValue,
+      payLabel:b.payLabel, payValue:b.payValue,
+      payStyle:`font-size:15px;font-weight:600;color:${b.payTone==='danger'?'#B23B3B':'#0D0D0F'};`,
+      usedPct:b.usedPct, usedText:b.usedText,
+      usedBarStyle:`height:100%;border-radius:9999px;width:${b.usedPct}%;background:${b.usedPct>0?'#5FD0A8':'#D6DBE0'};`,
+      primaryLabel:b.primary.label, primaryIcon:b.primary.icon,
+      hasSecondary: !!b.secondary, secondaryLabel: b.secondary ? b.secondary.label : '',
+      showInvoices: b.showInvoices,
+      onPrimary: () => this.go('account'),
+    };
+
+    // scenario dock
+    const scenarios = this.SCEN_ORDER.map(([key,label,dot]) => {
+      const active = st.scenario === key;
+      return { label, dot,
+        onClick: () => this.set(key),
+        style: `display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:${active?'#16484A':'transparent'};border:1px solid ${active?'#2E6E6E':'transparent'};border-radius:9px;padding:8px 11px;font-family:inherit;font-size:13px;font-weight:${active?'700':'500'};color:${active?'#fff':'#B8D2D3'};cursor:pointer;` };
+    });
+
+    // jobs
+    const isMatches = st.jobsTab === 'matches';
+    const isSavedDetail = st.jobsTab === 'saved' && !!st.savedDetailId;
+    const isSavedList = st.jobsTab === 'saved' && !st.savedDetailId;
+    const remaining = this.deckRemaining(st);
+    const dpos = remaining.length ? Math.min(st.mPos, remaining.length - 1) : 0;
+    const caughtUp = isMatches && st.mPos >= remaining.length && !st.pending;
+    const reviewedCount = st.passed.length + st.applied.length;
+    const job = isSavedDetail ? this.fullJob(st.savedDetailId)
+              : (remaining[dpos] || remaining[0] || this.JOBS[0]);
+    job.matchDeg = Math.round(job.match * 3.6) + 'deg';
+    const mx = this.matchInfo(job);
+    const el = this.eligInfo(job);
+    const curSaved = st.saved.includes(job.id);
+    const savedJobs = st.saved.map(id => {
+      const j = this.POOL[id] || {};
+      return { ...j,
+        onRemove: () => this.setState({ saved: this.state.saved.filter(x=>x!==id), savedDetailId: this.state.savedDetailId===id ? null : this.state.savedDetailId }),
+        onOpen: () => this.setState({ savedDetailId: id }) };
+    });
+
+    return {
+      // nav + shell
+      navItems,
+      promoShow: sc.promo,
+      onUpgrade: () => this.goBillingTab(),
+      goBilling: () => this.goBillingTab(),
+      goAccount: () => this.setState({ screen:'account', acctTab:'profile', avatarMenu:false }),
+      headerBadgeStyle,
+      sc,
+      creditsHover: st.creditsHover,
+      onCreditsEnter: () => this.setState({ creditsHover: true }),
+      onCreditsLeave: () => this.setState({ creditsHover: false }),
+      credInfo: this.creditInfo(sc, st),
+      credPlanPill: (() => { const [b,f] = this.toneColors(sc.headerBadge.tone); return `background:${b};color:${f};font-size:12px;font-weight:700;border-radius:9999px;padding:3px 10px;`; })(),
+      credCycleTag: this.credInfoPaid(sc) ? 'This cycle' : 'Free plan',
+      credUpgradeBox: (() => { const urgent = this.credInfoUrgent(sc); return `background:${urgent?'#FFF4EF':'#F5F8FA'};border:1px solid ${urgent?'#F9D9CB':'#ECEEF0'};border-radius:12px;padding:14px;margin-top:14px;`; })(),
+      credUpgradeBtn: (() => { const urgent = this.credInfoUrgent(sc); return `display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:${urgent?'#F76638':'#1D484F'};border:none;border-radius:9999px;padding:11px 16px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;`; })(),
+      avatarMenu: st.avatarMenu,
+      onAvatar: () => this.setState({ avatarMenu: !st.avatarMenu }),
+      // banner
+      bannerShow, bannerStyle, bannerCtaStyle, bannerDismissable,
+      onBannerCta: () => this.goBillingTab(),
+      onDismiss: () => this.setState({ checkoutDismissed:true }),
+      // screens
+      isJobs: st.screen==='jobs',
+      isLogin: st.screen==='login',
+      onSignIn: () => this.setState({ screen:'jobs', avatarMenu:false }),
+      onSignOut: () => this.setState({ screen:'login', avatarMenu:false }),
+      isProfile: st.screen==='profile',
+      profTabs: [['personal','Personal'],['education','Education'],['work','Work Experience'],['skills','Skills'],['employment','Employment']].map(([k,label]) => ({
+        label, onClick: () => this.scrollToSection(k),
+        style: `background:${st.profileTab===k?'#ECEEF0':'none'};border:none;border-radius:9999px;padding:9px ${k==='personal'?'18':'16'}px;font-family:inherit;font-size:15px;font-weight:${st.profileTab===k?'700':'500'};color:${st.profileTab===k?'#0D0D0F':'#7A8694'};cursor:pointer;margin-bottom:16px;`,
+      })),
+      profIsPersonal: st.profileTab==='personal',
+      profIsEducation: st.profileTab==='education',
+      profIsWork: st.profileTab==='work',
+      profIsSkills: st.profileTab==='skills',
+      profIsEmployment: st.profileTab==='employment',
+      salaryMissing: !st.expectedSalary,
+      salaryFilled: !!st.expectedSalary,
+      salaryDisplay: st.expectedSalary ? ('$' + st.expectedSalary + ' / year') : 'Not added yet',
+      salaryColor: st.expectedSalary ? '#0D0D0F' : '#A5A5A5',
+      salaryCardStyle: `display:flex;align-items:center;gap:16px;border-radius:14px;padding:16px 18px;margin-top:14px;${st.expectedSalary ? 'background:#F5F6F7;border:1px solid #ECEEF0;' : 'background:#FFFBF0;border:1px solid #F3E3C2;'}`,
+      salaryIconBg: st.expectedSalary ? '#E7EAEC' : '#FDF0D2',
+      salaryIconFg: st.expectedSalary ? '#4A5464' : '#8A6100',
+      editingSalary: st.editingSalary,
+      notEditingSalary: !st.editingSalary,
+      salaryDraft: st.salaryDraft,
+      onEditSalary: () => this.setState({ editingSalary: true, salaryDraft: st.expectedSalary }),
+      onSalaryDraftChange: (e) => this.setState({ salaryDraft: e.target.value }),
+      onSaveSalary: () => this.setState({ expectedSalary: st.salaryDraft, editingSalary: false }),
+      eduRows: st.educationList.map(ed => this.eduRowVals(ed)),
+      eduPanelRows: st.educationList.map(ed => this.eduPanelVals(ed)),
+      countryOptions: Object.keys(this.constructor.SCALES),
+      allCgpaFilled: st.educationList.every(ed => !!ed.cgpa),
+      strengthItems: [
+        ['Personal Info (contact + address)', true],
+        ['Add your education journey info', st.educationList.every(ed => !!ed.cgpa)],
+        ['Add your work experience', true],
+        ['Add your skills', true],
+        ['Fill out your job preferences', true],
+      ].map(([label, done]) => ({ label, done, pct: 20,
+        dotStyle: `width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${done?'#23B5DE':'#fff'};border:1.5px solid ${done?'#23B5DE':'#C7CDD3'};`,
+        textStyle: `font-size:15px;color:${done?'#8A93A0':'#23262E'};text-decoration:${done?'line-through':'none'};` })),
+      strengthPct: 80 + (st.educationList.every(ed => !!ed.cgpa) ? 20 : 0),
+      strengthExpanded: st.strengthExpanded,
+      strengthChevron: st.strengthExpanded ? 'icon icon-chevron-up' : 'icon icon-chevron-down',
+      onToggleStrength: () => this.setState(s => ({ strengthExpanded: !s.strengthExpanded })),
+      editPanelOpen: !!st.editPanel,
+      mainScrollLockStyle: st.editPanel ? 'overflow-y:hidden;' : '',
+      isEducationPanel: st.editPanel === 'education',
+      isWorkPanel: st.editPanel === 'work',
+      isPersonalPanel: st.editPanel === 'personal',
+      isAddressPanel: st.editPanel === 'address',
+      panelTitle: st.editPanel === 'work' ? 'Work Experience' : st.editPanel === 'personal' ? 'Personal Info' : st.editPanel === 'address' ? 'Address' : 'Education',
+      panelSaveLabel: st.editPanel === 'education' ? 'Add' : 'Update',
+      onOpenEducationPanel: () => this.setState({ editPanel: 'education' }),
+      onOpenWorkPanel: () => this.setState({ editPanel: 'work' }),
+      onOpenPersonalPanel: () => this.setState({ editPanel: 'personal' }),
+      onOpenAddressPanel: () => this.setState({ editPanel: 'address' }),
+      onClosePanel: () => this.setState({ editPanel: null }),
+      profCardShiftStyle: st.editPanel ? 'transform:translateX(-4%);' : '',
+      workHistory: [
+        { dates:'2024-08 → Present', title:'Visual Design Manager', company:'Freshworks', type:'Full-Time' },
+        { dates:'2018-09 → 2024-08', title:'Visual Design Manager', company:'Nurturebox', type:'Full-Time' },
+        { dates:'2010-09 → 2018-08', title:'Design Lead', company:'Contus', type:'Full-Time' },
+        { dates:'2008-06 → 2010-08', title:'Web Designer', company:'Concern Infotech Pvt Ltd', type:'Full-Time' },
+      ].map((w, i) => ({ ...w, expanded: st.workExpandedIdx === i, expandedMargin: st.workExpandedIdx === i ? '18px' : '0',
+        chevronClass: st.workExpandedIdx === i ? 'icon icon-chevron-up' : 'icon icon-chevron-down',
+        onToggle: () => this.setState({ workExpandedIdx: st.workExpandedIdx === i ? -1 : i }) })),
+      skillsList: ['adobe xd','blender','css','figma','html','illustrator','indesign','javascript','photoshop','procreate','sketch','ui','ux','web design'],
+      isApplications: st.screen==='applications',
+      isAccount: st.screen==='account',
+      // jobs
+      jobsHeading: isMatches ? 'Your top role matches' : 'Saved jobs',
+      isMatches, isSavedDetail, isSavedList, showCard: (isMatches && !caughtUp) || isSavedDetail,
+      caughtUp,
+      skippedCount: remaining.length,
+      hasSkipped: remaining.length > 0,
+      reviewedCount,
+      showMomentum: isMatches && reviewedCount > 0,
+      onNext: () => this.doSkip(dpos),
+      onApply: () => this.doApply(job),
+      onNotInterested: () => this.doPass(job),
+      onRefreshMatches: () => this.setState({ mPos: 0 }),
+      pendingShow: !!st.pending,
+      pendingText: st.pending ? ((st.pending.type === 'apply' ? 'Applied to ' : 'Passed ') + st.pending.company) : '',
+      pendingIcon: st.pending && st.pending.type === 'apply' ? 'icon icon-circle-check-big' : 'icon icon-circle-x',
+      onUndoPending: () => this.undoPending(),
+      onOpenPrefs: () => this.openPrefs(),
+      prefsOpen: st.prefsOpen,
+      onClosePrefs: () => this.closePrefs(),
+      onUpdatePrefs: () => this.closePrefs(),
+      prefFunc: st.prefs.func,
+      subOptions: [['fe','Frontend'],['be','Backend'],['fs','Full Stack'],['mobile','Mobile'],['devops','DevOps / Cloud'],['qa','QA / Testing']].map(([k,label]) => { const on = st.prefs.subs[k]; return { label, onClick: () => this.toggleSub(k), chipStyle: this.chipStyle(on), chipHover: this.chipHoverStyle(on), chipFocus: this.chipFocusStyle(), checkIcon: this.chipCheckIcon(on), checkIconStyle: this.chipCheckColor(on) }; }),
+      subHint: Object.values(st.prefs.subs).some(Boolean) ? 'Pick any that fit' : 'None picked — showing all of Software Engineering',
+      pfShowNear: st.prefs.arrangement.hybrid || st.prefs.arrangement.onsite,
+      pfRemoteOnly: st.prefs.arrangement.remote && !st.prefs.arrangement.hybrid && !st.prefs.arrangement.onsite,
+      ...(() => { const v = this.__pfN(st); const o = {}; Object.keys(v).forEach(k => o['pfN' + k] = v[k]); return o; })(),
+      locChip: (() => {
+        const a = st.prefs.arrangement, n = st.prefs.near, parts = [];
+        if (a.hybrid || a.onsite) parts.push(n.mode === 'any' ? (st.prefs.locations.ca && st.prefs.locations.us ? 'US & Canada' : st.prefs.locations.ca ? 'Canada' : 'United States')
+          : n.states.length === 0 ? 'Pick states' : n.states.length === 1 ? n.states[0] : (n.states[0] + ' +' + (n.states.length - 1)));
+        if (a.remote) parts.push('Remote');
+        return parts.length ? parts.join(' + ') : 'Set your location';
+      })(),
+      cbBox: (on) => `width:26px;height:26px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on?'#5AEBEB':'#fff'};border:1.5px solid ${on?'#5AEBEB':'#CBD3D6'};`,
+      prefTypes: [['full','Full Time'],['part','Part Time'],['intern','Internship']].map(([k,label]) => ({ label, on: st.prefs.types[k], onClick: () => this.toggleType(k), chipStyle: this.chipStyle(st.prefs.types[k]), chipHover: this.chipHoverStyle(st.prefs.types[k]), chipFocus: this.chipFocusStyle(), checkIcon: this.chipCheckIcon(st.prefs.types[k]), checkIconStyle: this.chipCheckColor(st.prefs.types[k]) })),
+      prefLevels: [['entry','Entry'],['mid','Mid'],['senior','Senior'],['exec','Executive']].map(([k,label]) => ({ label, on: st.prefs.levels[k], onClick: () => this.toggleLevel(k), chipStyle: this.chipStyle(st.prefs.levels[k]), chipHover: this.chipHoverStyle(st.prefs.levels[k]), chipFocus: this.chipFocusStyle(), checkIcon: this.chipCheckIcon(st.prefs.levels[k]), checkIconStyle: this.chipCheckColor(st.prefs.levels[k]) })),
+      locOptions: [['us','United States','🇺🇸'],['ca','Canada','🇨🇦']].map(([k,label,flag]) => {
+        const on = st.prefs.locations[k];
+        return { label, flag, on, onClick: () => this.toggleLocation(k), chipStyle: this.chipStyle(on), chipHover: this.chipHoverStyle(on), chipFocus: this.chipFocusStyle(), checkIcon: this.chipCheckIcon(on), checkIconStyle: this.chipCheckColor(on) };
+      }),
+      arrangeOptions: [['remote','Remote'],['hybrid','Hybrid'],['onsite','On-site']].map(([k,label]) => ({ label, on: st.prefs.arrangement[k], onClick: () => this.toggleArrangement(k), chipStyle: this.chipStyle(st.prefs.arrangement[k]), chipHover: this.chipHoverStyle(st.prefs.arrangement[k]), chipFocus: this.chipFocusStyle(), checkIcon: this.chipCheckIcon(st.prefs.arrangement[k]), checkIconStyle: this.chipCheckColor(st.prefs.arrangement[k]) })),
+      authBlocks: [['us','United States \ud83c\uddfa\ud83c\uddf8'],['ca','Canada \ud83c\udde8\ud83c\udde6']]
+        .filter(([k]) => st.prefs.locations[k])
+        .map(([k,title]) => {
+          const a = st.prefs.auth[k] || {};
+          const row = (field, label, hint) => {
+            const v = a[field];
+            return { label, hint, isYes: v==='yes', isNo: v==='no',
+              onYes: () => this.setAuth(k, field, 'yes'), onNo: () => this.setAuth(k, field, 'no'),
+              yesStyle: this.ynStyle(v==='yes'), noStyle: this.ynStyle(v==='no'),
+              yesDot: this.ynDot(v==='yes'), noDot: this.ynDot(v==='no') };
+          };
+          return { title, rows: [
+            row('authorized', 'Currently authorized to work', 'Citizen, PR, visa, EAD or work permit'),
+            row('sponsor', 'Will require sponsorship', 'Now or at any point in the future'),
+          ] };
+        }),
+      showGlobalAuth: false,
+      globalIsYes: st.prefs.globalAuth === 'yes', globalIsNo: st.prefs.globalAuth === 'no',
+      onGlobalYes: () => this.setGlobalAuth('yes'), onGlobalNo: () => this.setGlobalAuth('no'),
+      globalYesStyle: `display:flex;align-items:center;gap:10px;text-align:left;background:${st.prefs.globalAuth==='yes'?'#E9FCFC':'#fff'};border:1.5px solid ${st.prefs.globalAuth==='yes'?'#5AEBEB':'#ECEEF0'};border-radius:12px;padding:12px 14px;font-family:inherit;cursor:pointer;`,
+      globalNoStyle: `display:flex;align-items:center;gap:10px;text-align:left;background:${st.prefs.globalAuth==='no'?'#E9FCFC':'#fff'};border:1.5px solid ${st.prefs.globalAuth==='no'?'#5AEBEB':'#ECEEF0'};border-radius:12px;padding:12px 14px;font-family:inherit;cursor:pointer;`,
+      globalYesRadio: `width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid ${st.prefs.globalAuth==='yes'?'#00824D':'#CBD3D6'};`,
+      globalNoRadio: `width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff;border:2px solid ${st.prefs.globalAuth==='no'?'#00824D':'#CBD3D6'};`,
+      residenceCountry: st.prefs.residenceCountry,
+      onResidenceChange: (e) => this.setState(s => ({ prefs: { ...s.prefs, residenceCountry: e.target.value } })),
+      backToSaved: () => this.setState({ savedDetailId: null }),
+      showMatches: () => this.setState({ jobsTab:'matches', savedDetailId:null }),
+      showSaved: () => this.setState({ jobsTab:'saved', savedDetailId:null }),
+      segMatchesStyle: `display:flex;align-items:center;gap:8px;border:none;border-radius:9999px;padding:9px 18px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;background:${isMatches?'#fff':'transparent'};color:${isMatches?'#022F36':'#5A6B72'};box-shadow:${isMatches?'0 1px 3px rgba(0,0,0,0.12)':'none'};`,
+      segSavedStyle: `display:flex;align-items:center;gap:8px;border:none;border-radius:9999px;padding:9px 18px;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;background:${!isMatches?'#fff':'transparent'};color:${!isMatches?'#022F36':'#5A6B72'};box-shadow:${!isMatches?'0 1px 3px rgba(0,0,0,0.12)':'none'};`,
+      savedCount: st.saved.length,
+      job,
+      mx,
+      el,
+      goSkills: () => { this.setState({ screen:'profile' }); setTimeout(() => this.scrollToSection && this.scrollToSection('skills'), 60); },
+      onSave: () => { if(!curSaved) this.setState({ saved:[...st.saved, job.id] }); },
+      saveBtnLabel: curSaved ? 'Saved' : 'Save',
+      saveBtnIcon: curSaved ? 'icon icon-bookmark-check' : 'icon icon-bookmark',
+      saveBtnStyle: `display:flex;align-items:center;gap:8px;background:${curSaved?'#E0FAFA':'#fff'};border:1px solid ${curSaved?'#A6E9E9':'#E5E7EB'};border-radius:9999px;padding:10px 18px;font-family:inherit;font-size:14px;font-weight:600;color:${curSaved?'#022F36':'#23262E'};cursor:pointer;`,
+      savedJobs, hasSaved: st.saved.length>0, noSaved: st.saved.length===0,
+      // card + billing
+      card, billing,
+      // account tabs
+      acctTab: st.acctTab,
+      acctIsProfile: st.acctTab==='profile',
+      acctIsSecurity: st.acctTab==='security',
+      acctIsBilling: st.acctTab==='billing',
+      acctGoProfile: () => this.setState({ acctTab:'profile' }),
+      acctGoSecurity: () => this.setState({ acctTab:'security' }),
+      acctGoBilling: () => this.setState({ acctTab:'billing' }),
+      acctTabProfileStyle: this.acctTabStyle(st.acctTab==='profile'),
+      acctTabSecurityStyle: this.acctTabStyle(st.acctTab==='security'),
+      acctTabBillingStyle: this.acctTabStyle(st.acctTab==='billing'),
+      appsList: (() => { const b = this.buildApps(st); return b.list; })(),
+      appCounts: (() => {
+        const all = this.buildApps(st).all;
+        return {
+          needs: all.filter(a=>a.state==='needs'||a.state==='manual').length,
+          progress: all.filter(a=>a.state==='applying'||a.state==='queued').length,
+          done: all.filter(a=>a.state==='submitted').length,
+        };
+      })(),
+      fSearch: st.fSearch,
+      onSearch: (e) => this.setState({ fSearch: e.target.value }),
+      dateLabel: st.fDate === 'All time' ? 'Date' : st.fDate,
+      typeLabel: st.fType === 'All' ? 'Job Type' : st.fType,
+      statusLabel: st.fStatus === 'All' ? 'Status' : st.fStatus,
+      pillDateStyle: this.filterPill(st.fDate !== 'All time'),
+      pillTypeStyle: this.filterPill(st.fType !== 'All'),
+      pillStatusStyle: this.filterPill(st.fStatus !== 'All'),
+      dateOpen: st.openFilter === 'date',
+      typeOpen: st.openFilter === 'type',
+      statusOpen: st.openFilter === 'status',
+      onToggleDate: () => this.setState(s => ({ openFilter: s.openFilter === 'date' ? null : 'date' })),
+      onToggleType: () => this.setState(s => ({ openFilter: s.openFilter === 'type' ? null : 'type' })),
+      onToggleStatus: () => this.setState(s => ({ openFilter: s.openFilter === 'status' ? null : 'status' })),
+      dateOpts: this.filterOpts(['Last 6 hours','Last 24 hours','Last 7 days','Last 14 days','Last 30 days','All time'], st.fDate, 'fDate'),
+      typeOpts: this.filterOpts(['All','Fulltime','Remote'], st.fType, 'fType'),
+      statusOpts: this.filterOpts(['All','Needs you','In progress','Submitted'], st.fStatus, 'fStatus'),
+      onClearFilters: () => this.setState({ fSearch:'', fDate:'All time', fType:'All', fStatus:'All', openFilter:null }),
+      totalJobs: this.buildApps(st).all.length,
+      closedCount: this.buildApps(st).all.filter(a=>a.state==='failed').length,
+      isAppsActive: st.appsTab !== 'closed',
+      onAppsTabActive: () => this.setState({ appsTab:'active' }),
+      onAppsTabClosed: () => this.setState({ appsTab:'closed' }),
+      appsTabActiveStyle: this.appsTabChip(st.appsTab !== 'closed'),
+      appsTabClosedStyle: this.appsTabChip(st.appsTab === 'closed'),
+      verAStyle: this.verChip(st.appsVersion==='a'),
+      verBStyle: this.verChip(st.appsVersion==='b'),
+      invoices: this.invoicesFor(),
+      // dock
+      dockOpen: st.dockOpen, dockClosed: !st.dockOpen,
+      toggleDock: () => this.setState({ dockOpen: !st.dockOpen }),
+      scenarios,
+    };
+  }
+}
+</script>
+</body>
+</html>

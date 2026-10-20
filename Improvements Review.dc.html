@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/bloom-design-system-019dd285-6635-7cde-a3a1-528e983a1810/colors_and_type.css">
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.525.0/font/lucide.css">
+<style>
+@font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-regular.ttf");font-weight:400;}
+@font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-semibold.ttf");font-weight:600;}
+@font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-bold.ttf");font-weight:700;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#FAFAFA;font-family:"Proxima Soft",system-ui,sans-serif;color:#23262E;}
+a{color:#1D484F;font-weight:700;}
+a:hover{color:#022F36;}
+</style>
+</helmet>
+<div style="max-width:1080px;margin:0 auto;padding:48px 28px 80px;display:flex;flex-direction:column;gap:22px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px;">
+    <div style="font-size:13px;font-weight:700;letter-spacing:0.08em;color:#4A5464;">BLOOM · CURRENT PRODUCT · DESIGN SYNC</div>
+    <h1 style="font-size:36px;font-weight:700;color:#022F36;letter-spacing:-0.02em;line-height:1.15;">Six improvements from intern feedback</h1>
+    <p style="font-size:16px;line-height:1.6;color:#4A5464;max-width:720px;text-wrap:pretty;">What changed in the prototype for each item, and what engineering owns. Open the <a href="Bloom Subscription Flow.dc.html">live prototype</a> to walk through them.</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;">
+      <span style="display:inline-flex;align-items:center;gap:6px;background:#E3F7EC;color:#00824D;border-radius:9999px;padding:5px 12px;font-size:13px;font-weight:700;"><span style="width:7px;height:7px;border-radius:50%;background:#00B16B;"></span>Designed in prototype</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;background:#EFF6FF;color:#1041B7;border-radius:9999px;padding:5px 12px;font-size:13px;font-weight:700;"><span style="width:7px;height:7px;border-radius:50%;background:#1B88FE;"></span>Spec for engineering</span>
+    </div>
+  </header>
+
+  <!-- 1 -->
+  <section style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:26px 28px;display:flex;flex-direction:column;gap:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <h2 style="font-size:22px;font-weight:700;color:#0D0D0F;">1 · Onboarding &amp; profile saving</h2>
+      <span style="display:inline-flex;align-items:center;gap:6px;background:#EFF6FF;color:#1041B7;border-radius:9999px;padding:5px 12px;font-size:13px;font-weight:700;"><span style="width:7px;height:7px;border-radius:50%;background:#1B88FE;"></span>Spec for engineering</span>
+    </div>
+    <p style="font-size:15px;line-height:1.6;color:#4A5464;">Skills fail to save, EEO submissions error out, and the captcha resets the form. The root causes are bugs. Design defines how each failure should look so users never lose work.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;">
+      <div style="background:#F5F6F7;border:1px solid #ECEEF0;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font-size:13px;font-weight:700;color:#4A5464;">Skills didn't save</div>
+        <div style="display:flex;align-items:center;gap:10px;background:#0C2A2C;color:#fff;border-radius:10px;padding:11px 14px;font-size:13.5px;"><i class="icon icon-circle-alert" style="font-size:16px;color:#FFB899;"></i><span style="flex:1;">Couldn't save your skills</span><b style="color:#5AEBEB;">Retry</b></div>
+        <div style="font-size:13px;line-height:1.5;color:#4A5464;">Toast with retry. Typed skills stay in the field.</div>
+      </div>
+      <div style="background:#F5F6F7;border:1px solid #ECEEF0;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font-size:13px;font-weight:700;color:#4A5464;">EEO step fails</div>
+        <div style="background:#fff;border:1.5px solid #E5484D;border-radius:8px;padding:10px 12px;font-size:13.5px;color:#23262E;">Prefer not to say</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#B23B3B;font-weight:600;"><i class="icon icon-circle-alert" style="font-size:14px;"></i>Something went wrong. Your answers are kept, try again.</div>
+      </div>
+      <div style="background:#F5F6F7;border:1px solid #ECEEF0;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;">
+        <div style="font-size:13px;font-weight:700;color:#4A5464;">Captcha expires</div>
+        <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E5E7EB;border-radius:8px;padding:10px 12px;font-size:13.5px;"><i class="icon icon-rotate-ccw" style="font-size:15px;color:#1D484F;"></i>Verify again. Your form is saved.</div>
+        <div style="font-size:13px;line-height:1.5;color:#4A5464;">Re-verify in place. Never clear the form.</div>
+      </div>
+    </div>
+    <div style="font-size:13.5px;color:#23262E;"><b>Eng owns:</b> the save bug, the EEO error, and keeping captcha state.</div>
+  </section>
+
+  <!-- 2 -->
+  <section style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:26px 28px;display:flex;flex-direction:column;gap:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <h2 style="font-size:22px;font-weight:700;color:#0D0D0F;">2 · Match accuracy</h2>
+      <span style="display:inline-flex;align-items:center;gap:6px;background:#E3F7EC;color:#00824D;border-radius:9999px;padding:5px 12px;font-size:13px;font-weight:700;"><span style="width:7px;height:7px;border-radius:50%;background:#00B16B;"></span>Designed in prototype</span>
+    </div>
+    <p style="font-size:15px;line-height:1.6;color:#4A5464;">Users saw "Strong match" on jobs where they were missing core skills, and stopped trusting the score.</p>
+    <ul style="display:flex;flex-direction:column;gap:7px;padding-left:20px;font-size:15px;line-height:1.55;">
+      <li>Required skills card on every job: "4 of 5 matched", with ✓ and ✕ chips.</li>
+      <li>"Strong match" only shows when every required skill is present. Otherwise the card says "Good match · Missing 1 required skill".</li>
+      <li>Synonym note: "Node.js matched via 'NodeJS' on your profile".</li>
+      <li>"Have it? Add to your skills" jumps to the Skills section of the profile.</li>
+    </ul>
+    <div style="font-size:13.5px;"><b>See it:</b> Jobs tab. Miro has every skill, Linear is missing one, Coinbase is missing two. <b>Eng owns:</b> synonym matching and the label rule on the backend.</div>
+  </section>
+
+  <!-- 3 + 4 -->
+  <section style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:26px 28px;display:flex;flex-direction:column;gap:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <h2 style="font-size:22px;font-weight:700;color:#0D0D0F;">3 + 4 · City filter and specializations</h2>
+      <span style="display:inline-flex;align-items:center;gap:6px;background:#E3F7EC;color:#00824D;border-radius:9999px;padding:5px 12px;font-size:13px;font-weight:700;"><span style="width:7px;height:7px;border-radius:50%;background:#00B16B;"></span>Designed in prototype</span>
+    </div>
+    <p style="font-size:15px;line-height:1.6;color:#4A5464;">Both live in the existing Job Preferences modal, so there's no new screen to learn.</p>
+    <ul style="display:flex;flex-direction:column;gap:7px;padding-left:20px;font-size:15px;line-height:1.55;">
+      <li><b>Specialization</b> chips under Job Function: Frontend, Backend, Full Stack, Mobile, DevOps / Cloud, QA / Testing. Pick several, or none to see all of Software Engineering.</li>
+      <li><b>Near a city</b> search with a 10 / 25 / 50 / 100 mi radius.</li>
+      <li>The radius only applies to Hybrid and On-site jobs. With Remote only, the field is disabled and explains why. Work authorization still applies to all of them.</li>
+    </ul>
+    <div style="font-size:13.5px;"><b>See it:</b> Jobs → Match Preference. Turn on Hybrid to enable the city search.</div>
+  </section>
+
+  <!-- 5 -->
+  <section style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:26px 28px;display:flex;flex-direction:column;gap:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <h2 style="font-size:22px;font-weight:700;color:#0D0D0F;">5 · Application tracking</h2>
+      <span style="display:inline-flex;align-items:center;gap:6px;background:#E3F7EC;color:#00824D;border-radius:9999px;padding:5px 12px;font-size:13px;font-weight:700;"><span style="width:7px;height:7px;border-radius:50%;background:#00B16B;"></span>Designed in prototype</span>
+    </div>
+    <p style="font-size:15px;line-height:1.6;color:#4A5464;">Users couldn't tell what happened after Apply, why an application failed, or that it was waiting on them.</p>
+    <ul style="display:flex;flex-direction:column;gap:7px;padding-left:20px;font-size:15px;line-height:1.55;">
+      <li>Statuses with a live ticker: Queued → Submitting → Submitted. Needs you branches off Queued.</li>
+      <li>Failure reasons in plain language: "Employer requires US citizenship · 1 credit refunded".</li>
+      <li>The Needs you tooltip confirms that earlier answers are saved and that we'll also email the user.</li>
+    </ul>
+    <div style="font-size:13.5px;"><b>See it:</b> Applications tab (ShutterTech, Palantir). <b>Eng owns:</b> the Needs you email and keeping answers when an application resumes.</div>
+  </section>
+
+  <!-- 6 -->
+  <section style="background:#fff;border:1px solid #E5E7EB;border-radius:16px;padding:26px 28px;display:flex;flex-direction:column;gap:14px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+      <h2 style="font-size:22px;font-weight:700;color:#0D0D0F;">6 · Job content, date posted, eligibility</h2>
+      <span style="display:inline-flex;align-items:center;gap:6px;background:#E3F7EC;color:#00824D;border-radius:9999px;padding:5px 12px;font-size:13px;font-weight:700;"><span style="width:7px;height:7px;border-radius:50%;background:#00B16B;"></span>Designed in prototype</span>
+    </div>
+    <p style="font-size:15px;line-height:1.6;color:#4A5464;">Wrong company details, cut-off descriptions, no posting date, and auto-apply firing on jobs the user can't legally take.</p>
+    <ul style="display:flex;flex-direction:column;gap:7px;padding-left:20px;font-size:15px;line-height:1.55;">
+      <li>"Posted 2d ago" with a clock icon next to the company name.</li>
+      <li>Eligibility chips under the title, checked against the user's preferences: green when eligible, orange for citizenship, clearance, or location conflicts.</li>
+      <li>On a conflict, Bloom doesn't auto-apply and says why. The user can still apply themselves.</li>
+    </ul>
+    <div style="font-size:13.5px;"><b>See it:</b> Jobs tab: Datadog (on-site conflict), Coinbase (citizenship), Stripe (clearance). <b>Eng owns:</b> parsing fixes for company data and truncated descriptions, plus extracting the restrictions.</div>
+  </section>
+
+</div>
+</x-dc>
+</body>
+</html>

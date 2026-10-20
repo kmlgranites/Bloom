@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/bloom-design-system-019dd285-6635-7cde-a3a1-528e983a1810/colors_and_type.css">
+<link rel="stylesheet" href="https://unpkg.com/lucide-static@0.525.0/font/lucide.css">
+<script src="_ds/bloom-design-system-019dd285-6635-7cde-a3a1-528e983a1810/_ds_bundle.js"></script>
+<style>
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-regular.ttf");font-weight:400;}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-semibold.ttf");font-weight:600;}
+  @font-face{font-family:"Proxima Soft";src:url("fonts/proxima-nova-soft-bold.ttf");font-weight:700;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#EEF1F4;font-family:"Proxima Soft",system-ui,sans-serif;}
+  a{color:#1D484F;}
+  a:hover{color:#022F36;}
+</style>
+</helmet>
+
+<div data-screen-label="Priority Sheet" style="width:1100px;margin:32px auto;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:16px;padding:40px 44px 36px;font-family:'Proxima Soft',system-ui,sans-serif;color:#23262E;">
+
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding-bottom:22px;border-bottom:1px solid #E5E7EB;margin-bottom:26px;">
+    <div>
+      <div style="font-size:13px;font-weight:700;color:#4A5464;letter-spacing:0.06em;margin-bottom:8px;">STANDUP · FEEDBACK TRIAGE</div>
+      <h1 style="font-size:30px;font-weight:700;color:#022F36;letter-spacing:-0.01em;line-height:1.2;margin-bottom:8px;">User feedback: what we take, route, and park</h1>
+      <p style="font-size:15px;color:#4A5464;line-height:1.5;max-width:640px;text-wrap:pretty;">85 responses from the SW Intern assignment. First-session users, so strong on onboarding friction and weaker on long-term value. Ranked by how many people raised each theme independently.</p>
+    </div>
+    <img src="assets/Logo Dark.svg" alt="Bloom" style="height:30px;flex-shrink:0;margin-top:4px;" />
+  </div>
+
+  <!-- top 3 -->
+  <div style="font-size:13px;font-weight:700;color:#4A5464;letter-spacing:0.06em;margin-bottom:12px;">THE THREE REPEATING THEMES</div>
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:30px;">
+    <div style="background:#F5F6F7;border:1px solid #E5E7EB;border-radius:12px;padding:18px 18px 16px;">
+      <div style="font-size:28px;font-weight:700;color:#022F36;line-height:1;margin-bottom:8px;">40+</div>
+      <div style="font-size:16px;font-weight:700;color:#0D0D0F;margin-bottom:5px;">Match score isn’t trusted</div>
+      <div style="font-size:14px;color:#4A5464;line-height:1.5;">“70% Good Match” shown next to a 9% skill score, with no explanation.</div>
+    </div>
+    <div style="background:#F5F6F7;border:1px solid #E5E7EB;border-radius:12px;padding:18px 18px 16px;">
+      <div style="font-size:28px;font-weight:700;color:#022F36;line-height:1;margin-bottom:8px;">30+</div>
+      <div style="font-size:16px;font-weight:700;color:#0D0D0F;margin-bottom:5px;">Can’t see what the agent sends</div>
+      <div style="font-size:14px;color:#4A5464;line-height:1.5;">No view of the resume, answers, or progress before or after submit.</div>
+    </div>
+    <div style="background:#F5F6F7;border:1px solid #E5E7EB;border-radius:12px;padding:18px 18px 16px;">
+      <div style="font-size:28px;font-weight:700;color:#022F36;line-height:1;margin-bottom:8px;">12+</div>
+      <div style="font-size:16px;font-weight:700;color:#0D0D0F;margin-bottom:5px;">Missed “Needs you” moments</div>
+      <div style="font-size:14px;color:#4A5464;line-height:1.5;">Only the in-app bell tells users, so applications sit stalled.</div>
+    </div>
+  </div>
+
+  <!-- take now -->
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+    <span style="width:10px;height:10px;border-radius:50%;background:#00B16B;"></span>
+    <div style="font-size:13px;font-weight:700;color:#0D0D0F;letter-spacing:0.06em;">TAKE NOW · CURRENT PRODUCT</div>
+  </div>
+  <div style="border:1px solid #E5E7EB;border-radius:12px;overflow:hidden;margin-bottom:28px;">
+    <sc-for list="{{ takeNow }}" as="r" hint-placeholder-count="6">
+      <div style="display:grid;grid-template-columns:40px minmax(0,1fr) 120px 96px;align-items:center;gap:16px;padding:14px 18px;border-top:1px solid #F0F1F3;">
+        <div style="width:28px;height:28px;border-radius:50%;background:#E3F7EC;color:#00824D;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;">{{ r.n }}</div>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:#0D0D0F;margin-bottom:3px;">{{ r.title }}</div>
+          <div style="font-size:14px;color:#4A5464;line-height:1.45;">{{ r.why }}</div>
+        </div>
+        <div style="font-size:13px;font-weight:600;color:#4A5464;">{{ r.owner }}</div>
+        <div style="{{ r.effortStyle }}">{{ r.effort }}</div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;margin-bottom:24px;">
+    <!-- already done -->
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:#1D484F;"></span>
+        <div style="font-size:13px;font-weight:700;color:#0D0D0F;letter-spacing:0.06em;">ALREADY COVERED IN PROTOTYPE</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <sc-for list="{{ done }}" as="d" hint-placeholder-count="4">
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px;color:#23262E;line-height:1.45;">
+            <i class="icon icon-circle-check" style="font-size:16px;color:#00B16B;margin-top:1px;flex-shrink:0;"></i><span>{{ d }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <!-- V2 -->
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:#F76638;"></span>
+        <div style="font-size:13px;font-weight:700;color:#0D0D0F;letter-spacing:0.06em;">ROUTE TO V2 AUTO-APPLY</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <sc-for list="{{ v2 }}" as="d" hint-placeholder-count="3">
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px;color:#23262E;line-height:1.45;">
+            <i class="icon icon-arrow-right" style="font-size:16px;color:#C2410C;margin-top:1px;flex-shrink:0;"></i><span>{{ d }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <p style="font-size:13px;color:#4A5464;margin-top:10px;line-height:1.5;">These change the auto-apply model itself, so they don’t get patched into the current flow.</p>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;padding-top:22px;border-top:1px solid #E5E7EB;">
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:#E5484D;"></span>
+        <div style="font-size:13px;font-weight:700;color:#0D0D0F;letter-spacing:0.06em;">BUGS FOR ENGINEERING</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <sc-for list="{{ bugs }}" as="d" hint-placeholder-count="5">
+          <div style="display:flex;align-items:flex-start;gap:10px;font-size:14px;color:#23262E;line-height:1.45;">
+            <span style="width:5px;height:5px;border-radius:50%;background:#4A5464;margin-top:8px;flex-shrink:0;"></span><span>{{ d }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span style="width:10px;height:10px;border-radius:50%;background:#A5A5A5;"></span>
+        <div style="font-size:13px;font-weight:700;color:#0D0D0F;letter-spacing:0.06em;">PARK / NOT NOW</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;">
+        <sc-for list="{{ park }}" as="p" hint-placeholder-count="4">
+          <div style="font-size:14px;line-height:1.45;"><span style="font-weight:700;color:#0D0D0F;">{{ p.title }}</span><span style="color:#4A5464;"> · {{ p.why }}</span></div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:1400}}">
+class Component extends DCLogic {
+  renderVals() {
+    const effort = (e) => {
+      const t = { S: ['#E3F7EC', '#00824D', 'Small'], M: ['#FFF4E5', '#9A4A00', 'Medium'], L: ['#FDECEC', '#B42318', 'Large'] }[e];
+      return { effort: t[2], effortStyle: `justify-self:start;font-size:12px;font-weight:700;background:${t[0]};color:${t[1]};border-radius:9999px;padding:4px 11px;` };
+    };
+    const takeNow = [
+      { title: 'Explain the match score', why: 'Show matched vs missing skills and how the overall % is built. The loudest theme, and it drives whether people trust Bloom.', owner: 'Design + ML', e: 'L' },
+      { title: 'Readable job descriptions', why: 'Headings and bullets; fix “Key Responsibilities” showing About text and cutting off mid-sentence.', owner: 'Design + Eng', e: 'M' },
+      { title: 'Show posting date', why: '“Posted 2d ago”, or “First seen” when the real date isn’t reliable.', owner: 'Eng', e: 'S' },
+      { title: 'Notify on “Needs you”', why: 'Email or push for this one event so applications don’t stall unseen.', owner: 'Eng', e: 'M' },
+      { title: 'Sort / minimum match %', why: 'Let users order the deck by match or hide roles below a threshold.', owner: 'Design + Eng', e: 'M' },
+      { title: 'Confirm after Apply', why: 'A clear success moment right after Apply, before the status page takes over.', owner: 'Design', e: 'S' },
+    ].map((r, i) => ({ ...r, n: i + 1, ...effort(r.e) }));
+    return {
+      takeNow,
+      done: [
+        'Application statuses: Queued, Submitting (live ticker), Needs you, Submitted',
+        'Expected salary + CGPA in profile (one tester saw 100% complete with salary empty)',
+        'Credits clarity: replaces the confusing “0/5” header',
+        'Pass undo snackbar and Job Preferences with work authorization',
+      ],
+      v2: [
+        'Review and approve before submit, including batch approval',
+        'Agent activity log of what was entered and sent',
+        'Edit or withdraw an application in flight',
+      ],
+      bugs: [
+        'Raw notification slugs in UI (No_Swipe_for_time_interval_24_hr)',
+        'Sign-up: SSL warning, captcha wipes form, Brave spins forever',
+        'GPA field only accepts one decimal (8.45 fails)',
+        'Skill-save API error on /resume-wizard',
+        '“Complete profile” modal has no close button',
+        'Work authorization defaults to “No”',
+      ],
+      park: [
+        { title: 'Google sign-in', why: 'valid, but an auth/infra decision' },
+        { title: 'List/grid instead of swipe', why: 'conflicts with core concept; revisit in V2 discovery' },
+        { title: 'Free plan 5-credit limit', why: 'pricing call for PM' },
+        { title: 'Chat orchestrator, AI interview coach', why: 'out of scope' },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>
