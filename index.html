@@ -1054,9 +1054,9 @@
           <div style="margin-bottom:16px;">
           <div style="border:1px solid #E5E7EB;border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;">
             <div style="font-size:16px;font-weight:700;color:#022F36;">On-site / hybrid jobs</div>
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <div style="display:flex;gap:8px;flex-wrap:nowrap;">
               <sc-for list="{{ pfNNearModes }}" as="nm" hint-placeholder-count="2">
-                <button onClick="{{ nm.onClick }}" aria-pressed="{{ nm.on }}" style="{{ nm.style }}"><i class="icon icon-circle-check" style="{{ nm.iconStyle }}"></i>{{ nm.label }}</button>
+                <button onClick="{{ nm.onClick }}" title="{{ nm.label }}" aria-pressed="{{ nm.on }}" style="{{ nm.style }}"><i class="icon icon-circle-check" style="{{ nm.iconStyle }}"></i><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;">{{ nm.label }}</span></button>
               </sc-for>
             </div>
             <sc-if value="{{ pfNSpecific }}" hint-placeholder-val="{{ true }}">
@@ -1310,7 +1310,7 @@ v: (() => {
       const set = (patch) => this.setState(s => ({ prefs: { ...s.prefs, near: { ...s.prefs.near, ...patch } } }));
       const cs = ({ us: !!st.prefs.locations.us || !st.prefs.locations.ca, ca: !!st.prefs.locations.ca });
       const anyLabel = cs.us && cs.ca ? 'Anywhere in US & Canada' : cs.ca ? 'Anywhere in Canada' : 'Anywhere in United States';
-      const pill = (on) => `display:inline-flex;align-items:center;gap:10px;height:44px;padding:0 20px;border-radius:9999px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap;background:${on ? '#022F36' : '#FFFFFF'};color:${on ? '#FFFFFF' : '#022F36'};border:1.5px solid ${on ? '#022F36' : '#E5E7EB'};`;
+      const pill = (on) => `flex:0 1 auto;min-width:0;overflow:hidden;display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 16px;border-radius:9999px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;background:${on ? '#022F36' : '#FFFFFF'};color:${on ? '#FFFFFF' : '#022F36'};border:1.5px solid ${on ? '#022F36' : '#E5E7EB'};`;
       const groups = [];
       if (cs.us) groups.push({ name: 'United States', list: US_STATES });
       if (cs.ca) groups.push({ name: 'Canada', list: CA_PROVINCES });
@@ -1320,7 +1320,7 @@ v: (() => {
       return {
         NearModes: [['any', anyLabel], ['specific', 'Specific states / provinces']].map(([k, label]) => ({ label, on: loc.mode === k,
           onClick: () => set({ mode: k, open: false }), style: pill(loc.mode === k),
-          iconStyle: `font-size:18px;color:${loc.mode === k ? '#FFFFFF' : '#7A8694'};` })),
+          iconStyle: `font-size:16px;flex-shrink:0;color:${loc.mode === k ? '#FFFFFF' : '#7A8694'};` })),
         Specific: loc.mode === 'specific',
         StatesOpen: !!loc.open,
         OnStatesToggle: () => set({ open: !loc.open }),
