@@ -121,7 +121,7 @@
         </div>
 
         <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:10px;"><span style="color:#E5484D;">*</span> Job Type (select all that apply)</label>
-        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-bottom:26px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:26px;">
           <sc-for list="{{ obTypes }}" as="c" hint-placeholder-count="3">
             <button onClick="{{ c.onClick }}" style="{{ c.boxStyle }}"><span style="{{ c.tickStyle }}"><sc-if value="{{ c.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:14px;color:#0C2A2C;"></i></sc-if></span>{{ c.label }}</button>
           </sc-for>
@@ -138,7 +138,7 @@
         </div>
 
         <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:10px;">How do you want to work?</label>
-        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-bottom:26px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:26px;">
           <sc-for list="{{ obModes }}" as="c" hint-placeholder-count="3">
             <button onClick="{{ c.onClick }}" style="{{ c.boxStyle }}"><span style="{{ c.tickStyle }}"><sc-if value="{{ c.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:14px;color:#0C2A2C;"></i></sc-if></span>{{ c.label }}</button>
           </sc-for>
@@ -154,29 +154,6 @@
               </sc-for>
             </div>
             <sc-if value="{{ obNSpecific }}" hint-placeholder-val="{{ true }}">
-              <div style="position:relative;">
-                <i class="icon icon-search" style="position:absolute;left:15px;top:15px;font-size:18px;color:#4A5464;pointer-events:none;"></i>
-                <input type="text" value="{{ obNQ }}" onChange="{{ obNOnQ }}" onFocus="{{ obNOnFocus }}" onBlur="{{ obNOnBlur }}" placeholder="Search a city or state" aria-label="Search a city or state" style="width:100%;box-sizing:border-box;background:#fff;border:1px solid #E5E7EB;border-radius:10px;height:48px;padding:0 16px 0 44px;font-family:inherit;font-size:15px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
-                <sc-if value="{{ obNResultsOpen }}" hint-placeholder-val="{{ false }}">
-                  <div role="listbox" style="position:absolute;left:0;right:0;top:54px;z-index:30;background:#fff;border:1px solid #CBD3E4;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,0.14);max-height:280px;overflow-y:auto;padding:6px;">
-                    <sc-if value="{{ obNHasCityResults }}" hint-placeholder-val="{{ true }}">
-                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">Cities</div>
-                      <sc-for list="{{ obNCityResults }}" as="it" hint-placeholder-count="4">
-                        <button onMouseDown="{{ it.onPick }}" role="option" style="width:100%;display:flex;align-items:center;gap:10px;background:none;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F0FCFF;"><i class="icon icon-map-pin" style="font-size:16px;color:#1D484F;"></i><span>{{ it.name }}</span><span style="color:#4A5464;">{{ it.sub }}</span></button>
-                      </sc-for>
-                    </sc-if>
-                    <sc-if value="{{ obNHasStateResults }}" hint-placeholder-val="{{ true }}">
-                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">States / provinces</div>
-                      <sc-for list="{{ obNStateResults }}" as="it" hint-placeholder-count="2">
-                        <button onMouseDown="{{ it.onPick }}" role="option" style="width:100%;display:flex;align-items:center;gap:10px;background:none;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F0FCFF;"><i class="icon icon-map" style="font-size:16px;color:#1D484F;"></i><span>All of {{ it.name }}</span></button>
-                      </sc-for>
-                    </sc-if>
-                    <sc-if value="{{ obNNoResults }}" hint-placeholder-val="{{ false }}">
-                      <div style="padding:12px 10px;font-size:14px;color:#4A5464;">No matching city or state</div>
-                    </sc-if>
-                  </div>
-                </sc-if>
-              </div>
               <sc-if value="{{ obNHasChips }}" hint-placeholder-val="{{ true }}">
                 <div style="display:flex;flex-wrap:wrap;gap:8px;">
                   <sc-for list="{{ obNChips }}" as="c" hint-placeholder-count="1">
@@ -184,6 +161,35 @@
                   </sc-for>
                 </div>
               </sc-if>
+              <div style="position:relative;">
+                <i class="icon icon-search" style="position:absolute;left:15px;top:15px;font-size:18px;color:#4A5464;pointer-events:none;"></i>
+                <input type="text" value="{{ obNQ }}" onChange="{{ obNOnQ }}" onFocus="{{ obNOnFocus }}" onBlur="{{ obNOnBlur }}" onKeyDown="{{ obNOnKey }}" placeholder="Search a city or state" aria-label="Search a city or state" style="width:100%;box-sizing:border-box;background:#fff;border:1px solid #E5E7EB;border-radius:10px;height:48px;padding:0 16px 0 44px;font-family:inherit;font-size:15px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+                <sc-if value="{{ obNResultsOpen }}" hint-placeholder-val="{{ false }}">
+                  <div role="listbox" aria-multiselectable="true" style="position:absolute;left:0;right:0;top:54px;z-index:30;background:#fff;border:1px solid #CBD3E4;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,0.14);max-height:300px;overflow-y:auto;padding:6px 6px 0;">
+                    <sc-if value="{{ obNHasStateResults }}" hint-placeholder-val="{{ true }}">
+                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">States / provinces</div>
+                      <sc-for list="{{ obNStateResults }}" as="it" hint-placeholder-count="2">
+                        <button onMouseDown="{{ it.onPick }}" role="option" aria-selected="{{ it.on }}" style="width:100%;display:flex;align-items:center;gap:10px;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;font-weight:600;color:#23262E;cursor:pointer;text-align:left;{{ it.rowBg }}" style-hover="background:#F0FCFF;"><span style="{{ it.box }}"><sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:13px;color:#fff;"></i></sc-if></span><span>All of {{ it.name }}</span></button>
+                        <sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><div style="padding:0 10px 8px 40px;font-size:13px;color:#4A5464;">{{ it.incNote }}</div></sc-if>
+                      </sc-for>
+                    </sc-if>
+                    <sc-if value="{{ obNHasCityResults }}" hint-placeholder-val="{{ true }}">
+                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">Cities</div>
+                      <sc-for list="{{ obNCityResults }}" as="it" hint-placeholder-count="4">
+                        <button onMouseDown="{{ it.onPick }}" role="option" aria-selected="{{ it.on }}" style="width:100%;display:flex;align-items:center;gap:10px;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;{{ it.rowBg }}" style-hover="background:#F0FCFF;"><span style="{{ it.box }}"><sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:13px;color:#fff;"></i></sc-if></span><span>{{ it.name }}</span><span style="color:#4A5464;">{{ it.sub }}</span></button>
+                      </sc-for>
+                    </sc-if>
+                    
+                    <sc-if value="{{ obNNoResults }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding:12px 10px;font-size:14px;color:#4A5464;">No matching city or state</div>
+                    </sc-if>
+                    <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #EDEEF0;margin:6px -6px 0;padding:8px 12px;display:flex;justify-content:flex-end;">
+                      <button onMouseDown="{{ obNOnDone }}" style="background:#1D484F;border:none;border-radius:9999px;padding:7px 18px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;" style-hover="background:#022F36;">{{ obNDoneLabel }}</button>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+              
               <sc-if value="{{ obNHasNote }}" hint-placeholder-val="{{ false }}">
                 <div style="font-size:13px;color:#4A5464;">{{ obNNote }}</div>
               </sc-if>
@@ -199,7 +205,7 @@
         </sc-if>
 
         <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:10px;">Experience Level (select all that apply)</label>
-        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px;margin-bottom:26px;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:26px;">
           <sc-for list="{{ obLevels }}" as="c" hint-placeholder-count="4">
             <button onClick="{{ c.onClick }}" style="{{ c.boxStyle }}"><span style="{{ c.tickStyle }}"><sc-if value="{{ c.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:14px;color:#0C2A2C;"></i></sc-if></span>{{ c.label }}</button>
           </sc-for>
@@ -424,24 +430,34 @@ v: (() => {
         OnQ: (e) => set({ q: e.target.value, ro: true }),
         OnFocus: () => set({ ro: true }),
         OnBlur: () => setTimeout(() => set({ ro: false }), 120),
+        OnKey: (e) => { if (e.key === 'Escape') { set({ ro: false }); e.target.blur(); } },
+        OnDone: (e) => { if (e && e.preventDefault) e.preventDefault(); set({ ro: false, q: '' }); if (document.activeElement) document.activeElement.blur(); },
         ...(() => {
           const allowed = groups.flatMap(g => g.list);
           const ckey = (c, st) => c + '|' + st;
           const q = (loc.q || '').trim().toLowerCase();
           const sts = (loc.states || []).filter(n => allowed.includes(n));
           const cts = (loc.cities || []).filter(k => allowed.includes(k.split('|')[1]) && !sts.includes(k.split('|')[1]));
-          const pickCity = (c, st) => () => set({ cities: [...(loc.cities || []).filter(k => k !== ckey(c, st)), ckey(c, st)], q: '', ro: false, detected: false, note: '' });
-          const pickState = (st) => () => { const dropped = (loc.cities || []).filter(k => k.split('|')[1] === st).map(k => k.split('|')[0]);
-            set({ states: [...(loc.states || []).filter(x => x !== st), st], cities: (loc.cities || []).filter(k => k.split('|')[1] !== st), q: '', ro: false, detected: false,
+          const pickCity = (c, st) => (e) => { if (e && e.preventDefault) e.preventDefault(); const k = ckey(c, st), has = (loc.cities || []).includes(k);
+            set({ cities: has ? loc.cities.filter(x => x !== k) : [...(loc.cities || []), k], ro: true, detected: false, note: '' }); };
+          const pickState = (st) => (e) => { if (e && e.preventDefault) e.preventDefault();
+            if ((loc.states || []).includes(st)) { set({ states: loc.states.filter(x => x !== st), ro: true, note: '' }); return; }
+            const dropped = (loc.cities || []).filter(k => k.split('|')[1] === st).map(k => k.split('|')[0]);
+            set({ states: [...(loc.states || []).filter(x => x !== st), st], cities: (loc.cities || []).filter(k => k.split('|')[1] !== st), q: '', ro: true, detected: false,
               note: dropped.length ? (st + ' already includes ' + dropped.join(' and ') + ', so we merged them.') : '' }); };
-          const cityRes = []; allowed.forEach(st => (CITIES[st] || []).forEach(c => { if (!cts.includes(ckey(c, st)) && !sts.includes(st) && (!q || c.toLowerCase().includes(q) || st.toLowerCase().includes(q))) cityRes.push({ name: c, sub: st, onPick: pickCity(c, st) }); }));
-          const stateRes = allowed.filter(st => !sts.includes(st) && (q ? st.toLowerCase().includes(q) : false)).slice(0, 8).map(st => ({ name: st, onPick: pickState(st) }));
+          const cityRes = []; allowed.forEach(st => (CITIES[st] || []).forEach(c => { if (!sts.includes(st) && (!q || c.toLowerCase().includes(q) || st.toLowerCase().includes(q))) { const inc = false; const on = inc || cts.includes(ckey(c, st));
+            cityRes.push({ name: c, sub: inc ? ('Included in All of ' + st) : st, on, onPick: inc ? ((e) => { if (e && e.preventDefault) e.preventDefault(); }) : pickCity(c, st),
+              rowBg: (on ? 'background:#F0FCFF;' : 'background:none;') + (inc ? 'opacity:0.6;cursor:default;' : ''),
+              box: `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on ? '#1D484F' : '#fff'};border:1.5px solid ${on ? '#1D484F' : '#A9B3B9'};` }); }  }));
+          const stateRes = allowed.filter(st => (q ? st.toLowerCase().includes(q) : false)).slice(0, 8).map(st => { const on = sts.includes(st); return { name: st, on, onPick: pickState(st), incNote: 'Every city in ' + st + ' is included',
+            rowBg: on ? 'background:#F0FCFF;' : 'background:none;',
+            box: `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on ? '#1D484F' : '#fff'};border:1.5px solid ${on ? '#1D484F' : '#A9B3B9'};` }; });
           const chips = [...cts.map(k => { const [c, st] = k.split('|'); return { name: c + ', ' + st, onRemove: () => set({ cities: loc.cities.filter(x => x !== k), detected: false, note: '' }) }; }),
                          ...sts.map(st => ({ name: 'All of ' + st, onRemove: () => set({ states: loc.states.filter(x => x !== st), note: '' }) }))];
           const cr = cityRes.slice(0, 60);
           return { ResultsOpen: !!loc.ro && (cr.length + stateRes.length > 0 || q.length > 0), CityResults: cr, StateResults: stateRes,
             HasCityResults: cr.length > 0, HasStateResults: stateRes.length > 0, NoResults: q.length > 0 && cr.length + stateRes.length === 0,
-            Chips: chips, HasChips: chips.length > 0, HasNote: !!loc.note, Note: loc.note || '',
+            Chips: chips, HasChips: chips.length > 0, DoneLabel: chips.length ? ('Done · ' + chips.length + ' selected') : 'Done', HasNote: !!loc.note, Note: loc.note || '',
             Detected2: !!loc.detected && cts.length > 0, DetectedText2: 'Detected ' + (cts[0] ? cts[0].split('|')[0] : '') + ' from your network, so you see local jobs first' };
         })(),
         CityDdLabel: (() => { const c = (loc.cities || []).filter(x => valid.some(v => (CITIES[v] || []).includes(x))); return c.length ? (c.length + (c.length === 1 ? ' city' : ' cities') + ' selected') : 'Any city in selected states'; })(),
@@ -459,7 +475,7 @@ v: (() => {
   }
 
   obVals(st) {
-    const box = (on) => `display:flex;align-items:center;gap:14px;background:#FFFFFF;border:1px solid ${on ? '#1D484F' : '#D5DBDF'};border-radius:8px;height:56px;padding:0 20px;font-family:inherit;font-size:16px;color:#23262E;cursor:pointer;text-align:left;white-space:nowrap;`;
+    const box = (on) => `display:flex;align-items:center;gap:12px;min-width:0;background:#FFFFFF;border:1px solid ${on ? '#1D484F' : '#D5DBDF'};border-radius:8px;height:48px;padding:0 14px;font-family:inherit;font-size:14px;font-weight:600;color:#0D0D0F;cursor:pointer;text-align:left;white-space:nowrap;overflow:hidden;`;
     const tick = (on) => `width:22px;height:22px;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on ? '#5AEBEB' : '#FFFFFF'};border:1.5px solid ${on ? '#5AEBEB' : '#A9B3B9'};`;
     const group = (key, opts) => opts.map(([k, label]) => ({
       label, on: st[key][k], boxStyle: box(st[key][k]), tickStyle: tick(st[key][k]),
