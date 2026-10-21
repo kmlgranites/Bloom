@@ -155,27 +155,40 @@
             </div>
             <sc-if value="{{ obNSpecific }}" hint-placeholder-val="{{ true }}">
               <div style="position:relative;">
-                <button onClick="{{ obNOnStatesToggle }}" aria-expanded="{{ obNStatesOpen }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;border:1px solid {{ obNDdBorder }};border-radius:10px;height:48px;padding:0 16px;font-family:inherit;font-size:15px;color:{{ obNDdInk }};cursor:pointer;text-align:left;"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ obNDdLabel }}</span><i class="icon icon-chevron-down" style="font-size:18px;color:#022F36;flex-shrink:0;"></i></button>
-                <sc-if value="{{ obNStatesOpen }}" hint-placeholder-val="{{ false }}">
-                  <div style="position:absolute;left:0;right:0;top:54px;z-index:30;background:#fff;border:1px solid #CBD3E4;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,0.14);max-height:260px;overflow-y:auto;padding:6px;">
-                    <sc-for list="{{ obNStateGroups }}" as="g" hint-placeholder-count="1">
-                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">{{ g.name }}</div>
-                      <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="6">
-                        <button onClick="{{ it.onClick }}" role="option" aria-selected="{{ it.on }}" style="width:100%;display:flex;align-items:center;gap:10px;background:none;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F0FCFF;"><span style="{{ it.box }}"><sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:13px;color:#fff;"></i></sc-if></span>{{ it.name }}</button>
+                <i class="icon icon-search" style="position:absolute;left:15px;top:15px;font-size:18px;color:#4A5464;pointer-events:none;"></i>
+                <input type="text" value="{{ obNQ }}" onChange="{{ obNOnQ }}" onFocus="{{ obNOnFocus }}" onBlur="{{ obNOnBlur }}" placeholder="Search a city or state" aria-label="Search a city or state" style="width:100%;box-sizing:border-box;background:#fff;border:1px solid #E5E7EB;border-radius:10px;height:48px;padding:0 16px 0 44px;font-family:inherit;font-size:15px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+                <sc-if value="{{ obNResultsOpen }}" hint-placeholder-val="{{ false }}">
+                  <div role="listbox" style="position:absolute;left:0;right:0;top:54px;z-index:30;background:#fff;border:1px solid #CBD3E4;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,0.14);max-height:280px;overflow-y:auto;padding:6px;">
+                    <sc-if value="{{ obNHasCityResults }}" hint-placeholder-val="{{ true }}">
+                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">Cities</div>
+                      <sc-for list="{{ obNCityResults }}" as="it" hint-placeholder-count="4">
+                        <button onMouseDown="{{ it.onPick }}" role="option" style="width:100%;display:flex;align-items:center;gap:10px;background:none;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F0FCFF;"><i class="icon icon-map-pin" style="font-size:16px;color:#1D484F;"></i><span>{{ it.name }}</span><span style="color:#4A5464;">{{ it.sub }}</span></button>
                       </sc-for>
-                    </sc-for>
+                    </sc-if>
+                    <sc-if value="{{ obNHasStateResults }}" hint-placeholder-val="{{ true }}">
+                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">States / provinces</div>
+                      <sc-for list="{{ obNStateResults }}" as="it" hint-placeholder-count="2">
+                        <button onMouseDown="{{ it.onPick }}" role="option" style="width:100%;display:flex;align-items:center;gap:10px;background:none;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F0FCFF;"><i class="icon icon-map" style="font-size:16px;color:#1D484F;"></i><span>All of {{ it.name }}</span></button>
+                      </sc-for>
+                    </sc-if>
+                    <sc-if value="{{ obNNoResults }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding:12px 10px;font-size:14px;color:#4A5464;">No matching city or state</div>
+                    </sc-if>
                   </div>
                 </sc-if>
               </div>
-              <sc-if value="{{ obNHasStates }}" hint-placeholder-val="{{ true }}">
+              <sc-if value="{{ obNHasChips }}" hint-placeholder-val="{{ true }}">
                 <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                  <sc-for list="{{ obNStateChips }}" as="c" hint-placeholder-count="1">
+                  <sc-for list="{{ obNChips }}" as="c" hint-placeholder-count="1">
                     <span style="display:inline-flex;align-items:center;gap:6px;background:#F0FCFF;border:1px solid #B8EAF5;color:#022F36;border-radius:9999px;padding:5px 6px 5px 12px;font-size:14px;font-weight:600;">{{ c.name }}<button onClick="{{ c.onRemove }}" aria-label="Remove" style="width:22px;height:22px;border-radius:50%;border:none;background:#fff;color:#4A5464;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="icon icon-x" style="font-size:13px;"></i></button></span>
                   </sc-for>
                 </div>
               </sc-if>
-              <sc-if value="{{ obNDetected }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#4A5464;"><i class="icon icon-locate-fixed" style="font-size:14px;color:#1D484F;"></i>{{ obNDetectedText }}</div>
+              <sc-if value="{{ obNHasNote }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:13px;color:#4A5464;">{{ obNNote }}</div>
+              </sc-if>
+              <sc-if value="{{ obNDetected2 }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#4A5464;"><i class="icon icon-locate-fixed" style="font-size:14px;color:#1D484F;"></i>{{ obNDetectedText2 }}</div>
               </sc-if>
             </sc-if>
           </div>
@@ -312,12 +325,13 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;rotateSeconds&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:5.5,&quot;min&quot;:3,&quot;max&quot;:10,&quot;step&quot;:0.5,&quot;unit&quot;:&quot;s&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Live feed&quot;},&quot;ctaColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#18D1D1&quot;,&quot;options&quot;:[&quot;#18D1D1&quot;,&quot;#1D484F&quot;,&quot;#022F36&quot;,&quot;#F76638&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Branding&quot;},&quot;showLinkedIn&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sign in&quot;}}">
 const US_STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
+const CITIES = {"Alabama":["Birmingham","Huntsville","Montgomery","Mobile"],"Alaska":["Anchorage","Fairbanks","Juneau"],"Arizona":["Phoenix","Tucson","Scottsdale","Tempe","Mesa"],"Arkansas":["Little Rock","Fayetteville","Bentonville"],"California":["San Francisco","Los Angeles","San Jose","San Diego","Palo Alto","Mountain View","Sunnyvale","Oakland","Irvine","Sacramento"],"Colorado":["Denver","Boulder","Colorado Springs","Fort Collins"],"Connecticut":["Hartford","Stamford","New Haven"],"Delaware":["Wilmington","Dover"],"Florida":["Miami","Tampa","Orlando","Jacksonville","Fort Lauderdale"],"Georgia":["Atlanta","Alpharetta","Savannah","Augusta"],"Hawaii":["Honolulu"],"Idaho":["Boise","Idaho Falls"],"Illinois":["Chicago","Naperville","Evanston","Champaign"],"Indiana":["Indianapolis","Fort Wayne","Bloomington"],"Iowa":["Des Moines","Cedar Rapids","Iowa City"],"Kansas":["Wichita","Overland Park","Kansas City"],"Kentucky":["Louisville","Lexington"],"Louisiana":["New Orleans","Baton Rouge"],"Maine":["Portland","Bangor"],"Maryland":["Baltimore","Bethesda","Rockville","Columbia"],"Massachusetts":["Boston","Cambridge","Somerville","Waltham","Worcester"],"Michigan":["Detroit","Ann Arbor","Grand Rapids"],"Minnesota":["Minneapolis","St. Paul","Rochester"],"Mississippi":["Jackson","Gulfport"],"Missouri":["St. Louis","Kansas City","Springfield"],"Montana":["Bozeman","Missoula","Billings"],"Nebraska":["Omaha","Lincoln"],"Nevada":["Las Vegas","Reno","Henderson"],"New Hampshire":["Manchester","Nashua","Portsmouth"],"New Jersey":["Jersey City","Newark","Princeton","Hoboken"],"New Mexico":["Albuquerque","Santa Fe"],"New York":["New York City","Brooklyn","Buffalo","Rochester","Albany"],"North Carolina":["Raleigh","Charlotte","Durham","Chapel Hill"],"North Dakota":["Fargo","Bismarck"],"Ohio":["Columbus","Cleveland","Cincinnati","Dayton"],"Oklahoma":["Oklahoma City","Tulsa"],"Oregon":["Portland","Beaverton","Eugene","Bend"],"Pennsylvania":["Philadelphia","Pittsburgh","Harrisburg"],"Rhode Island":["Providence"],"South Carolina":["Charleston","Greenville","Columbia"],"South Dakota":["Sioux Falls","Rapid City"],"Tennessee":["Nashville","Memphis","Knoxville","Chattanooga"],"Texas":["Austin","Dallas","Houston","San Antonio","Plano","Fort Worth"],"Utah":["Salt Lake City","Lehi","Provo"],"Vermont":["Burlington"],"Virginia":["Arlington","Richmond","Reston","McLean","Virginia Beach"],"Washington":["Seattle","Bellevue","Redmond","Tacoma","Spokane"],"West Virginia":["Charleston","Morgantown"],"Wisconsin":["Milwaukee","Madison","Green Bay"],"Wyoming":["Cheyenne","Jackson"],"Alberta":["Calgary","Edmonton"],"British Columbia":["Vancouver","Victoria","Burnaby","Surrey"],"Manitoba":["Winnipeg"],"New Brunswick":["Moncton","Fredericton","Saint John"],"Newfoundland and Labrador":["St. John's"],"Nova Scotia":["Halifax"],"Ontario":["Toronto","Ottawa","Waterloo","Mississauga","Hamilton","London"],"Prince Edward Island":["Charlottetown"],"Quebec":["Montreal","Quebec City","Laval"],"Saskatchewan":["Saskatoon","Regina"],"Northwest Territories":["Yellowknife"],"Nunavut":["Iqaluit"],"Yukon":["Whitehorse"]};
 const CA_PROVINCES = ["Alberta","British Columbia","Manitoba","New Brunswick","Newfoundland and Labrador","Nova Scotia","Ontario","Prince Edward Island","Quebec","Saskatchewan","Northwest Territories","Nunavut","Yukon"];
 class Component extends DCLogic {
   state = { stage: 'signin', file: null, fileErr: '', dragOver: false, obFunc: 'Software Engineering', obLoc: 'United States',
     obTypes: { full: true, part: false, intern: false },
     obModes: { remote: true, hybrid: true, onsite: false },
-    obNear: { mode: 'specific', states: ['Texas'], detected: true, open: false },
+    obNear: { mode: 'specific', states: [], cities: ['Austin|Texas'], detected: true, q: '', ro: false, note: '' },
     obLevels: { entry: true, mid: false, senior: false, exec: false },
     obAuth: { us: { auth: 'no', spon: 'yes' }, ca: { auth: null, spon: null } },
     feedIdx: 0, step: 0, showPw: false, email: '', password: '', liveCount: 1284 };
@@ -398,7 +412,7 @@ v: (() => {
           iconStyle: `font-size:16px;flex-shrink:0;color:${loc.mode === k ? '#FFFFFF' : '#7A8694'};` })),
         Specific: loc.mode === 'specific',
         StatesOpen: !!loc.open,
-        OnStatesToggle: () => set({ open: !loc.open }),
+        OnStatesToggle: () => set({ open: !loc.open, cityOpen: false }),
         DdLabel: valid.length ? (valid.length + ' selected') : 'Choose states or provinces',
         DdInk: valid.length ? '#0D0D0F' : '#7A8694',
         DdBorder: loc.open ? '#1D484F' : '#E5E7EB',
@@ -406,7 +420,40 @@ v: (() => {
         HasStates: valid.length > 0,
         StateChips: valid.map(n => ({ name: n, onRemove: () => toggle(n) })),
         Detected: !!loc.detected && valid.length > 0,
-        DetectedText: 'Detected from your network, so you see local jobs first',
+        Q: loc.q || '',
+        OnQ: (e) => set({ q: e.target.value, ro: true }),
+        OnFocus: () => set({ ro: true }),
+        OnBlur: () => setTimeout(() => set({ ro: false }), 120),
+        ...(() => {
+          const allowed = groups.flatMap(g => g.list);
+          const ckey = (c, st) => c + '|' + st;
+          const q = (loc.q || '').trim().toLowerCase();
+          const sts = (loc.states || []).filter(n => allowed.includes(n));
+          const cts = (loc.cities || []).filter(k => allowed.includes(k.split('|')[1]) && !sts.includes(k.split('|')[1]));
+          const pickCity = (c, st) => () => set({ cities: [...(loc.cities || []).filter(k => k !== ckey(c, st)), ckey(c, st)], q: '', ro: false, detected: false, note: '' });
+          const pickState = (st) => () => { const dropped = (loc.cities || []).filter(k => k.split('|')[1] === st).map(k => k.split('|')[0]);
+            set({ states: [...(loc.states || []).filter(x => x !== st), st], cities: (loc.cities || []).filter(k => k.split('|')[1] !== st), q: '', ro: false, detected: false,
+              note: dropped.length ? (st + ' already includes ' + dropped.join(' and ') + ', so we merged them.') : '' }); };
+          const cityRes = []; allowed.forEach(st => (CITIES[st] || []).forEach(c => { if (!cts.includes(ckey(c, st)) && !sts.includes(st) && (!q || c.toLowerCase().includes(q) || st.toLowerCase().includes(q))) cityRes.push({ name: c, sub: st, onPick: pickCity(c, st) }); }));
+          const stateRes = allowed.filter(st => !sts.includes(st) && (q ? st.toLowerCase().includes(q) : false)).slice(0, 8).map(st => ({ name: st, onPick: pickState(st) }));
+          const chips = [...cts.map(k => { const [c, st] = k.split('|'); return { name: c + ', ' + st, onRemove: () => set({ cities: loc.cities.filter(x => x !== k), detected: false, note: '' }) }; }),
+                         ...sts.map(st => ({ name: 'All of ' + st, onRemove: () => set({ states: loc.states.filter(x => x !== st), note: '' }) }))];
+          const cr = cityRes.slice(0, 60);
+          return { ResultsOpen: !!loc.ro && (cr.length + stateRes.length > 0 || q.length > 0), CityResults: cr, StateResults: stateRes,
+            HasCityResults: cr.length > 0, HasStateResults: stateRes.length > 0, NoResults: q.length > 0 && cr.length + stateRes.length === 0,
+            Chips: chips, HasChips: chips.length > 0, HasNote: !!loc.note, Note: loc.note || '',
+            Detected2: !!loc.detected && cts.length > 0, DetectedText2: 'Detected ' + (cts[0] ? cts[0].split('|')[0] : '') + ' from your network, so you see local jobs first' };
+        })(),
+        CityDdLabel: (() => { const c = (loc.cities || []).filter(x => valid.some(v => (CITIES[v] || []).includes(x))); return c.length ? (c.length + (c.length === 1 ? ' city' : ' cities') + ' selected') : 'Any city in selected states'; })(),
+        CityDdInk: ((loc.cities || []).length ? '#0D0D0F' : '#7A8694'),
+        CityDdBorder: loc.cityOpen ? '#1D484F' : '#E5E7EB',
+        CitiesOpen: !!loc.cityOpen,
+        OnCitiesToggle: () => set({ cityOpen: !loc.cityOpen, open: false }),
+        CityGroups: valid.map(v => ({ name: v, items: (CITIES[v] || []).map(c => { const on = (loc.cities || []).includes(c); return { name: c, on, box: box(on),
+          onClick: () => set({ cities: on ? loc.cities.filter(x => x !== c) : [...(loc.cities || []), c], detected: false }) }; }) })),
+        ...(() => { const c = (loc.cities || []).filter(x => valid.some(v => (CITIES[v] || []).includes(x)));
+          return { HasCities: c.length > 0, NoCities: c.length === 0, CityChips: c.map(n => ({ name: n, onRemove: () => set({ cities: loc.cities.filter(x => x !== n), detected: false }) })) }; })(),
+        DetectedText: (loc.cities || []).length ? 'Detected ' + loc.cities[0] + ' from your network, so you see local jobs first' : 'Detected from your network, so you see local jobs first',
       };
     })(), }).v;
   }

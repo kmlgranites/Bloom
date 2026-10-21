@@ -32,6 +32,8 @@
   .tip .tipbox{position:absolute;bottom:calc(100% + 10px);right:0;width:250px;background:#0D0D0F;color:#fff;border-radius:14px;padding:12px 15px;font-size:13.5px;line-height:1.45;font-weight:500;opacity:0;visibility:hidden;transition:opacity .15s;pointer-events:none;z-index:65;text-align:left;white-space:normal;}
   .tip:hover .tipbox{opacity:1;visibility:visible;}
   @keyframes spin{to{transform:rotate(360deg);}}
+  @keyframes skPopA{0%{transform:scale(1);}40%{transform:scale(1.12);}100%{transform:scale(1);}}
+  @keyframes skPopB{0%{transform:scale(1);}40%{transform:scale(1.12);}100%{transform:scale(1);}}
   @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.45;transform:scale(0.8);}}
   @keyframes sbIn{from{opacity:0;transform:translate(-50%,16px);}to{opacity:1;transform:translate(-50%,0);}}
   /* ---- responsive: phones/tablets ---- */
@@ -214,7 +216,6 @@
           </div>
           <sc-if value="{{ isMatches }}" hint-placeholder-val="{{ true }}">
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-            <button onClick="{{ onOpenPrefs }}" title="Change where you're looking" style="display:flex;align-items:center;gap:7px;background:#F0FCFF;border:1px solid #B8EAF5;border-radius:9999px;padding:9px 14px;font-family:inherit;font-size:14px;font-weight:600;color:#022F36;cursor:pointer;white-space:nowrap;" style-hover="background:#E0F7FB;"><i class="icon icon-map-pin" style="font-size:15px;color:#1D484F;"></i>{{ locChip }}<span style="color:#1D484F;font-weight:700;margin-left:2px;">Edit</span></button>
             <button onClick="{{ onOpenPrefs }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E5E7EB;border-radius:9999px;padding:9px 16px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;"><i class="icon icon-sliders-horizontal" style="font-size:15px;color:#1D484F;"></i>Match Preference</button>
             </div>
           </sc-if>
@@ -304,6 +305,23 @@
                   </div>
                 </div>
 
+                <!-- skills for this role (full width of left column, scales to many skills) -->
+                <div style="margin-top:26px;padding-top:22px;border-top:1px solid #EDEEF0;">
+                  <div style="display:flex;align-items:baseline;gap:6px 14px;flex-wrap:wrap;margin-bottom:4px;">
+                    <span style="font-size:17px;font-weight:700;color:#0D0D0F;">Skills for this role</span>
+                    <span style="font-size:13.5px;font-weight:700;color:#1D484F;">{{ mx.counter }}</span>
+                  </div>
+                  <div style="font-size:13.5px;line-height:1.5;color:#4A5464;margin-bottom:14px;">Tap a skill to tell us if you have it. We’ll update your matches.</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px;max-width:900px;">
+                    <sc-for list="{{ mx.skillsShown }}" as="sk" hint-placeholder-count="8">
+                      <button onClick="{{ sk.onClick }}" aria-pressed="{{ sk.on }}" title="{{ sk.tip }}" style="{{ sk.style }}"><i class="{{ sk.icon }}" style="font-size:13px;"></i>{{ sk.name }}</button>
+                    </sc-for>
+                    <sc-if value="{{ mx.hasMoreSkills }}" hint-placeholder-val="{{ false }}">
+                      <button onClick="{{ onToggleSkillsAll }}" aria-expanded="{{ skillsAll }}" style="display:inline-flex;align-items:center;gap:5px;background:none;border:none;padding:6px 8px;font-family:inherit;font-size:13px;font-weight:700;color:#1D484F;cursor:pointer;">{{ mx.moreLabel }}<i class="{{ mx.moreIcon }}" style="font-size:14px;"></i></button>
+                    </sc-if>
+                  </div>
+                </div>
+
                 <div style="height:1px;background:#EDEEF0;margin:28px 0;"></div>
 
                 <!-- responsibilities -->
@@ -330,42 +348,28 @@
                 <!-- RIGHT rail -->
                 <div style="display:flex;flex-direction:column;gap:16px;">
                   <div style="background:linear-gradient(160deg,#0C2A2C 0%,#0E2F31 40%,#16615A 100%);border-radius:18px;padding:22px;color:#fff;text-align:center;">
-                    <div style="width:96px;height:96px;border-radius:50%;margin:0 auto 8px;background:conic-gradient(#5AEBEB {{ job.matchDeg }},rgba(255,255,255,0.14) 0);display:flex;align-items:center;justify-content:center;">
-                      <div style="width:78px;height:78px;border-radius:50%;background:#0C2A2C;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;">{{ job.match }}%</div>
+                    <div style="width:96px;height:96px;border-radius:50%;margin:0 auto 8px;background:conic-gradient(#5AEBEB {{ mx.deg }},rgba(255,255,255,0.14) 0);display:flex;align-items:center;justify-content:center;transition:background .3s;">
+                      <div style="width:78px;height:78px;border-radius:50%;background:#0C2A2C;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;">{{ mx.overall }}%</div>
                     </div>
                     <div style="{{ mx.labelStyle }}">{{ mx.label }}</div>
-                    <div style="font-size:12.5px;color:#BFD6D8;margin:-8px 0 16px;">{{ mx.summary }}</div>
+                    <div style="font-size:12.5px;line-height:1.5;color:#BFD6D8;margin:-8px 0 16px;">{{ mx.summary }}</div>
                     <div style="display:flex;justify-content:space-between;gap:8px;">
                       <div style="flex:1;"><div style="width:50px;height:50px;border-radius:50%;margin:0 auto 5px;border:3px solid #5AEBEB;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;">{{ job.expPct }}</div><div style="font-size:11px;color:#9FBEC0;">Exp. Level</div></div>
-                      <div style="flex:1;"><div style="width:50px;height:50px;border-radius:50%;margin:0 auto 5px;border:3px solid #5AEBEB;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;">{{ job.skillPct }}</div><div style="font-size:11px;color:#9FBEC0;">Skill</div></div>
+                      <div style="flex:1;"><div style="width:50px;height:50px;border-radius:50%;margin:0 auto 5px;border:3px solid #5AEBEB;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;">{{ mx.skillPct }}%</div><div style="font-size:11px;color:#9FBEC0;">Skill</div></div>
                       <div style="flex:1;"><div style="width:50px;height:50px;border-radius:50%;margin:0 auto 5px;border:3px solid rgba(90,235,235,0.4);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;">{{ job.indPct }}</div><div style="font-size:11px;color:#9FBEC0;">Industry Exp.</div></div>
                     </div>
-                    <div style="text-align:left;margin-top:16px;font-size:13px;line-height:1.9;"><div>✓ Growth Opportunities</div><div>✓ H1B Sponsor Likely</div></div>
+                    <sc-if value="{{ mx.hasPerks }}" hint-placeholder-val="{{ true }}"><div style="text-align:left;margin-top:16px;font-size:13px;line-height:1.9;"><sc-for list="{{ mx.perks }}" as="pk" hint-placeholder-count="1"><div>✓ {{ pk }}</div></sc-for></div></sc-if>
                   </div>
-                  <!-- skills breakdown -->
-                  <div style="background:#fff;border:1px solid #EDEEF0;border-radius:16px;padding:18px;">
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-                      <span style="font-size:15px;font-weight:700;color:#0D0D0F;">Required skills</span>
-                      <span style="font-size:13px;font-weight:700;color:#4A5464;">{{ mx.reqCount }}</span>
+                  <!-- free upgrade hook -->
+                  <sc-if value="{{ mx.showUpsell }}" hint-placeholder-val="{{ false }}">
+                    <div style="background:#FFF4EF;border:1px solid #F9D9CB;border-radius:16px;padding:16px 18px;">
+                      <div style="display:flex;gap:10px;margin-bottom:12px;">
+                        <i class="icon icon-sparkles" style="font-size:17px;color:#F76638;flex-shrink:0;margin-top:1px;"></i>
+                        <div style="font-size:13.5px;line-height:1.5;color:#23262E;">{{ mx.upsellText }}</div>
+                      </div>
+                      <button onClick="{{ onUpgrade }}" style="width:100%;display:flex;align-items:center;justify-content:center;gap:7px;background:#1D484F;border:none;border-radius:9999px;padding:10px 16px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;" style-hover="background:#022F36;"><i class="icon icon-crown" style="font-size:15px;"></i>Unlock better matches</button>
                     </div>
-                    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
-                      <sc-for list="{{ mx.required }}" as="sk" hint-placeholder-count="5">
-                        <span title="{{ sk.tip }}" style="{{ sk.style }}"><i class="{{ sk.icon }}" style="font-size:13px;"></i>{{ sk.name }}</span>
-                      </sc-for>
-                    </div>
-                    <sc-if value="{{ mx.hasSyn }}" hint-placeholder-val="{{ false }}">
-                      <div style="font-size:12.5px;color:#4A5464;margin-bottom:12px;line-height:1.5;">{{ mx.synNote }}</div>
-                    </sc-if>
-                    <div style="font-size:13px;font-weight:700;color:#4A5464;margin-bottom:8px;">Nice to have</div>
-                    <div style="display:flex;flex-wrap:wrap;gap:6px;">
-                      <sc-for list="{{ mx.nice }}" as="sk" hint-placeholder-count="3">
-                        <span style="{{ sk.style }}"><i class="{{ sk.icon }}" style="font-size:13px;"></i>{{ sk.name }}</span>
-                      </sc-for>
-                    </div>
-                    <sc-if value="{{ mx.hasMissing }}" hint-placeholder-val="{{ false }}">
-                      <button onClick="{{ goSkills }}" style="margin-top:14px;width:100%;display:flex;align-items:center;justify-content:center;gap:7px;background:#F5F6F7;border:1px solid #E5E7EB;border-radius:9999px;padding:9px 14px;font-family:inherit;font-size:13.5px;font-weight:600;color:#1D484F;cursor:pointer;"><i class="icon icon-plus" style="font-size:14px;"></i>Have it? Add to your skills</button>
-                    </sc-if>
-                  </div>
+                  </sc-if>
                   <div style="background:#fff;border:1px solid #EDEEF0;border-radius:16px;padding:18px;">
                     <button style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E5E7EB;border-radius:9999px;padding:8px 16px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;margin-bottom:16px;"><i class="icon icon-external-link" style="font-size:15px;color:#1D484F;"></i>Website</button>
                     <div style="display:flex;gap:9px;margin-bottom:16px;">
@@ -1061,27 +1065,40 @@
             </div>
             <sc-if value="{{ pfNSpecific }}" hint-placeholder-val="{{ true }}">
               <div style="position:relative;">
-                <button onClick="{{ pfNOnStatesToggle }}" aria-expanded="{{ pfNStatesOpen }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fff;border:1px solid {{ pfNDdBorder }};border-radius:10px;height:48px;padding:0 16px;font-family:inherit;font-size:15px;color:{{ pfNDdInk }};cursor:pointer;text-align:left;"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ pfNDdLabel }}</span><i class="icon icon-chevron-down" style="font-size:18px;color:#022F36;flex-shrink:0;"></i></button>
-                <sc-if value="{{ pfNStatesOpen }}" hint-placeholder-val="{{ false }}">
-                  <div style="position:absolute;left:0;right:0;top:54px;z-index:30;background:#fff;border:1px solid #CBD3E4;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,0.14);max-height:260px;overflow-y:auto;padding:6px;">
-                    <sc-for list="{{ pfNStateGroups }}" as="g" hint-placeholder-count="1">
-                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">{{ g.name }}</div>
-                      <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="6">
-                        <button onClick="{{ it.onClick }}" role="option" aria-selected="{{ it.on }}" style="width:100%;display:flex;align-items:center;gap:10px;background:none;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F0FCFF;"><span style="{{ it.box }}"><sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:13px;color:#fff;"></i></sc-if></span>{{ it.name }}</button>
+                <i class="icon icon-search" style="position:absolute;left:15px;top:15px;font-size:18px;color:#4A5464;pointer-events:none;"></i>
+                <input type="text" value="{{ pfNQ }}" onChange="{{ pfNOnQ }}" onFocus="{{ pfNOnFocus }}" onBlur="{{ pfNOnBlur }}" placeholder="Search a city or state" aria-label="Search a city or state" style="width:100%;box-sizing:border-box;background:#fff;border:1px solid #E5E7EB;border-radius:10px;height:48px;padding:0 16px 0 44px;font-family:inherit;font-size:15px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+                <sc-if value="{{ pfNResultsOpen }}" hint-placeholder-val="{{ false }}">
+                  <div role="listbox" style="position:absolute;left:0;right:0;top:54px;z-index:30;background:#fff;border:1px solid #CBD3E4;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,0.14);max-height:280px;overflow-y:auto;padding:6px;">
+                    <sc-if value="{{ pfNHasCityResults }}" hint-placeholder-val="{{ true }}">
+                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">Cities</div>
+                      <sc-for list="{{ pfNCityResults }}" as="it" hint-placeholder-count="4">
+                        <button onMouseDown="{{ it.onPick }}" role="option" style="width:100%;display:flex;align-items:center;gap:10px;background:none;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F0FCFF;"><i class="icon icon-map-pin" style="font-size:16px;color:#1D484F;"></i><span>{{ it.name }}</span><span style="color:#4A5464;">{{ it.sub }}</span></button>
                       </sc-for>
-                    </sc-for>
+                    </sc-if>
+                    <sc-if value="{{ pfNHasStateResults }}" hint-placeholder-val="{{ true }}">
+                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">States / provinces</div>
+                      <sc-for list="{{ pfNStateResults }}" as="it" hint-placeholder-count="2">
+                        <button onMouseDown="{{ it.onPick }}" role="option" style="width:100%;display:flex;align-items:center;gap:10px;background:none;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F0FCFF;"><i class="icon icon-map" style="font-size:16px;color:#1D484F;"></i><span>All of {{ it.name }}</span></button>
+                      </sc-for>
+                    </sc-if>
+                    <sc-if value="{{ pfNNoResults }}" hint-placeholder-val="{{ false }}">
+                      <div style="padding:12px 10px;font-size:14px;color:#4A5464;">No matching city or state</div>
+                    </sc-if>
                   </div>
                 </sc-if>
               </div>
-              <sc-if value="{{ pfNHasStates }}" hint-placeholder-val="{{ true }}">
+              <sc-if value="{{ pfNHasChips }}" hint-placeholder-val="{{ true }}">
                 <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                  <sc-for list="{{ pfNStateChips }}" as="c" hint-placeholder-count="1">
+                  <sc-for list="{{ pfNChips }}" as="c" hint-placeholder-count="1">
                     <span style="display:inline-flex;align-items:center;gap:6px;background:#F0FCFF;border:1px solid #B8EAF5;color:#022F36;border-radius:9999px;padding:5px 6px 5px 12px;font-size:14px;font-weight:600;">{{ c.name }}<button onClick="{{ c.onRemove }}" aria-label="Remove" style="width:22px;height:22px;border-radius:50%;border:none;background:#fff;color:#4A5464;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="icon icon-x" style="font-size:13px;"></i></button></span>
                   </sc-for>
                 </div>
               </sc-if>
-              <sc-if value="{{ pfNDetected }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#4A5464;"><i class="icon icon-locate-fixed" style="font-size:14px;color:#1D484F;"></i>{{ pfNDetectedText }}</div>
+              <sc-if value="{{ pfNHasNote }}" hint-placeholder-val="{{ false }}">
+                <div style="font-size:13px;color:#4A5464;">{{ pfNNote }}</div>
+              </sc-if>
+              <sc-if value="{{ pfNDetected2 }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#4A5464;"><i class="icon icon-locate-fixed" style="font-size:14px;color:#1D484F;"></i>{{ pfNDetectedText2 }}</div>
               </sc-if>
             </sc-if>
           </div>
@@ -1157,9 +1174,14 @@
     </div>
   </sc-if>
 
+  <!-- ===== SKILL TOAST ===== -->
+  <sc-if value="{{ skillToast }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:71;display:flex;align-items:center;gap:10px;background:#0C2A2C;color:#fff;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,0.3);padding:12px 18px;font-size:14.5px;font-weight:600;white-space:nowrap;animation:sbIn .25s ease;"><i class="icon icon-circle-check" style="font-size:18px;color:#5AEBEB;"></i>Profile updated — matches will refresh</div>
+  </sc-if>
+
   <!-- ===== SCENARIO DOCK ===== -->
   <sc-if value="{{ dockOpen }}" hint-placeholder-val="{{ true }}">
-    <div style="position:fixed;left:18px;bottom:18px;width:280px;background:#0C2A2C;border-radius:16px;box-shadow:0 18px 48px rgba(0,0,0,0.32);padding:14px 14px 16px;z-index:60;color:#fff;">
+    <div style="position:fixed;left:18px;bottom:18px;width:280px;max-height:calc(100vh - 36px);overflow-y:auto;background:#0C2A2C;border-radius:16px;box-shadow:0 18px 48px rgba(0,0,0,0.32);padding:14px 14px 16px;z-index:60;color:#fff;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
         <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:0.04em;color:#5AEBEB;"><i class="icon icon-flask-conical" style="font-size:15px;"></i>SUBSCRIPTION STATE</div>
         <button onClick="{{ toggleDock }}" title="Collapse" style="background:rgba(255,255,255,0.12);border:none;color:#fff;cursor:pointer;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;" style-hover="background:rgba(255,255,255,0.24);"><i class="icon icon-x" style="font-size:16px;"></i></button>
@@ -1168,6 +1190,13 @@
       <div style="display:flex;flex-direction:column;gap:4px;">
         <sc-for list="{{ scenarios }}" as="sx" hint-placeholder-count="9">
           <button onClick="{{ sx.onClick }}" style="{{ sx.style }}"><span style="width:8px;height:8px;border-radius:50%;background:{{ sx.dot }};flex-shrink:0;"></span>{{ sx.label }}</button>
+        </sc-for>
+      </div>
+      <div style="height:1px;background:rgba(255,255,255,0.12);margin:12px 0 10px;"></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:0.04em;color:#5AEBEB;margin-bottom:8px;"><i class="icon icon-target" style="font-size:15px;"></i>SKILL MATCH</div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <sc-for list="{{ skillDemos }}" as="sd" hint-placeholder-count="3">
+          <button onClick="{{ sd.onClick }}" style="{{ sd.style }}"><span style="width:8px;height:8px;border-radius:50%;background:{{ sd.dot }};flex-shrink:0;"></span>{{ sd.label }}</button>
         </sc-for>
       </div>
     </div>
@@ -1180,6 +1209,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
 const US_STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
+const CITIES = {"Alabama":["Birmingham","Huntsville","Montgomery","Mobile"],"Alaska":["Anchorage","Fairbanks","Juneau"],"Arizona":["Phoenix","Tucson","Scottsdale","Tempe","Mesa"],"Arkansas":["Little Rock","Fayetteville","Bentonville"],"California":["San Francisco","Los Angeles","San Jose","San Diego","Palo Alto","Mountain View","Sunnyvale","Oakland","Irvine","Sacramento"],"Colorado":["Denver","Boulder","Colorado Springs","Fort Collins"],"Connecticut":["Hartford","Stamford","New Haven"],"Delaware":["Wilmington","Dover"],"Florida":["Miami","Tampa","Orlando","Jacksonville","Fort Lauderdale"],"Georgia":["Atlanta","Alpharetta","Savannah","Augusta"],"Hawaii":["Honolulu"],"Idaho":["Boise","Idaho Falls"],"Illinois":["Chicago","Naperville","Evanston","Champaign"],"Indiana":["Indianapolis","Fort Wayne","Bloomington"],"Iowa":["Des Moines","Cedar Rapids","Iowa City"],"Kansas":["Wichita","Overland Park","Kansas City"],"Kentucky":["Louisville","Lexington"],"Louisiana":["New Orleans","Baton Rouge"],"Maine":["Portland","Bangor"],"Maryland":["Baltimore","Bethesda","Rockville","Columbia"],"Massachusetts":["Boston","Cambridge","Somerville","Waltham","Worcester"],"Michigan":["Detroit","Ann Arbor","Grand Rapids"],"Minnesota":["Minneapolis","St. Paul","Rochester"],"Mississippi":["Jackson","Gulfport"],"Missouri":["St. Louis","Kansas City","Springfield"],"Montana":["Bozeman","Missoula","Billings"],"Nebraska":["Omaha","Lincoln"],"Nevada":["Las Vegas","Reno","Henderson"],"New Hampshire":["Manchester","Nashua","Portsmouth"],"New Jersey":["Jersey City","Newark","Princeton","Hoboken"],"New Mexico":["Albuquerque","Santa Fe"],"New York":["New York City","Brooklyn","Buffalo","Rochester","Albany"],"North Carolina":["Raleigh","Charlotte","Durham","Chapel Hill"],"North Dakota":["Fargo","Bismarck"],"Ohio":["Columbus","Cleveland","Cincinnati","Dayton"],"Oklahoma":["Oklahoma City","Tulsa"],"Oregon":["Portland","Beaverton","Eugene","Bend"],"Pennsylvania":["Philadelphia","Pittsburgh","Harrisburg"],"Rhode Island":["Providence"],"South Carolina":["Charleston","Greenville","Columbia"],"South Dakota":["Sioux Falls","Rapid City"],"Tennessee":["Nashville","Memphis","Knoxville","Chattanooga"],"Texas":["Austin","Dallas","Houston","San Antonio","Plano","Fort Worth"],"Utah":["Salt Lake City","Lehi","Provo"],"Vermont":["Burlington"],"Virginia":["Arlington","Richmond","Reston","McLean","Virginia Beach"],"Washington":["Seattle","Bellevue","Redmond","Tacoma","Spokane"],"West Virginia":["Charleston","Morgantown"],"Wisconsin":["Milwaukee","Madison","Green Bay"],"Wyoming":["Cheyenne","Jackson"],"Alberta":["Calgary","Edmonton"],"British Columbia":["Vancouver","Victoria","Burnaby","Surrey"],"Manitoba":["Winnipeg"],"New Brunswick":["Moncton","Fredericton","Saint John"],"Newfoundland and Labrador":["St. John's"],"Nova Scotia":["Halifax"],"Ontario":["Toronto","Ottawa","Waterloo","Mississauga","Hamilton","London"],"Prince Edward Island":["Charlottetown"],"Quebec":["Montreal","Quebec City","Laval"],"Saskatchewan":["Saskatoon","Regina"],"Northwest Territories":["Yellowknife"],"Nunavut":["Iqaluit"],"Yukon":["Whitehorse"]};
 const CA_PROVINCES = ["Alberta","British Columbia","Manitoba","New Brunswick","Newfoundland and Labrador","Nova Scotia","Ontario","Prince Edward Island","Quebec","Saskatchewan","Northwest Territories","Nunavut","Yukon"];
 class Component extends DCLogic {
   state = {
@@ -1197,6 +1227,7 @@ class Component extends DCLogic {
     appsFilter: 'all',
     appsTab: 'active',
     appsVersion: 'b',
+    skillOv: {}, skillDemo: 'partial', skPop: '', skPopN: 0, skillToast: false,
     fSearch: '',
     fDate: 'All time',
     fType: 'All',
@@ -1210,7 +1241,7 @@ class Component extends DCLogic {
     prefs: {
       func: 'Software Engineering',
       subs: { fe: false, be: true, fs: true, mobile: false, devops: false, qa: false },
-      near: { mode: 'specific', states: ['Texas'], detected: true, open: false },
+      near: { mode: 'specific', states: [], cities: ['Austin|Texas'], detected: true, q: '', ro: false, note: '' },
       types: { full: true, part: false, intern: false },
       locations: { us: true, ca: false },
       globalRemote: false,
@@ -1323,7 +1354,7 @@ v: (() => {
           iconStyle: `font-size:16px;flex-shrink:0;color:${loc.mode === k ? '#FFFFFF' : '#7A8694'};` })),
         Specific: loc.mode === 'specific',
         StatesOpen: !!loc.open,
-        OnStatesToggle: () => set({ open: !loc.open }),
+        OnStatesToggle: () => set({ open: !loc.open, cityOpen: false }),
         DdLabel: valid.length ? (valid.length + ' selected') : 'Choose states or provinces',
         DdInk: valid.length ? '#0D0D0F' : '#7A8694',
         DdBorder: loc.open ? '#1D484F' : '#E5E7EB',
@@ -1331,7 +1362,40 @@ v: (() => {
         HasStates: valid.length > 0,
         StateChips: valid.map(n => ({ name: n, onRemove: () => toggle(n) })),
         Detected: !!loc.detected && valid.length > 0,
-        DetectedText: 'Detected from your network, so you see local jobs first',
+        Q: loc.q || '',
+        OnQ: (e) => set({ q: e.target.value, ro: true }),
+        OnFocus: () => set({ ro: true }),
+        OnBlur: () => setTimeout(() => set({ ro: false }), 120),
+        ...(() => {
+          const allowed = groups.flatMap(g => g.list);
+          const ckey = (c, st) => c + '|' + st;
+          const q = (loc.q || '').trim().toLowerCase();
+          const sts = (loc.states || []).filter(n => allowed.includes(n));
+          const cts = (loc.cities || []).filter(k => allowed.includes(k.split('|')[1]) && !sts.includes(k.split('|')[1]));
+          const pickCity = (c, st) => () => set({ cities: [...(loc.cities || []).filter(k => k !== ckey(c, st)), ckey(c, st)], q: '', ro: false, detected: false, note: '' });
+          const pickState = (st) => () => { const dropped = (loc.cities || []).filter(k => k.split('|')[1] === st).map(k => k.split('|')[0]);
+            set({ states: [...(loc.states || []).filter(x => x !== st), st], cities: (loc.cities || []).filter(k => k.split('|')[1] !== st), q: '', ro: false, detected: false,
+              note: dropped.length ? (st + ' already includes ' + dropped.join(' and ') + ', so we merged them.') : '' }); };
+          const cityRes = []; allowed.forEach(st => (CITIES[st] || []).forEach(c => { if (!cts.includes(ckey(c, st)) && !sts.includes(st) && (!q || c.toLowerCase().includes(q) || st.toLowerCase().includes(q))) cityRes.push({ name: c, sub: st, onPick: pickCity(c, st) }); }));
+          const stateRes = allowed.filter(st => !sts.includes(st) && (q ? st.toLowerCase().includes(q) : false)).slice(0, 8).map(st => ({ name: st, onPick: pickState(st) }));
+          const chips = [...cts.map(k => { const [c, st] = k.split('|'); return { name: c + ', ' + st, onRemove: () => set({ cities: loc.cities.filter(x => x !== k), detected: false, note: '' }) }; }),
+                         ...sts.map(st => ({ name: 'All of ' + st, onRemove: () => set({ states: loc.states.filter(x => x !== st), note: '' }) }))];
+          const cr = cityRes.slice(0, 60);
+          return { ResultsOpen: !!loc.ro && (cr.length + stateRes.length > 0 || q.length > 0), CityResults: cr, StateResults: stateRes,
+            HasCityResults: cr.length > 0, HasStateResults: stateRes.length > 0, NoResults: q.length > 0 && cr.length + stateRes.length === 0,
+            Chips: chips, HasChips: chips.length > 0, HasNote: !!loc.note, Note: loc.note || '',
+            Detected2: !!loc.detected && cts.length > 0, DetectedText2: 'Detected ' + (cts[0] ? cts[0].split('|')[0] : '') + ' from your network, so you see local jobs first' };
+        })(),
+        CityDdLabel: (() => { const c = (loc.cities || []).filter(x => valid.some(v => (CITIES[v] || []).includes(x))); return c.length ? (c.length + (c.length === 1 ? ' city' : ' cities') + ' selected') : 'Any city in selected states'; })(),
+        CityDdInk: ((loc.cities || []).length ? '#0D0D0F' : '#7A8694'),
+        CityDdBorder: loc.cityOpen ? '#1D484F' : '#E5E7EB',
+        CitiesOpen: !!loc.cityOpen,
+        OnCitiesToggle: () => set({ cityOpen: !loc.cityOpen, open: false }),
+        CityGroups: valid.map(v => ({ name: v, items: (CITIES[v] || []).map(c => { const on = (loc.cities || []).includes(c); return { name: c, on, box: box(on),
+          onClick: () => set({ cities: on ? loc.cities.filter(x => x !== c) : [...(loc.cities || []), c], detected: false }) }; }) })),
+        ...(() => { const c = (loc.cities || []).filter(x => valid.some(v => (CITIES[v] || []).includes(x)));
+          return { HasCities: c.length > 0, NoCities: c.length === 0, CityChips: c.map(n => ({ name: n, onRemove: () => set({ cities: loc.cities.filter(x => x !== n), detected: false }) })) }; })(),
+        DetectedText: (loc.cities || []).length ? 'Detected ' + loc.cities[0] + ' from your network, so you see local jobs first' : 'Detected from your network, so you see local jobs first',
       };
     })(), }).v;
   }
@@ -1380,7 +1444,7 @@ v: (() => {
       degree:"Bachelor's of Computer Science", onsite:'Remote', type:'Full Time',
       about:"Stripe builds economic infrastructure for the internet. Businesses of every size use Stripe to accept payments, send payouts, and manage their operations online.",
       comp:'$160,000 - $220,000 annually, plus equity',
-      tags:['Payments','Fintech','Developer Tools','H1B Sponsor Likely','Equity','Growth Opportunities'],
+      tags:['Payments','Fintech','Developer Tools','H1B Sponsor Likely','Equity'],
       employees:'5,001-10,000 employees', founded:'Founded in 2010', hq:'San Francisco', url:'https://stripe.com/',
       match:88, expPct:'96%', skillPct:'90%', indPct:'58%', id:'stripe' },
     figma:{ company:'Figma', logoChar:'F', logoBg:'#0D0D0F', posted:'saved 4 days ago', title:'Product Engineer',
@@ -1388,7 +1452,7 @@ v: (() => {
       degree:"Bachelor's preferred", onsite:'Inperson', type:'Full Time',
       about:"Figma is the collaborative interface design tool that lets teams design, prototype, and build together in the browser. It is the industry standard for modern product design.",
       comp:'$150,000 - $200,000 annually, plus equity',
-      tags:['Design Tools','SaaS','Collaboration','Equity','Growth Opportunities'],
+      tags:['Design Tools','SaaS','Collaboration','Equity'],
       employees:'1,001-5,000 employees', founded:'Founded in 2012', hq:'San Francisco', url:'https://figma.com/',
       match:84, expPct:'88%', skillPct:'92%', indPct:'52%', id:'figma' },
   };
@@ -1410,6 +1474,58 @@ v: (() => {
     stripe:  { req:[['Ruby','x'],['Go','m'],['REST APIs','m'],['Distributed systems','m']], nice:[['Payments','m']] },
     figma:   { req:[['TypeScript','m'],['React','m'],['C++','x']], nice:[['WebGL','x']] },
   };
+  SKILL8 = {
+    miro: [['TypeScript',1],['React',1],['Go',0],['Python',1],['CI/CD',1],['Git',1],['System Design',0],['REST APIs',1]],
+  };
+  toggleSkill(jobId, name, on) {
+    clearTimeout(this._skT);
+    this.setState(s => ({
+      skillOv: { ...s.skillOv, [jobId]: { ...(s.skillOv[jobId] || {}), [name]: !on } },
+      skPop: name, skPopN: s.skPopN + 1, skillToast: true,
+    }));
+    this._skT = setTimeout(() => this.setState({ skillToast: false }), 2600);
+  }
+  skillMatch(job, st) {
+    const raw = this.SKILL8[job.id] || (() => { const d = this.SKILLS[job.id] || { req:[], nice:[] }; return [...d.req, ...d.nice].map(([n, x]) => [n, x === 'x' ? 0 : 1]); })();
+    let base = raw.map(([n, m]) => [n, !!m]);
+    if (st.skillDemo === 'full') base = base.map(([n]) => [n, true]);
+    if (st.skillDemo === 'low') { const order = [...base].sort((p, q) => q[1] - p[1]).slice(0, 3).map(p => p[0]); base = base.map(([n]) => [n, order.includes(n)]); }
+    const ov = st.skillOv[job.id] || {};
+    const list = base.map(([n, m]) => ({ name: n, on: n in ov ? ov[n] : m }));
+    const hit = list.filter(x => x.on).length, total = list.length || 1;
+    const skillPct = Math.round(hit / total * 100);
+    const overall = Math.round(skillPct * 0.5 + (parseInt(job.expPct) || 0) * 0.3 + (parseInt(job.indPct) || 0) * 0.2);
+    const missing = list.filter(x => !x.on).map(x => x.name);
+    const label = overall >= 80 ? 'STRONG MATCH' : overall >= 60 ? 'GOOD MATCH' : 'FAIR MATCH';
+    const labelColor = overall >= 80 ? '#FFFFFF' : overall >= 60 ? '#5AEBEB' : '#FFB899';
+    const free = ['free', 'checkout_failed', 'cancelled'].includes(st.scenario);
+    const pill = (x) => {
+      const pop = st.skPop === x.name ? `animation:${st.skPopN % 2 ? 'skPopA' : 'skPopB'} .32s ease;` : '';
+      return x.on
+        ? `display:inline-flex;align-items:center;gap:6px;background:#1D484F;border:1px solid #1D484F;color:#FFFFFF;border-radius:9999px;padding:6px 12px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s,border-color .2s;${pop}`
+        : `display:inline-flex;align-items:center;gap:6px;background:#FFFFFF;border:1px solid #C9D0D4;color:#4A5464;border-radius:9999px;padding:6px 12px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s,border-color .2s;${pop}`;
+    };
+    return {
+      skills: list.map(x => ({ name: x.name, on: x.on, icon: x.on ? 'icon icon-check' : 'icon icon-plus', style: pill(x),
+        tip: x.on ? 'On your profile. Tap if you don’t have it' : 'Tap to add to your skills',
+        onClick: () => this.toggleSkill(job.id, x.name, x.on) })),
+      ...(() => { const sorted = [...list].sort((p, q) => p.on - q.on); const cap = 12;
+        const mk = (x) => ({ name: x.name, on: x.on, icon: x.on ? 'icon icon-check' : 'icon icon-plus', style: pill(x),
+          tip: x.on ? 'On your profile. Tap if you don’t have it' : 'Tap to add to your skills', onClick: () => this.toggleSkill(job.id, x.name, x.on) });
+        const all = !!st.skillsAll, more = sorted.length > cap;
+        return { skillsShown: (all || !more ? sorted : sorted.slice(0, cap)).map(mk), hasMoreSkills: more,
+          moreLabel: all ? 'Show less' : ('+' + (sorted.length - cap) + ' more'), moreIcon: all ? 'icon icon-chevron-up' : 'icon icon-chevron-down' }; })(),
+      counter: hit + ' of ' + list.length + ' skills matched',
+      skillPct, overall, deg: Math.round(overall * 3.6) + 'deg',
+      label, labelStyle: `font-size:15px;font-weight:700;letter-spacing:0.08em;margin-bottom:16px;color:${labelColor};`,
+      summary: missing.length === 0 ? 'You have every required skill'
+        : ('You’re missing ' + missing.length + (missing.length === 1 ? ' skill: ' : ' skills: ') + missing.join(', ')),
+      ...(() => { const e = JSON.stringify((this.ELIG && this.ELIG[job.id]) || ''); const h1b = (job.tags || []).includes('H1B Sponsor Likely') && !/No visa sponsorship/i.test(e);
+        return { perks: h1b ? ['H1B Sponsor Likely'] : [], hasPerks: h1b }; })(),
+      showUpsell: free && skillPct < 100,
+      upsellText: 'You’re missing ' + missing.length + (missing.length === 1 ? ' skill' : ' skills') + ' for this role. Upgrade and Bloom will prioritise jobs where you match 80%+ and Auto Apply to them.',
+    };
+  }
   matchInfo(job) {
     const d = this.SKILLS[job.id] || { req:[], nice:[] };
     const chip = ([name, st, via]) => {
@@ -1447,15 +1563,15 @@ v: (() => {
       degree:"Bachelor's of Computer Science", onsite:'Inperson', type:'Full Time',
       about:"Miro is an online collaborative whiteboard platform designed for teams to brainstorm, plan, and visualize ideas together in real time. It's widely used for design thinking, project planning, and remote collaboration — a go-to tool for creative and agile workflows.",
       comp:'$50,500 - $112,500 annually, plus potential',
-      tags:['Consulting','Financial services','Professional Services','Risk Management','Growth Opportunities','H1B Sponsor Likely'],
-      employees:'10,001+ employees', founded:'Founded in 1845', hq:'London', url:'https://miro.com/',
+      tags:['Collaboration software','SaaS','Visual workspace'],
+      employees:'1,001-5,000 employees', founded:'Founded in 2011', hq:'San Francisco', url:'https://miro.com/',
       match:90, expPct:'100%', skillPct:'84%', indPct:'46%', id:'miro' },
     { company:'Linear', logoChar:'L', logoBg:'#5E6AD2', posted:'12 minutes ago', title:'Frontend Engineer',
       location:'Remote, US', mode:'Remote', level:'Mid Level', exp:'3+ Years Exp',
       degree:"Bachelor's preferred", onsite:'Remote', type:'Full Time',
       about:"Linear is the issue tracking and project management tool built for high-performance software teams. It is loved for its speed, keyboard-first workflow, and beautifully crafted interface.",
       comp:'$120,000 - $160,000 annually',
-      tags:['SaaS','Developer Tools','Product','Growth Opportunities','Equity'],
+      tags:['SaaS','Developer Tools','Product','Equity'],
       employees:'201-500 employees', founded:'Founded in 2019', hq:'San Francisco', url:'https://linear.app/',
       match:86, expPct:'92%', skillPct:'88%', indPct:'61%', id:'linear' },
     { company:'Notion', logoChar:'N', logoBg:'#0D0D0F', posted:'1 hour ago', title:'Full Stack Engineer',
@@ -1463,7 +1579,7 @@ v: (() => {
       degree:"Bachelor's of Computer Science", onsite:'Inperson', type:'Full Time',
       about:"Notion is the connected workspace where teams write, plan, and organize. It blends notes, docs, wikis, and databases into one flexible tool used by millions.",
       comp:'$140,000 - $190,000 annually, plus equity',
-      tags:['Productivity','SaaS','Collaboration','H1B Sponsor Likely','Growth Opportunities'],
+      tags:['Productivity','SaaS','Collaboration','H1B Sponsor Likely'],
       employees:'501-1,000 employees', founded:'Founded in 2016', hq:'San Francisco', url:'https://notion.so/',
       match:81, expPct:'78%', skillPct:'90%', indPct:'55%', id:'notion' },
     { company:'Vercel', logoChar:'V', logoBg:'#0D0D0F', posted:'24 minutes ago', title:'Senior Platform Engineer',
@@ -1471,7 +1587,7 @@ v: (() => {
       degree:"Bachelor's preferred", onsite:'Remote', type:'Full Time',
       about:"Vercel is the platform for frontend developers, powering the world's best products with Next.js. The team builds the infrastructure that ships the modern web at scale.",
       comp:'$170,000 - $230,000 annually, plus equity',
-      tags:['Developer Tools','Cloud','Infrastructure','Equity','Growth Opportunities','H1B Sponsor Likely'],
+      tags:['Developer Tools','Cloud','Infrastructure','Equity'],
       employees:'201-500 employees', founded:'Founded in 2015', hq:'San Francisco', url:'https://vercel.com/',
       match:92, expPct:'98%', skillPct:'94%', indPct:'63%', id:'vercel' },
     { company:'Datadog', logoChar:'D', logoBg:'#632CA6', posted:'40 minutes ago', title:'Backend Engineer, Metrics',
@@ -1479,7 +1595,7 @@ v: (() => {
       degree:"Bachelor's of Computer Science", onsite:'Inperson', type:'Full Time',
       about:"Datadog is the monitoring and security platform for cloud applications, bringing together metrics, traces, and logs at massive scale for engineering teams worldwide.",
       comp:'$155,000 - $205,000 annually, plus equity',
-      tags:['Observability','Cloud','SaaS','H1B Sponsor Likely','Growth Opportunities'],
+      tags:['Observability','Cloud','SaaS','H1B Sponsor Likely'],
       employees:'5,001-10,000 employees', founded:'Founded in 2010', hq:'New York', url:'https://datadoghq.com/',
       match:87, expPct:'90%', skillPct:'86%', indPct:'58%', id:'datadog' },
     { company:'Ramp', logoChar:'R', logoBg:'#E5FF44', posted:'1 hour ago', title:'Product Engineer',
@@ -1487,7 +1603,7 @@ v: (() => {
       degree:"Bachelor's preferred", onsite:'Remote', type:'Full Time',
       about:"Ramp is the finance automation platform helping businesses spend less time and money. The product team ships fast and owns features end-to-end from idea to impact.",
       comp:'$145,000 - $195,000 annually, plus equity',
-      tags:['Fintech','SaaS','Automation','Equity','Growth Opportunities'],
+      tags:['Fintech','SaaS','Automation','Equity'],
       employees:'501-1,000 employees', founded:'Founded in 2019', hq:'New York', url:'https://ramp.com/',
       match:85, expPct:'88%', skillPct:'89%', indPct:'50%', id:'ramp' },
     { company:'Discord', logoChar:'D', logoBg:'#5865F2', posted:'2 hours ago', title:'Full Stack Engineer',
@@ -1495,7 +1611,7 @@ v: (() => {
       degree:"Bachelor's of Computer Science", onsite:'Inperson', type:'Full Time',
       about:"Discord is where the world builds communities and belonging. Engineers build real-time messaging and voice experiences serving hundreds of millions of users.",
       comp:'$160,000 - $210,000 annually, plus equity',
-      tags:['Social','Real-time','Consumer','H1B Sponsor Likely','Growth Opportunities'],
+      tags:['Social','Real-time','Consumer','H1B Sponsor Likely'],
       employees:'501-1,000 employees', founded:'Founded in 2015', hq:'San Francisco', url:'https://discord.com/',
       match:83, expPct:'82%', skillPct:'88%', indPct:'54%', id:'discord' },
     { company:'Coinbase', logoChar:'C', logoBg:'#0052FF', posted:'3 hours ago', title:'Software Engineer, Backend',
@@ -1503,7 +1619,7 @@ v: (() => {
       degree:"Bachelor's preferred", onsite:'Remote', type:'Full Time',
       about:"Coinbase is building the cryptoeconomy — a more fair, accessible, efficient, and transparent financial system. Engineers work on secure, high-scale financial infrastructure.",
       comp:'$165,000 - $225,000 annually, plus equity',
-      tags:['Crypto','Fintech','Blockchain','Equity','Growth Opportunities'],
+      tags:['Crypto','Fintech','Blockchain','Equity'],
       employees:'1,001-5,000 employees', founded:'Founded in 2012', hq:'Remote-first', url:'https://coinbase.com/',
       match:80, expPct:'84%', skillPct:'82%', indPct:'48%', id:'coinbase' },
     { company:'Airbnb', logoChar:'A', logoBg:'#FF5A5F', posted:'5 hours ago', title:'Frontend Engineer',
@@ -1511,7 +1627,7 @@ v: (() => {
       degree:"Bachelor's of Computer Science", onsite:'Inperson', type:'Full Time',
       about:"Airbnb's mission is to create a world where anyone can belong anywhere. Engineers craft the experiences that connect millions of hosts and guests across the globe.",
       comp:'$158,000 - $208,000 annually, plus equity',
-      tags:['Travel','Consumer','Marketplace','H1B Sponsor Likely','Growth Opportunities'],
+      tags:['Travel','Consumer','Marketplace','H1B Sponsor Likely'],
       employees:'5,001-10,000 employees', founded:'Founded in 2008', hq:'San Francisco', url:'https://airbnb.com/',
       match:78, expPct:'80%', skillPct:'84%', indPct:'52%', id:'airbnb' },
     { company:'Spotify', logoChar:'S', logoBg:'#1DB954', posted:'8 hours ago', title:'Backend Engineer, Personalization',
@@ -1519,7 +1635,7 @@ v: (() => {
       degree:"Bachelor's preferred", onsite:'Inperson', type:'Full Time',
       about:"Spotify is the world's most popular audio streaming subscription service. Engineers build the recommendation systems and infrastructure behind a personalized listening experience.",
       comp:'$150,000 - $200,000 annually, plus equity',
-      tags:['Audio','Consumer','ML','Growth Opportunities','Equity'],
+      tags:['Audio','Consumer','ML','Equity'],
       employees:'5,001-10,000 employees', founded:'Founded in 2006', hq:'Stockholm', url:'https://spotify.com/',
       match:76, expPct:'76%', skillPct:'80%', indPct:'46%', id:'spotify' },
   ];
@@ -1963,7 +2079,7 @@ v: (() => {
     const job = isSavedDetail ? this.fullJob(st.savedDetailId)
               : (remaining[dpos] || remaining[0] || this.JOBS[0]);
     job.matchDeg = Math.round(job.match * 3.6) + 'deg';
-    const mx = this.matchInfo(job);
+    const mx = { ...this.matchInfo(job), ...this.skillMatch(job, st) };
     const el = this.eligInfo(job);
     const curSaved = st.saved.includes(job.id);
     const savedJobs = st.saved.map(id => {
@@ -2141,6 +2257,12 @@ v: (() => {
       job,
       mx,
       el,
+      skillToast: st.skillToast,
+      skillsAll: !!st.skillsAll,
+      onToggleSkillsAll: () => this.setState(s => ({ skillsAll: !s.skillsAll })),
+      skillDemos: [['full','100% skill match','#00B16B'],['partial','Partial match','#5AEBEB'],['low','Low match (3 of 8)','#F76638']].map(([k, label, dot]) => ({ label, dot,
+        onClick: () => this.setState({ skillDemo: k, skillOv: {}, skPop: '' }),
+        style: `display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:${st.skillDemo === k ? 'rgba(90,235,235,0.16)' : 'transparent'};border:none;border-radius:9px;padding:8px 10px;font-family:inherit;font-size:13px;font-weight:${st.skillDemo === k ? 700 : 500};color:#fff;cursor:pointer;` })),
       goSkills: () => { this.setState({ screen:'profile' }); setTimeout(() => this.scrollToSection && this.scrollToSection('skills'), 60); },
       onSave: () => { if(!curSaved) this.setState({ saved:[...st.saved, job.id] }); },
       saveBtnLabel: curSaved ? 'Saved' : 'Save',
