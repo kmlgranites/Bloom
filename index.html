@@ -848,6 +848,38 @@
         </div>
         <p style="font-size:15px;color:#5A6B72;margin-bottom:20px;">Your Bloom agent applies in the background — most applications are submitted within 24 hours.</p>
 
+        <!-- overall application progress -->
+        <div style="background:#5AC8E3;border-radius:20px;padding:18px 20px 20px;margin-bottom:24px;">
+          <h2 style="font-size:20px;font-weight:600;color:#fff;margin:0 4px 14px;">Overall Application Progress</h2>
+          <div style="background:#fff;border-radius:18px;padding:18px 20px 20px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px;">
+              <div style="display:flex;align-items:center;gap:12px;">
+                <i class="icon icon-shield" style="font-size:26px;color:#F76638;"></i>
+                <div><div style="font-size:16px;font-weight:600;color:#0D0D0F;">{{ op.streakTitle }}</div><div style="font-size:13px;color:#4A5464;margin-top:1px;">{{ op.streakSub }}</div></div>
+              </div>
+              <button onClick="{{ goJobs }}" style="display:flex;align-items:center;gap:8px;background:#022F36;border:none;border-radius:12px;height:44px;padding:0 20px;font-family:inherit;font-size:15px;font-weight:600;color:#fff;cursor:pointer;" style-hover="background:#1D484F;">View Job Matches<i class="icon icon-arrow-up-right" style="font-size:16px;"></i></button>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;">
+              <button onClick="{{ op.needs.onClick }}" style="grid-column:span 2;display:flex;align-items:center;gap:16px;text-align:left;min-height:124px;background:#FDE6AE;border:1px solid #F6D58A;border-radius:16px;padding:18px 22px;font-family:inherit;cursor:pointer;" style-hover="box-shadow:0 4px 14px rgba(0,0,0,0.07);">
+                <span style="width:64px;height:64px;border-radius:50%;background:#fff;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;color:#4A3A1A;">{{ op.needs.n }}</span>
+                <span style="display:flex;flex-direction:column;"><span style="font-size:20px;font-weight:700;color:#4A3A1A;">Applications</span><span style="font-size:17px;color:#4A3A1A;">Need Your Attention</span></span>
+              </button>
+            <button onClick="{{ op.manual.onClick }}" style="display:flex;flex-direction:column;justify-content:space-between;gap:14px;text-align:left;min-height:124px;background:#F0FCFF;border:1px solid #B8EAF5;border-radius:16px;padding:18px 20px;font-family:inherit;cursor:pointer;" style-hover="box-shadow:0 4px 14px rgba(0,0,0,0.07);">
+              <span style="display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;color:#022F36;line-height:1.25;"><i class="icon icon-clock-alert" style="font-size:22px;color:#0E93B5;flex-shrink:0;"></i>Manual Apply Required</span>
+              <span style="font-size:32px;font-weight:800;color:#022F36;line-height:1;">{{ op.manual.n }}</span>
+            </button>
+            <button onClick="{{ op.submitting.onClick }}" style="display:flex;flex-direction:column;justify-content:space-between;gap:14px;text-align:left;min-height:124px;background:#F5F6F7;border:1px solid #E5E7EB;border-radius:16px;padding:18px 20px;font-family:inherit;cursor:pointer;" style-hover="box-shadow:0 4px 14px rgba(0,0,0,0.07);">
+              <span style="display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;color:#022F36;line-height:1.25;"><i class="icon icon-hourglass" style="font-size:22px;color:#1041B7;flex-shrink:0;"></i>Submitting</span>
+              <span style="font-size:32px;font-weight:800;color:#022F36;line-height:1;">{{ op.submitting.n }}</span>
+            </button>
+            <button onClick="{{ op.submitted.onClick }}" style="display:flex;flex-direction:column;justify-content:space-between;gap:14px;text-align:left;min-height:124px;background:#F0FBF4;border:1px solid #CFEBD9;border-radius:16px;padding:18px 20px;font-family:inherit;cursor:pointer;" style-hover="box-shadow:0 4px 14px rgba(0,0,0,0.07);">
+              <span style="display:flex;align-items:center;gap:10px;font-size:16px;font-weight:600;color:#022F36;line-height:1.25;"><i class="icon icon-circle-check" style="font-size:22px;color:#00824D;flex-shrink:0;"></i>Submitted</span>
+              <span style="font-size:32px;font-weight:800;color:#022F36;line-height:1;">{{ op.submitted.n }}</span>
+            </button>
+            </div>
+          </div>
+        </div>
+
         <!-- total + Active/Closed tabs -->
         <div style="display:flex;align-items:center;gap:26px;border-bottom:1px solid #E1E6EB;margin-bottom:18px;">
           <span style="font-size:19px;font-weight:700;color:#0D0D0F;padding-bottom:12px;">{{ totalJobs }} Total Jobs</span>
@@ -3070,6 +3102,18 @@ v: (() => {
       statusOpts: this.filterOpts(['All','Needs you','In progress','Submitted'], st.fStatus, 'fStatus'),
       onClearFilters: () => this.setState({ fSearch:'', fDate:'All time', fType:'All', fStatus:'All', openFilter:null }),
       totalJobs: this.buildApps(st).all.length,
+      op: (() => {
+        const all = this.buildApps(st).all;
+        const n = (fn) => all.filter(fn).length;
+        const go = (f) => () => this.setState({ appsTab: 'active', fStatus: f, openFilter: null });
+        return {
+          streakTitle: 'No Active Streak', streakSub: 'Apply on 5 days in a row to earn +10 bonus swipes',
+          needs: { n: n(a => a.state === 'needs'), onClick: go('Needs you') },
+          manual: { n: n(a => a.state === 'manual'), onClick: go('Needs you') },
+          submitting: { n: n(a => a.state === 'applying' || a.state === 'queued'), onClick: go('In progress') },
+          submitted: { n: n(a => a.state === 'submitted'), onClick: go('Submitted') },
+        };
+      })(),
       closedCount: this.buildApps(st).all.filter(a=>a.state==='failed').length,
       isAppsActive: st.appsTab !== 'closed',
       onAppsTabActive: () => this.setState({ appsTab:'active' }),
