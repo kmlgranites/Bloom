@@ -840,6 +840,111 @@
       </div>
     </sc-if>
 
+    <!-- ============ APPLICATIONS ============ -->
+    <sc-if value="{{ isApplications }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Applications" style="max-width:1180px;margin:0 auto;padding:24px 32px 90px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <h1 style="font-size:24px;font-weight:700;color:#022F36;">Applications</h1>
+        </div>
+        <p style="font-size:15px;color:#5A6B72;margin-bottom:20px;">Your Bloom agent applies in the background — most applications are submitted within 24 hours.</p>
+
+        <!-- total + Active/Closed tabs -->
+        <div style="display:flex;align-items:center;gap:26px;border-bottom:1px solid #E1E6EB;margin-bottom:18px;">
+          <span style="font-size:19px;font-weight:700;color:#0D0D0F;padding-bottom:12px;">{{ totalJobs }} Total Jobs</span>
+          <button onClick="{{ onAppsTabActive }}" style="{{ appsTabActiveStyle }}">Active</button>
+          <button onClick="{{ onAppsTabClosed }}" style="{{ appsTabClosedStyle }}">Closed <span style="opacity:.6;">{{ closedCount }}</span></button>
+        </div>
+
+        <!-- search + filters (compact) -->
+        <sc-if value="{{ isAppsActive }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E5E7EB;border-radius:9999px;padding:8px 14px;flex:1;min-width:200px;max-width:320px;">
+            <i class="icon icon-search" style="font-size:15px;color:#7A8694;"></i>
+            <input value="{{ fSearch }}" onChange="{{ onSearch }}" placeholder="Search for Jobs or Companies" style="border:none;outline:none;background:none;font-family:inherit;font-size:14px;color:#23262E;width:100%;" />
+          </div>
+          <div style="position:relative;">
+            <button onClick="{{ onToggleDate }}" style="{{ pillDateStyle }}">{{ dateLabel }}<i class="icon icon-chevron-down" style="font-size:14px;color:#7A8694;"></i></button>
+            <sc-if value="{{ dateOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:44px;left:0;min-width:190px;background:#fff;border:1px solid #E5E7EB;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,0.14);padding:6px;z-index:55;">
+                <sc-for list="{{ dateOpts }}" as="o" hint-placeholder-count="6">
+                  <button onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:11px;width:100%;background:none;border:none;border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F5F6F7;">
+                    <span style="{{ o.radioStyle }}"><sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;border-radius:50%;background:#022F36;"></span></sc-if></span>{{ o.label }}
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+          <div style="position:relative;">
+            <button onClick="{{ onToggleType }}" style="{{ pillTypeStyle }}">{{ typeLabel }}<i class="icon icon-chevron-down" style="font-size:14px;color:#7A8694;"></i></button>
+            <sc-if value="{{ typeOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:44px;left:0;min-width:170px;background:#fff;border:1px solid #E5E7EB;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,0.14);padding:6px;z-index:55;">
+                <sc-for list="{{ typeOpts }}" as="o" hint-placeholder-count="3">
+                  <button onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:11px;width:100%;background:none;border:none;border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F5F6F7;">
+                    <span style="{{ o.radioStyle }}"><sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;border-radius:50%;background:#022F36;"></span></sc-if></span>{{ o.label }}
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+          <div style="position:relative;">
+            <button onClick="{{ onToggleStatus }}" style="{{ pillStatusStyle }}">{{ statusLabel }}<i class="icon icon-chevron-down" style="font-size:14px;color:#7A8694;"></i></button>
+            <sc-if value="{{ statusOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute;top:44px;right:0;min-width:190px;background:#fff;border:1px solid #E5E7EB;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,0.14);padding:6px;z-index:55;">
+                <sc-for list="{{ statusOpts }}" as="o" hint-placeholder-count="4">
+                  <button onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:11px;width:100%;background:none;border:none;border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F5F6F7;">
+                    <span style="{{ o.radioStyle }}"><sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;border-radius:50%;background:#022F36;"></span></sc-if></span>{{ o.label }}
+                  </button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+          <button onClick="{{ onClearFilters }}" title="Clear filters" style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:#5AC8E0;border:none;color:#fff;cursor:pointer;flex-shrink:0;" style-hover="background:#3BB5D0;"><i class="icon icon-funnel-x" style="font-size:16px;"></i></button>
+        </div>
+        </sc-if>
+
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <sc-for list="{{ appsList }}" as="a" hint-placeholder-count="5">
+            <div role="button" tabindex="0" onClick="{{ a.onOpen }}" style="display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #EDEEF0;border-radius:16px;padding:18px 22px;box-shadow:0 2px 6px rgba(0,0,0,0.04);cursor:pointer;" style-hover="border-color:#B8EAF5;box-shadow:0 4px 14px rgba(0,0,0,0.07);">
+              <div style="width:44px;height:44px;border-radius:11px;background:{{ a.logoBg }};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;flex-shrink:0;">{{ a.logoChar }}</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:16px;font-weight:700;color:#0D0D0F;">{{ a.title }}</div>
+                <div style="font-size:14px;color:#5A6B72;margin-top:2px;">{{ a.company }} · {{ a.meta }}</div>
+                <sc-if value="{{ a.hasCredit }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:13px;font-weight:600;color:{{ a.creditInk }};"><i class="{{ a.creditIcon }}" style="font-size:14px;"></i>{{ a.creditNote }}</div>
+                </sc-if>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:7px;min-width:0;">
+                <sc-if value="{{ a.isManual }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:14px;background:#F0FCFF;border:1px solid #B8EAF5;border-radius:12px;padding:9px 10px 9px 14px;">
+                    <span class="tip" style="display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:700;color:#0E93B5;white-space:nowrap;"><i class="icon icon-file-warning" style="font-size:17px;"></i>Apply directly on the company site<span class="tipbox">{{ a.tipText }}</span></span>
+                    <button style="display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #23262E;border-radius:9999px;padding:9px 18px;font-family:inherit;font-size:14px;font-weight:700;color:#0D0D0F;cursor:pointer;white-space:nowrap;" style-hover="background:#F5F6F7;">Apply on your own<i class="icon icon-arrow-up-right" style="font-size:15px;"></i></button>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ a.notManual }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <sc-if value="{{ a.isNeeds }}" hint-placeholder-val="{{ false }}">
+                    <button style="display:flex;align-items:center;gap:7px;background:#1D484F;border:none;border-radius:9999px;padding:8px 16px;font-family:inherit;font-size:13px;font-weight:700;color:#fff;cursor:pointer;" style-hover="background:#022F36;">Add info<i class="icon icon-arrow-right" style="font-size:14px;"></i></button>
+                  </sc-if>
+                  <span class="tip" style="{{ a.badgeStyle }}"><span style="{{ a.dotStyle }}"></span>{{ a.badgeLabel }}<i class="icon icon-info" style="font-size:13px;opacity:0.55;"></i><span class="tipbox">{{ a.tipText }}</span></span>
+                </div>
+                </sc-if>
+                <sc-if value="{{ a.isApplying }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:7px;font-size:13px;color:#0C5A5A;max-width:340px;">
+                    <span style="width:6px;height:6px;border-radius:50%;background:#5AEBEB;flex-shrink:0;"></span>
+                    <span style="font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.tickText }}…</span>
+                    
+                  </div>
+                </sc-if>
+                <sc-if value="{{ a.hasSub }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:13px;color:{{ a.subColor }};max-width:340px;text-align:right;">{{ a.subText }}</div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
     <!-- ============ PLAN & BILLING ============ -->
     <sc-if value="{{ isPlan }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Plan & Billing" style="max-width:960px;margin:0 auto;padding:32px 24px 90px;display:flex;flex-direction:column;gap:22px;">
