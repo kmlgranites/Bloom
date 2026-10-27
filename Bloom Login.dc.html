@@ -98,7 +98,7 @@
     <sc-if value="{{ isPrefs }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Onboarding · Job Preference" style="width:100%;max-width:820px;margin:0 auto;">
         <!-- stepper -->
-        <div style="display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:44px;">
+        <div style="position:sticky;top:-48px;z-index:6;background:#FFFFFF;display:flex;align-items:center;justify-content:center;gap:0;margin:-48px 0 28px;padding:24px 0 16px;border-bottom:1px solid #EDEEF0;">
           <div style="display:flex;align-items:center;gap:10px;background:#1D484F;border-radius:9999px;padding:7px 18px 7px 7px;">
             <span style="width:30px;height:30px;border-radius:50%;background:#FFFFFF;color:#1D484F;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;">1</span>
             <span style="font-size:17px;font-weight:600;color:#FFFFFF;">Job Preference</span>
@@ -114,10 +114,55 @@
 
         <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;">Job Function (select from drop-down for best results) <span style="color:#E5484D;">*</span></label>
         <div style="position:relative;margin-bottom:26px;">
-          <select value="{{ obFunc }}" onChange="{{ onObFunc }}" style="width:100%;appearance:none;-webkit-appearance:none;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:6px;height:48px;padding:0 44px 0 16px;font-family:inherit;font-size:16px;color:#23262E;cursor:pointer;" style-focus="outline:none;border-color:#1D484F;">
-            <sc-for list="{{ obFuncOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o }}">{{ o }}</option></sc-for>
-          </select>
-          <i class="icon icon-chevron-down" style="position:absolute;right:16px;top:15px;font-size:18px;color:#4A5464;pointer-events:none;"></i>
+          <button onClick="{{ onFuncToggle }}" aria-expanded="{{ funcOpen }}" aria-haspopup="listbox" style="{{ funcBoxStyle }}"><span>{{ obFunc }}</span><i class="{{ funcChevron }}" style="font-size:18px;color:#4A5464;"></i></button>
+          <sc-if value="{{ funcOpen }}" hint-placeholder-val="{{ false }}">
+            <div role="listbox" style="position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:31;background:#fff;border:1px solid #CBD3E4;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,0.14);padding:6px;">
+              <sc-for list="{{ funcItems }}" as="f" hint-placeholder-count="6">
+                <button onClick="{{ f.onClick }}" role="option" aria-selected="{{ f.on }}" aria-disabled="{{ f.off }}" style="{{ f.style }}"><span style="flex:1;">{{ f.name }}</span><sc-if value="{{ f.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:17px;color:#022F36;"></i></sc-if><sc-if value="{{ f.off }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px;font-weight:700;color:#4A5464;background:#F1F3F5;border-radius:9999px;padding:3px 10px;">Coming soon</span></sc-if></button>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+        <div style="font-size:13px;color:#4A5464;margin:-18px 0 24px;">Bloom covers Software Engineering today. More job functions are coming soon.
+        </div>
+
+        <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;">Job Titles <span style="font-weight:500;color:#4A5464;">(pick all that count)</span> <span style="color:#E5484D;">*</span></label>
+        <div style="position:relative;margin-bottom:26px;">
+          <button onClick="{{ onTitlesToggle }}" aria-expanded="{{ titlesOpen }}" aria-haspopup="listbox" style="{{ titlesBoxStyle }}">
+            <span style="flex:1;min-width:0;display:flex;flex-wrap:wrap;gap:8px;">
+              <sc-for list="{{ titleChips }}" as="c" hint-placeholder-count="1">
+                <span style="display:inline-flex;align-items:center;gap:6px;background:#E3F7EC;color:#00824D;border-radius:8px;padding:6px 8px 6px 12px;font-size:15px;font-weight:600;">{{ c.name }}<span onClick="{{ c.onRemove }}" role="button" aria-label="Remove" style="display:flex;align-items:center;cursor:pointer;"><i class="icon icon-x" style="font-size:14px;"></i></span></span>
+              </sc-for>
+              <sc-if value="{{ titlesEmpty }}" hint-placeholder-val="{{ false }}"><span style="font-size:16px;color:#7A8694;line-height:32px;">Choose job titles</span></sc-if>
+            </span>
+            <i class="{{ titlesChevron }}" style="font-size:18px;color:#4A5464;flex-shrink:0;"></i>
+          </button>
+          <sc-if value="{{ titlesOpen }}" hint-placeholder-val="{{ false }}">
+            <div role="listbox" aria-multiselectable="true" style="position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:30;background:#fff;border:1px solid #CBD3E4;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,0.14);overflow:hidden;">
+              <div style="position:relative;padding:10px 10px 6px;border-bottom:1px solid #EDEEF0;">
+                <i class="icon icon-search" style="position:absolute;left:24px;top:23px;font-size:17px;color:#4A5464;pointer-events:none;"></i>
+                <input type="text" value="{{ titleQ }}" onChange="{{ onTitleQ }}" autofocus="{{ true }}" placeholder="Search job titles" aria-label="Search job titles" style="width:100%;box-sizing:border-box;background:#F5F6F7;border:1px solid #E5E7EB;border-radius:8px;height:42px;padding:0 36px 0 40px;font-family:inherit;font-size:15px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;background:#fff;">
+                <sc-if value="{{ titleHasQ }}" hint-placeholder-val="{{ false }}">
+                  <button onClick="{{ onTitleQClear }}" aria-label="Clear search" style="position:absolute;right:18px;top:19px;width:26px;height:26px;border-radius:50%;border:none;background:#E5E7EB;color:#4A5464;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="icon icon-x" style="font-size:13px;"></i></button>
+                </sc-if>
+              </div>
+              <div style="max-height:300px;overflow-y:auto;padding:6px;">
+                <sc-if value="{{ titleNoResults }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:16px 10px;font-size:14px;color:#4A5464;">No titles match “{{ titleQ }}”. Try a broader word like “Engineer”.</div>
+                </sc-if>
+                <sc-for list="{{ titleGroups }}" as="g" hint-placeholder-count="2">
+                  <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">{{ g.name }}</div>
+                  <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="5">
+                    <button onClick="{{ it.onClick }}" role="option" aria-selected="{{ it.on }}" style="width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;border-radius:8px;padding:10px;font-family:inherit;font-size:16px;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F0FCFF;"><span style="{{ it.box }}"><sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:13px;color:#fff;"></i></sc-if></span>{{ it.name }}</button>
+                  </sc-for>
+                </sc-for>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;border-top:1px solid #EDEEF0;padding:10px 12px;">
+                <span style="font-size:13px;color:#4A5464;">{{ titlesCount }}</span>
+                <button onClick="{{ onTitlesToggle }}" style="background:#022F36;border:none;border-radius:9999px;padding:8px 20px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;">Done</button>
+              </div>
+            </div>
+          </sc-if>
         </div>
 
         <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:10px;"><span style="color:#E5484D;">*</span> Job Type (select all that apply)</label>
@@ -174,7 +219,7 @@
                       </sc-for>
                     </sc-if>
                     <sc-if value="{{ obNHasCityResults }}" hint-placeholder-val="{{ true }}">
-                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">Cities</div>
+                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">{{ obNCityHead }}</div>
                       <sc-for list="{{ obNCityResults }}" as="it" hint-placeholder-count="4">
                         <button onMouseDown="{{ it.onPick }}" role="option" aria-selected="{{ it.on }}" style="width:100%;display:flex;align-items:center;gap:10px;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;{{ it.rowBg }}" style-hover="background:#F0FCFF;"><span style="{{ it.box }}"><sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:13px;color:#fff;"></i></sc-if></span><span>{{ it.name }}</span><span style="color:#4A5464;">{{ it.sub }}</span></button>
                       </sc-for>
@@ -232,7 +277,7 @@
           </sc-for>
         </div>
 
-        <div style="display:flex;justify-content:center;padding-bottom:16px;">
+        <div style="position:sticky;bottom:-48px;z-index:6;background:#FFFFFF;border-top:1px solid #EDEEF0;display:flex;justify-content:center;margin:0 0 -48px;padding:16px 0 24px;">
           <button onClick="{{ onObNext }}" style="background:#022F36;border:none;border-radius:9999px;height:56px;padding:0 64px;font-family:inherit;font-size:19px;font-weight:600;color:#FFFFFF;cursor:pointer;" style-hover="background:#1D484F;">Next</button>
         </div>
       </div>
@@ -333,8 +378,19 @@
 const US_STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
 const CITIES = {"Alabama":["Birmingham","Huntsville","Montgomery","Mobile"],"Alaska":["Anchorage","Fairbanks","Juneau"],"Arizona":["Phoenix","Tucson","Scottsdale","Tempe","Mesa"],"Arkansas":["Little Rock","Fayetteville","Bentonville"],"California":["San Francisco","Los Angeles","San Jose","San Diego","Palo Alto","Mountain View","Sunnyvale","Oakland","Irvine","Sacramento"],"Colorado":["Denver","Boulder","Colorado Springs","Fort Collins"],"Connecticut":["Hartford","Stamford","New Haven"],"Delaware":["Wilmington","Dover"],"Florida":["Miami","Tampa","Orlando","Jacksonville","Fort Lauderdale"],"Georgia":["Atlanta","Alpharetta","Savannah","Augusta"],"Hawaii":["Honolulu"],"Idaho":["Boise","Idaho Falls"],"Illinois":["Chicago","Naperville","Evanston","Champaign"],"Indiana":["Indianapolis","Fort Wayne","Bloomington"],"Iowa":["Des Moines","Cedar Rapids","Iowa City"],"Kansas":["Wichita","Overland Park","Kansas City"],"Kentucky":["Louisville","Lexington"],"Louisiana":["New Orleans","Baton Rouge"],"Maine":["Portland","Bangor"],"Maryland":["Baltimore","Bethesda","Rockville","Columbia"],"Massachusetts":["Boston","Cambridge","Somerville","Waltham","Worcester"],"Michigan":["Detroit","Ann Arbor","Grand Rapids"],"Minnesota":["Minneapolis","St. Paul","Rochester"],"Mississippi":["Jackson","Gulfport"],"Missouri":["St. Louis","Kansas City","Springfield"],"Montana":["Bozeman","Missoula","Billings"],"Nebraska":["Omaha","Lincoln"],"Nevada":["Las Vegas","Reno","Henderson"],"New Hampshire":["Manchester","Nashua","Portsmouth"],"New Jersey":["Jersey City","Newark","Princeton","Hoboken"],"New Mexico":["Albuquerque","Santa Fe"],"New York":["New York City","Brooklyn","Buffalo","Rochester","Albany"],"North Carolina":["Raleigh","Charlotte","Durham","Chapel Hill"],"North Dakota":["Fargo","Bismarck"],"Ohio":["Columbus","Cleveland","Cincinnati","Dayton"],"Oklahoma":["Oklahoma City","Tulsa"],"Oregon":["Portland","Beaverton","Eugene","Bend"],"Pennsylvania":["Philadelphia","Pittsburgh","Harrisburg"],"Rhode Island":["Providence"],"South Carolina":["Charleston","Greenville","Columbia"],"South Dakota":["Sioux Falls","Rapid City"],"Tennessee":["Nashville","Memphis","Knoxville","Chattanooga"],"Texas":["Austin","Dallas","Houston","San Antonio","Plano","Fort Worth"],"Utah":["Salt Lake City","Lehi","Provo"],"Vermont":["Burlington"],"Virginia":["Arlington","Richmond","Reston","McLean","Virginia Beach"],"Washington":["Seattle","Bellevue","Redmond","Tacoma","Spokane"],"West Virginia":["Charleston","Morgantown"],"Wisconsin":["Milwaukee","Madison","Green Bay"],"Wyoming":["Cheyenne","Jackson"],"Alberta":["Calgary","Edmonton"],"British Columbia":["Vancouver","Victoria","Burnaby","Surrey"],"Manitoba":["Winnipeg"],"New Brunswick":["Moncton","Fredericton","Saint John"],"Newfoundland and Labrador":["St. John's"],"Nova Scotia":["Halifax"],"Ontario":["Toronto","Ottawa","Waterloo","Mississauga","Hamilton","London"],"Prince Edward Island":["Charlottetown"],"Quebec":["Montreal","Quebec City","Laval"],"Saskatchewan":["Saskatoon","Regina"],"Northwest Territories":["Yellowknife"],"Nunavut":["Iqaluit"],"Yukon":["Whitehorse"]};
 const CA_PROVINCES = ["Alberta","British Columbia","Manitoba","New Brunswick","Newfoundland and Labrador","Nova Scotia","Ontario","Prince Edward Island","Quebec","Saskatchewan","Northwest Territories","Nunavut","Yukon"];
+const TITLES = {
+  'Software Engineering': [
+    { name: 'General', items: ['Software Engineer','Software Developer','Software Engineering Intern','Junior Software Engineer','Entry Level Software Engineer','New Grad Software Engineer'] },
+    { name: 'Specialty', items: ['Backend Engineer','Frontend Engineer','Full Stack Engineer','Mobile Engineer (iOS / Android)','Machine Learning Engineer','AI Engineer','Data Engineer','DevOps / Cloud Engineer','Site Reliability Engineer','QA / Test Engineer','Security Engineer','Embedded Systems Engineer'] },
+  ],
+  'Data Science': [{ name: 'Titles', items: ['Data Scientist','Data Analyst','Machine Learning Scientist','Analytics Engineer','Business Intelligence Analyst'] }],
+  'Product Management': [{ name: 'Titles', items: ['Product Manager','Associate Product Manager','Technical Product Manager','Product Owner'] }],
+  'Design': [{ name: 'Titles', items: ['Product Designer','UX Designer','UI Designer','UX Researcher'] }],
+  'DevOps / Cloud': [{ name: 'Titles', items: ['DevOps Engineer','Cloud Engineer','Platform Engineer','Site Reliability Engineer'] }],
+  'QA / Testing': [{ name: 'Titles', items: ['QA Engineer','Test Automation Engineer','SDET','Manual QA Tester'] }],
+};
 class Component extends DCLogic {
-  state = { stage: 'signin', file: null, fileErr: '', dragOver: false, obFunc: 'Software Engineering', obLoc: 'United States',
+  state = { stage: 'signin', file: null, fileErr: '', dragOver: false, obFunc: 'Software Engineering', obTitles: ['Software Engineer'], titlesOpen: false, obLoc: 'United States',
     obTypes: { full: true, part: false, intern: false },
     obModes: { remote: true, hybrid: true, onsite: false },
     obNear: { mode: 'specific', states: [], cities: ['Austin|Texas'], detected: true, q: '', ro: false, note: '' },
@@ -445,8 +501,8 @@ v: (() => {
             const dropped = (loc.cities || []).filter(k => k.split('|')[1] === st).map(k => k.split('|')[0]);
             set({ states: [...(loc.states || []).filter(x => x !== st), st], cities: (loc.cities || []).filter(k => k.split('|')[1] !== st), q: '', ro: true, detected: false,
               note: dropped.length ? (st + ' already includes ' + dropped.join(' and ') + ', so we merged them.') : '' }); };
-          const cityRes = []; allowed.forEach(st => (CITIES[st] || []).forEach(c => { if (!sts.includes(st) && (!q || c.toLowerCase().includes(q) || st.toLowerCase().includes(q))) { const inc = false; const on = inc || cts.includes(ckey(c, st));
-            cityRes.push({ name: c, sub: inc ? ('Included in All of ' + st) : st, on, onPick: inc ? ((e) => { if (e && e.preventDefault) e.preventDefault(); }) : pickCity(c, st),
+          const cityRes = []; allowed.forEach(st => (CITIES[st] || []).forEach((c, ci) => { if (!sts.includes(st) && (q.length < 2 ? (st === 'Texas' && ci < 4) : c.toLowerCase().includes(q))) { const inc = false; const on = inc || cts.includes(ckey(c, st));
+            cityRes.push({ name: c, sub: st + (groups.length > 1 ? (US_STATES.includes(st) ? ' · US' : ' · Canada') : ''), starts: c.toLowerCase().startsWith(q), on, onPick: inc ? ((e) => { if (e && e.preventDefault) e.preventDefault(); }) : pickCity(c, st),
               rowBg: (on ? 'background:#F0FCFF;' : 'background:none;') + (inc ? 'opacity:0.6;cursor:default;' : ''),
               box: `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on ? '#1D484F' : '#fff'};border:1.5px solid ${on ? '#1D484F' : '#A9B3B9'};` }); }  }));
           const stateRes = allowed.filter(st => (q ? st.toLowerCase().includes(q) : false)).slice(0, 8).map(st => { const on = sts.includes(st); return { name: st, on, onPick: pickState(st), incNote: 'Every city in ' + st + ' is included',
@@ -454,8 +510,8 @@ v: (() => {
             box: `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on ? '#1D484F' : '#fff'};border:1.5px solid ${on ? '#1D484F' : '#A9B3B9'};` }; });
           const chips = [...cts.map(k => { const [c, st] = k.split('|'); return { name: c + ', ' + st, onRemove: () => set({ cities: loc.cities.filter(x => x !== k), detected: false, note: '' }) }; }),
                          ...sts.map(st => ({ name: 'All of ' + st, onRemove: () => set({ states: loc.states.filter(x => x !== st), note: '' }) }))];
-          const cr = cityRes.slice(0, 60);
-          return { ResultsOpen: !!loc.ro && (cr.length + stateRes.length > 0 || q.length > 0), CityResults: cr, StateResults: stateRes,
+          const cr = cityRes.sort((x, y) => (y.starts - x.starts) || x.name.localeCompare(y.name)).slice(0, q.length < 2 ? 4 : 8);
+          return { ResultsOpen: !!loc.ro && (cr.length + stateRes.length > 0 || q.length > 0), CityHead: q.length < 2 ? 'Near you' : 'Cities', CityResults: cr, StateResults: stateRes,
             HasCityResults: cr.length > 0, HasStateResults: stateRes.length > 0, NoResults: q.length > 0 && cr.length + stateRes.length === 0,
             Chips: chips, HasChips: chips.length > 0, DoneLabel: chips.length ? ('Done · ' + chips.length + ' selected') : 'Done', HasNote: !!loc.note, Note: loc.note || '',
             Detected2: !!loc.detected && cts.length > 0, DetectedText2: 'Detected ' + (cts[0] ? cts[0].split('|')[0] : '') + ' from your network, so you see local jobs first' };
@@ -499,7 +555,37 @@ v: (() => {
     return {
       obFunc: st.obFunc, obLoc: st.obLoc,
       obFuncOpts: ['Software Engineering', 'Data Science', 'Product Management', 'Design', 'DevOps / Cloud', 'QA / Testing'],
-      onObFunc: (e) => this.setState({ obFunc: e.target.value }),
+      funcOpen: !!st.funcOpen,
+      onFuncToggle: () => this.setState(s => ({ funcOpen: !s.funcOpen, titlesOpen: false })),
+      funcChevron: st.funcOpen ? 'icon icon-chevron-up' : 'icon icon-chevron-down',
+      funcBoxStyle: `width:100%;display:flex;align-items:center;justify-content:space-between;background:#FFFFFF;border:1px solid ${st.funcOpen ? '#022F36' : '#D5DBDF'};border-radius:6px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#23262E;cursor:pointer;text-align:left;`,
+      funcItems: ['Software Engineering','Data Science','Product Management','Design','DevOps / Cloud','QA / Testing'].map(n => { const off = n !== 'Software Engineering', on = n === st.obFunc;
+        return { name: n, on, off, onClick: () => { if (!off) this.setState({ funcOpen: false }); },
+          style: `width:100%;display:flex;align-items:center;gap:10px;background:${on ? '#F0FCFF' : 'none'};border:none;border-radius:8px;padding:10px 12px;font-family:inherit;font-size:16px;color:${off ? '#7A8694' : '#23262E'};cursor:${off ? 'not-allowed' : 'pointer'};text-align:left;` }; }),
+      onObFunc: (e) => { const f = e.target.value; const t = TITLES[f]; this.setState({ obFunc: f, obTitles: t ? [t[0].items[0]] : [], titlesOpen: false }); },
+      ...(() => {
+        const groups = TITLES[st.obFunc] || [];
+        const sel = st.obTitles;
+        const toggle = (n) => this.setState(s => ({ obTitles: s.obTitles.includes(n) ? s.obTitles.filter(x => x !== n) : [...s.obTitles, n] }));
+        const box = (on) => `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on ? '#022F36' : '#fff'};border:1.5px solid ${on ? '#022F36' : '#A9B3B9'};`;
+        return {
+          titlesOpen: !!st.titlesOpen,
+          onTitlesToggle: () => this.setState(s => ({ titlesOpen: !s.titlesOpen, funcOpen: false, titleQ: '' })),
+          titlesBoxStyle: `width:100%;display:flex;align-items:center;gap:12px;background:#FFFFFF;border:1px solid ${st.titlesOpen ? '#022F36' : '#D5DBDF'};border-radius:6px;min-height:48px;padding:7px 16px 7px 8px;font-family:inherit;cursor:pointer;text-align:left;`,
+          titlesChevron: st.titlesOpen ? 'icon icon-chevron-up' : 'icon icon-chevron-down',
+          titleChips: sel.map(n => ({ name: n, onRemove: (e) => { e.stopPropagation(); toggle(n); } })),
+          titlesEmpty: sel.length === 0,
+          titlesCount: sel.length + ' selected',
+          ...(() => {
+            const q = (st.titleQ || '').trim().toLowerCase();
+            const fg = groups.map(g => ({ name: g.name, items: g.items.filter(n => !q || n.toLowerCase().includes(q) || g.name.toLowerCase().includes(q)) }))
+              .filter(g => g.items.length)
+              .map(g => ({ name: g.name, items: g.items.map(n => ({ name: n, on: sel.includes(n), onClick: () => toggle(n), box: box(sel.includes(n)) })) }));
+            return { titleGroups: fg, titleQ: st.titleQ || '', titleHasQ: !!q, titleNoResults: !!q && fg.length === 0,
+              onTitleQ: (e) => this.setState({ titleQ: e.target.value }), onTitleQClear: () => this.setState({ titleQ: '' }) };
+          })(),
+        };
+      })(),
       onObLoc: (e) => this.setState({ obLoc: e.target.value }),
       obTypes: group('obTypes', [['full','Full Time'],['part','Part Time'],['intern','Internship']]),
       obModes: group('obModes', [['remote','Remote'],['hybrid','Hybrid'],['onsite','On-site']]),
