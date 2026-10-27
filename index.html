@@ -74,7 +74,7 @@
 <div style="height:100vh;width:100%;display:flex;flex-direction:column;font-family:'Proxima Soft',system-ui,sans-serif;background:#EEF4FA;overflow:hidden;color:#23262E;">
 
   <!-- ===== HEADER ===== -->
-  <header class="app-header" style="flex-shrink:0;background:#FFFFFF;border-bottom:1px solid #ECECEC;height:76px;display:flex;align-items:center;gap:18px;padding:0 26px;z-index:30;">
+  <header class="app-header" style="flex-shrink:0;background:#FFFFFF;border-bottom:1px solid #ECECEC;height:76px;display:flex;align-items:center;gap:18px;padding:0 26px;position:relative;z-index:60;">
     <img src="assets/bloom-logo.svg" alt="Bloom" style="height:32px;flex-shrink:0;">
 
     <nav style="display:flex;align-items:stretch;height:100%;gap:2px;margin-left:6px;">
@@ -89,21 +89,23 @@
     <div style="flex:1;display:flex;justify-content:flex-end;align-items:center;gap:12px;">
       <sc-if value="{{ promoShow }}" hint-placeholder-val="{{ true }}">
         <div class="promo-pill" style="display:flex;align-items:center;gap:11px;border:1px solid #ECECEC;border-radius:9999px;padding:6px 7px 6px 16px;">
-          <span style="font-size:14px;color:#23262E;white-space:nowrap;"><i class="icon icon-sparkles" style="font-size:12px;color:#F76638;margin-right:5px;"></i>Get <b>100+</b> Job Auto Applies at <b>Just $29</b></span>
+          <span style="font-size:14px;color:#23262E;white-space:nowrap;"><i class="icon icon-sparkles" style="font-size:12px;color:#F76638;margin-right:5px;"></i>Get <b>100+</b> Job Auto Applies at <b>Just $19</b></span>
           <button onClick="{{ onUpgrade }}" style="border:double 2px transparent;border-radius:9999px;background-image:linear-gradient(#fff,#fff),linear-gradient(95deg,#5AEBEB,#7C8BFF,#F76638);background-origin:border-box;background-clip:padding-box,border-box;padding:6px 15px;font-family:inherit;font-size:14px;font-weight:700;color:#022F36;cursor:pointer;white-space:nowrap;">Upgrade Now</button>
         </div>
       </sc-if>
 
-      <button onClick="{{ goBilling }}" title="Manage subscription" style="{{ headerBadgeStyle }}">
-        <i class="{{ sc.headerBadge.icon }}" style="font-size:13px;"></i>
-        <span>{{ sc.headerBadge.label }}</span>
-      </button>
+      <sc-if value="{{ showPlanBadge }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ goBilling }}" title="Plan &amp; Billing" style="{{ headerBadgeStyle }}">
+          <i class="{{ sc.headerBadge.icon }}" style="font-size:13px;"></i>
+          <span>{{ sc.headerBadge.label }}</span>
+        </button>
+      </sc-if>
 
       <div style="position:relative;" onMouseEnter="{{ onCreditsEnter }}" onMouseLeave="{{ onCreditsLeave }}">
-        <div style="display:flex;align-items:center;gap:7px;border:1px solid #ECECEC;border-radius:9999px;padding:5px 7px 5px 14px;cursor:default;">
+        <div onClick="{{ goCredits }}" role="button" style="display:flex;align-items:center;gap:7px;border:1px solid #ECECEC;border-radius:9999px;padding:5px 7px 5px 14px;cursor:pointer;">
           <i class="icon icon-sparkles" style="font-size:13px;color:#022F36;"></i>
           <span class="credits-label" style="font-size:14px;font-weight:600;color:#23262E;white-space:nowrap;">Apply Credits</span>
-          <span style="background:#E0FAFA;color:#022F36;font-weight:700;border-radius:9999px;padding:4px 12px;font-size:13px;">{{ sc.credits }}</span>
+          <span style="background:#E0FAFA;color:#022F36;font-weight:700;border-radius:9999px;padding:4px 12px;font-size:13px;white-space:nowrap;">{{ credInfo.badgeText }}</span>
         </div>
 
         <sc-if value="{{ creditsHover }}" hint-placeholder-val="{{ false }}">
@@ -124,9 +126,13 @@
             </div>
             <div style="height:8px;border-radius:9999px;background:#EDF0F2;overflow:hidden;margin-bottom:8px;"><div style="{{ credInfo.barStyle }}"></div></div>
             <div style="font-size:13px;color:#7A8694;">{{ credInfo.contextLine }}</div>
+            <sc-if value="{{ credInfo.hasHold }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:13px;font-weight:600;color:#92400E;"><i class="icon icon-clock" style="font-size:14px;"></i>{{ credInfo.holdLine }}</div>
+            </sc-if>
 
+            <div style="font-size:13px;color:#4A5464;margin-top:8px;">{{ ddReset }}</div>
             <!-- upgrade nudge (free plan) -->
-            <sc-if value="{{ credInfo.showUpgrade }}" hint-placeholder-val="{{ false }}">
+            <sc-if value="{{ ddFreeUp }}" hint-placeholder-val="{{ false }}">
               <div style="{{ credUpgradeBox }}">
                 <div style="font-size:14px;font-weight:700;color:#0D0D0F;margin-bottom:2px;">{{ credInfo.upgradeTitle }}</div>
                 <div style="font-size:13px;color:#4A5464;margin-bottom:11px;">{{ credInfo.upgradeSub }}</div>
@@ -134,32 +140,18 @@
               </div>
             </sc-if>
 
-            <div style="height:1px;background:#EDEEF0;margin:15px 0;"></div>
-
-            <!-- ZONE 2 · APPLICATIONS (all time) -->
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-              <span style="font-size:15px;font-weight:700;color:#0D0D0F;">Your Applications</span>
-              <span style="font-size:15px;font-weight:700;color:#0D0D0F;">{{ credInfo.allTime }}</span>
-            </div>
-            <div style="font-size:12px;font-weight:600;color:#7A8694;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:12px;">All time · across every plan</div>
-            <div style="display:flex;gap:10px;">
-              <div style="flex:1;display:flex;align-items:center;gap:9px;background:#F5F8FA;border:1px solid #ECEEF0;border-radius:12px;padding:11px 13px;">
-                <span style="width:10px;height:10px;border-radius:3px;background:#1D484F;flex-shrink:0;"></span>
-                <div><div style="font-size:20px;font-weight:700;color:#0D0D0F;line-height:1;">{{ credInfo.inProgress }}</div><div style="font-size:12.5px;color:#4A5464;margin-top:3px;">In Progress</div></div>
+            <sc-if value="{{ ddStarterLow }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:14px;background:#FFF4EF;border:1px solid #F9D9CB;border-radius:12px;padding:12px 14px;">
+                <div style="font-size:14px;font-weight:700;color:#0D0D0F;margin-bottom:2px;">Running low</div>
+                <div style="font-size:13px;color:#4A5464;margin-bottom:10px;">Get 900 swipes with Quarterly.</div>
+                <button onClick="{{ onOpenUpgrade }}" style="width:100%;background:#022F36;border:none;border-radius:9999px;height:38px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;">Switch to Quarterly</button>
               </div>
-              <div style="flex:1;display:flex;align-items:center;gap:9px;background:#F1FBF4;border:1px solid #CFEBD9;border-radius:12px;padding:11px 13px;">
-                <span style="width:10px;height:10px;border-radius:3px;background:#00B16B;flex-shrink:0;"></span>
-                <div><div style="font-size:20px;font-weight:700;color:#00824D;line-height:1;">{{ credInfo.completed }}</div><div style="font-size:12.5px;color:#4A5464;margin-top:3px;">Completed</div></div>
-              </div>
-            </div>
-            <div style="display:flex;align-items:center;gap:7px;margin-top:11px;font-size:13px;color:#4A5464;">
-              <i class="icon icon-layers" style="font-size:14px;color:#7A8694;"></i>{{ credInfo.breakdown }}
-            </div>
-
-            <!-- bridge explainer -->
-            <div style="display:flex;align-items:flex-start;gap:8px;background:#F5F8FA;border-radius:10px;padding:10px 12px;margin-top:14px;">
-              <i class="icon icon-info" style="font-size:15px;color:#7A8694;flex-shrink:0;margin-top:1px;"></i>
-              <span style="font-size:12.5px;line-height:1.5;color:#4A5464;">Credits are your allowance for the current cycle and reset each period. Applications are every job you've ever applied to — across all plans and past cycles — so this total keeps growing and can be higher than your credits.</span>
+            </sc-if>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:13px;border-top:1px solid #EDEEF0;">
+              <button onClick="{{ goCredits }}" style="display:flex;align-items:center;gap:6px;border:none;background:none;padding:0;font-family:inherit;font-size:14px;font-weight:700;color:#1D484F;cursor:pointer;">View details<i class="icon icon-arrow-right" style="font-size:15px;"></i></button>
+              <sc-if value="{{ ddStarterLink }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ onOpenUpgrade }}" style="display:flex;align-items:center;gap:5px;border:none;background:none;padding:0;font-family:inherit;font-size:14px;font-weight:700;color:#C2410C;cursor:pointer;"><i class="icon icon-crown" style="font-size:14px;"></i>Upgrade</button>
+              </sc-if>
             </div>
           </div>
         </sc-if>
@@ -241,7 +233,12 @@
             <div class="card-actions" style="display:flex;align-items:center;gap:12px;">
               <button onClick="{{ onNotInterested }}" style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E5E7EB;border-radius:9999px;padding:10px 18px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;"><i class="icon icon-x" style="font-size:17px;"></i>Pass</button>
               <button onClick="{{ onSave }}" style="{{ saveBtnStyle }}"><i class="{{ saveBtnIcon }}" style="font-size:16px;"></i>{{ saveBtnLabel }}</button>
-              <button onClick="{{ onApply }}" class="apply-btn" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;border:2px solid #0D0D0F;border-radius:9999px;padding:9px 22px;font-family:inherit;font-size:15px;font-weight:700;color:#0D0D0F;cursor:pointer;box-shadow:0 2px 0 #0D0D0F;"><i class="icon icon-badge-check" style="font-size:17px;color:#F76638;"></i>APPLY NOW</button>
+              <sc-if value="{{ alreadyApplied }}" hint-placeholder-val="{{ false }}">
+                <button onClick="{{ goApps }}" class="apply-btn" title="You’ve already applied. No credit used again." style="display:flex;align-items:center;justify-content:center;gap:8px;background:#E3F7EC;border:2px solid #CFEBD9;border-radius:9999px;padding:9px 22px;font-family:inherit;font-size:15px;font-weight:700;color:#00824D;cursor:pointer;"><i class="icon icon-circle-check" style="font-size:17px;"></i>Applied · View status</button>
+              </sc-if>
+              <sc-if value="{{ canApply }}" hint-placeholder-val="{{ true }}">
+                <button onClick="{{ onApply }}" class="apply-btn" style="display:flex;align-items:center;justify-content:center;gap:8px;background:#fff;border:2px solid #0D0D0F;border-radius:9999px;padding:9px 22px;font-family:inherit;font-size:15px;font-weight:700;color:#0D0D0F;cursor:pointer;box-shadow:0 2px 0 #0D0D0F;"><i class="icon icon-badge-check" style="font-size:17px;color:#F76638;"></i>APPLY NOW</button>
+              </sc-if>
             </div>
           </sc-if>
         </div>
@@ -774,104 +771,132 @@
         </sc-if>
       </div>
     </sc-if>
-    <sc-if value="{{ isApplications }}" hint-placeholder-val="{{ false }}">
-      <div data-screen-label="Applications" style="max-width:1180px;margin:0 auto;padding:24px 32px 90px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-          <h1 style="font-size:24px;font-weight:700;color:#022F36;">Applications</h1>
-        </div>
-        <p style="font-size:15px;color:#5A6B72;margin-bottom:20px;">Your Bloom agent applies in the background — most applications are submitted within 24 hours.</p>
-
-        <!-- total + Active/Closed tabs -->
-        <div style="display:flex;align-items:center;gap:26px;border-bottom:1px solid #E1E6EB;margin-bottom:18px;">
-          <span style="font-size:19px;font-weight:700;color:#0D0D0F;padding-bottom:12px;">{{ totalJobs }} Total Jobs</span>
-          <button onClick="{{ onAppsTabActive }}" style="{{ appsTabActiveStyle }}">Active</button>
-          <button onClick="{{ onAppsTabClosed }}" style="{{ appsTabClosedStyle }}">Closed <span style="opacity:.6;">{{ closedCount }}</span></button>
+    <sc-if value="{{ isCredits }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Apply Credits" style="max-width:900px;margin:0 auto;padding:32px 24px 90px;display:flex;flex-direction:column;gap:20px;">
+        <div>
+          <button onClick="{{ goJobs }}" style="display:flex;align-items:center;gap:7px;background:none;border:none;padding:0;margin-bottom:14px;font-family:inherit;font-size:14px;font-weight:700;color:#1D484F;cursor:pointer;"><i class="icon icon-arrow-left" style="font-size:16px;"></i>Back to jobs</button>
+          <h1 style="font-size:28px;font-weight:700;color:#022F36;letter-spacing:-0.02em;">Apply credits</h1>
         </div>
 
-        <!-- search + filters (compact) -->
-        <sc-if value="{{ isAppsActive }}" hint-placeholder-val="{{ true }}">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
-          <div style="display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #E5E7EB;border-radius:9999px;padding:8px 14px;flex:1;min-width:200px;max-width:320px;">
-            <i class="icon icon-search" style="font-size:15px;color:#7A8694;"></i>
-            <input value="{{ fSearch }}" onChange="{{ onSearch }}" placeholder="Search for Jobs or Companies" style="border:none;outline:none;background:none;font-family:inherit;font-size:14px;color:#23262E;width:100%;" />
+        <div style="background:#fff;border:1px solid #EDEEF0;border-radius:18px;padding:26px 28px;display:flex;gap:30px;align-items:center;flex-wrap:wrap;">
+          <div style="{{ cr.ringStyle }}">
+            <div style="width:124px;height:124px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+              <span style="font-size:34px;font-weight:800;color:#022F36;line-height:1;">{{ cr.left }}</span>
+              <span style="font-size:13px;font-weight:600;color:#4A5464;margin-top:4px;">left</span>
+            </div>
           </div>
-          <div style="position:relative;">
-            <button onClick="{{ onToggleDate }}" style="{{ pillDateStyle }}">{{ dateLabel }}<i class="icon icon-chevron-down" style="font-size:14px;color:#7A8694;"></i></button>
-            <sc-if value="{{ dateOpen }}" hint-placeholder-val="{{ false }}">
-              <div style="position:absolute;top:44px;left:0;min-width:190px;background:#fff;border:1px solid #E5E7EB;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,0.14);padding:6px;z-index:55;">
-                <sc-for list="{{ dateOpts }}" as="o" hint-placeholder-count="6">
-                  <button onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:11px;width:100%;background:none;border:none;border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F5F6F7;">
-                    <span style="{{ o.radioStyle }}"><sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;border-radius:50%;background:#022F36;"></span></sc-if></span>{{ o.label }}
-                  </button>
-                </sc-for>
-              </div>
+          <div style="flex:1;min-width:240px;display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <span style="font-size:20px;font-weight:700;color:#0D0D0F;">{{ cr.usedLine }}</span>
+              <span style="{{ cr.planPill }}">{{ cr.planName }}</span>
+            </div>
+            <sc-if value="{{ cr.hasHold }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#92400E;"><i class="icon icon-clock" style="font-size:16px;"></i>{{ cr.holdLine }}</div>
             </sc-if>
-          </div>
-          <div style="position:relative;">
-            <button onClick="{{ onToggleType }}" style="{{ pillTypeStyle }}">{{ typeLabel }}<i class="icon icon-chevron-down" style="font-size:14px;color:#7A8694;"></i></button>
-            <sc-if value="{{ typeOpen }}" hint-placeholder-val="{{ false }}">
-              <div style="position:absolute;top:44px;left:0;min-width:170px;background:#fff;border:1px solid #E5E7EB;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,0.14);padding:6px;z-index:55;">
-                <sc-for list="{{ typeOpts }}" as="o" hint-placeholder-count="3">
-                  <button onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:11px;width:100%;background:none;border:none;border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F5F6F7;">
-                    <span style="{{ o.radioStyle }}"><sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;border-radius:50%;background:#022F36;"></span></sc-if></span>{{ o.label }}
-                  </button>
-                </sc-for>
-              </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:15px;color:#23262E;"><i class="icon icon-rotate-cw" style="font-size:16px;color:#1D484F;"></i>{{ cr.resetLine }}</div>
+            <sc-if value="{{ cr.hasStreak }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;align-items:center;gap:8px;font-size:15px;color:#23262E;"><i class="icon icon-flame" style="font-size:16px;color:#F76638;"></i><b style="font-weight:700;">{{ cr.streakBonus }}</b>{{ cr.streakNote }}</div>
             </sc-if>
+            <div style="font-size:13px;color:#4A5464;">You’re only charged when an application is submitted. If it can’t be submitted, the credit comes back.</div>
           </div>
-          <div style="position:relative;">
-            <button onClick="{{ onToggleStatus }}" style="{{ pillStatusStyle }}">{{ statusLabel }}<i class="icon icon-chevron-down" style="font-size:14px;color:#7A8694;"></i></button>
-            <sc-if value="{{ statusOpen }}" hint-placeholder-val="{{ false }}">
-              <div style="position:absolute;top:44px;right:0;min-width:190px;background:#fff;border:1px solid #E5E7EB;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,0.14);padding:6px;z-index:55;">
-                <sc-for list="{{ statusOpts }}" as="o" hint-placeholder-count="4">
-                  <button onClick="{{ o.onClick }}" style="display:flex;align-items:center;gap:11px;width:100%;background:none;border:none;border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;font-weight:600;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#F5F6F7;">
-                    <span style="{{ o.radioStyle }}"><sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><span style="width:9px;height:9px;border-radius:50%;background:#022F36;"></span></sc-if></span>{{ o.label }}
-                  </button>
-                </sc-for>
-              </div>
-            </sc-if>
-          </div>
-          <button onClick="{{ onClearFilters }}" title="Clear filters" style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:#5AC8E0;border:none;color:#fff;cursor:pointer;flex-shrink:0;" style-hover="background:#3BB5D0;"><i class="icon icon-funnel-x" style="font-size:16px;"></i></button>
         </div>
+
+        <sc-if value="{{ cr.showLow }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#FFF4EF;border:1px solid #F9D9CB;border-radius:16px;padding:18px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+            <i class="icon icon-triangle-alert" style="font-size:22px;color:#F76638;"></i>
+            <div style="flex:1;min-width:220px;">
+              <div style="font-size:16px;font-weight:700;color:#0D0D0F;">Running low · {{ cr.left }} swipes left</div>
+              <div style="font-size:14px;color:#4A5464;margin-top:2px;">{{ cr.lowSub }}</div>
+            </div>
+            <button onClick="{{ cr.onLowCta }}" style="background:#022F36;border:none;border-radius:9999px;height:44px;padding:0 22px;font-family:inherit;font-size:15px;font-weight:700;color:#fff;cursor:pointer;" style-hover="background:#1D484F;">{{ cr.lowCta }}</button>
+          </div>
         </sc-if>
 
-        <div style="display:flex;flex-direction:column;gap:12px;">
-          <sc-for list="{{ appsList }}" as="a" hint-placeholder-count="5">
-            <div style="display:flex;align-items:center;gap:16px;background:#fff;border:1px solid #EDEEF0;border-radius:16px;padding:18px 22px;box-shadow:0 2px 6px rgba(0,0,0,0.04);">
-              <div style="width:44px;height:44px;border-radius:11px;background:{{ a.logoBg }};display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;flex-shrink:0;">{{ a.logoChar }}</div>
-              <div style="flex:1;min-width:0;">
-                <div style="font-size:16px;font-weight:700;color:#0D0D0F;">{{ a.title }}</div>
-                <div style="font-size:14px;color:#5A6B72;margin-top:2px;">{{ a.company }} · {{ a.meta }}</div>
-              </div>
-              <div style="display:flex;flex-direction:column;align-items:flex-end;gap:7px;min-width:0;">
-                <sc-if value="{{ a.isManual }}" hint-placeholder-val="{{ false }}">
-                  <div style="display:flex;align-items:center;gap:14px;background:#F0FCFF;border:1px solid #B8EAF5;border-radius:12px;padding:9px 10px 9px 14px;">
-                    <span class="tip" style="display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:700;color:#0E93B5;white-space:nowrap;"><i class="icon icon-file-warning" style="font-size:17px;"></i>Apply directly on the company site<span class="tipbox">{{ a.tipText }}</span></span>
-                    <button style="display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid #23262E;border-radius:9999px;padding:9px 18px;font-family:inherit;font-size:14px;font-weight:700;color:#0D0D0F;cursor:pointer;white-space:nowrap;" style-hover="background:#F5F6F7;">Apply on your own<i class="icon icon-arrow-up-right" style="font-size:15px;"></i></button>
-                  </div>
-                </sc-if>
-                <sc-if value="{{ a.notManual }}" hint-placeholder-val="{{ true }}">
-                <div style="display:flex;align-items:center;gap:10px;">
-                  <sc-if value="{{ a.isNeeds }}" hint-placeholder-val="{{ false }}">
-                    <button style="display:flex;align-items:center;gap:7px;background:#1D484F;border:none;border-radius:9999px;padding:8px 16px;font-family:inherit;font-size:13px;font-weight:700;color:#fff;cursor:pointer;" style-hover="background:#022F36;">Add info<i class="icon icon-arrow-right" style="font-size:14px;"></i></button>
-                  </sc-if>
-                  <span class="tip" style="{{ a.badgeStyle }}"><span style="{{ a.dotStyle }}"></span>{{ a.badgeLabel }}<i class="icon icon-info" style="font-size:13px;opacity:0.55;"></i><span class="tipbox">{{ a.tipText }}</span></span>
-                </div>
-                </sc-if>
-                <sc-if value="{{ a.isApplying }}" hint-placeholder-val="{{ false }}">
-                  <div style="display:flex;align-items:center;gap:7px;font-size:13px;color:#0C5A5A;max-width:340px;">
-                    <span style="width:6px;height:6px;border-radius:50%;background:#5AEBEB;flex-shrink:0;"></span>
-                    <span style="font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ a.tickText }}…</span>
-                    
-                  </div>
-                </sc-if>
-                <sc-if value="{{ a.hasSub }}" hint-placeholder-val="{{ false }}">
-                  <div style="font-size:13px;color:{{ a.subColor }};max-width:340px;text-align:right;">{{ a.subText }}</div>
-                </sc-if>
-              </div>
+        <div style="background:#fff;border:1px solid #EDEEF0;border-radius:18px;padding:22px 24px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
+            <h2 style="font-size:18px;font-weight:700;color:#0D0D0F;">History</h2>
+            <div role="tablist" style="display:flex;gap:6px;flex-wrap:wrap;">
+              <sc-for list="{{ cr.filters }}" as="f" hint-placeholder-count="4">
+                <button role="tab" aria-selected="{{ f.on }}" onClick="{{ f.onClick }}" style="{{ f.style }}">{{ f.label }}</button>
+              </sc-for>
             </div>
-          </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;">
+            <sc-for list="{{ cr.rows }}" as="r" hint-placeholder-count="6">
+              <div style="display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid #F0F1F3;">
+                <div style="width:38px;height:38px;border-radius:10px;background:{{ r.logoBg }};color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">{{ r.logoChar }}</div>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:15px;font-weight:600;color:#0D0D0F;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.job }}</div>
+                  <div style="font-size:13.5px;color:#4A5464;margin-top:2px;">{{ r.company }} · {{ r.date }}</div>
+                </div>
+                <span style="{{ r.pill }}">{{ r.status }}</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ cr.empty }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:22px 0;text-align:center;font-size:14px;color:#4A5464;border-top:1px solid #F0F1F3;">Nothing here yet.</div>
+            </sc-if>
+          </div>
         </div>
+      </div>
+    </sc-if>
+
+    <!-- ============ PLAN & BILLING ============ -->
+    <sc-if value="{{ isPlan }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Plan & Billing" style="max-width:960px;margin:0 auto;padding:32px 24px 90px;display:flex;flex-direction:column;gap:22px;">
+        <h1 style="font-size:28px;font-weight:700;color:#022F36;letter-spacing:-0.02em;">Plan &amp; Billing</h1>
+
+        <!-- current plan -->
+        <div style="background:#fff;border:1px solid #EDEEF0;border-radius:18px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;gap:8px;min-width:0;">
+            <div style="font-size:13px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.05em;">Current plan</div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <span style="font-size:24px;font-weight:700;color:#0D0D0F;">{{ pl.name }}</span>
+              <span style="{{ pl.statusStyle }}">{{ pl.status }}</span>
+            </div>
+            <div style="font-size:15px;color:#23262E;">{{ pl.priceLine }}</div>
+            <div style="font-size:14px;color:#4A5464;">{{ pl.renewLine }}</div>
+            <sc-if value="{{ pl.hasNote }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;align-items:center;gap:8px;margin-top:4px;font-size:14px;font-weight:600;color:#92400E;"><i class="icon icon-clock" style="font-size:15px;"></i>{{ pl.note }}<sc-if value="{{ pl.noteUndo }}" hint-placeholder-val="{{ false }}"><button onClick="{{ onUndoDowngrade }}" style="background:none;border:none;padding:0;margin-left:6px;font-family:inherit;font-size:14px;font-weight:700;color:#1D484F;cursor:pointer;text-decoration:underline;">Undo</button></sc-if></div>
+            </sc-if>
+          </div>
+          <sc-if value="{{ pl.showSwitchUp }}" hint-placeholder-val="{{ false }}">
+            <button onClick="{{ onOpenUpgrade }}" style="display:flex;align-items:center;gap:8px;background:#022F36;border:none;border-radius:9999px;height:48px;padding:0 24px;font-family:inherit;font-size:15px;font-weight:700;color:#fff;cursor:pointer;white-space:nowrap;" style-hover="background:#1D484F;"><i class="icon icon-arrow-up-right" style="font-size:17px;"></i>Switch to Quarterly, save $8</button>
+          </sc-if>
+        </div>
+
+        <!-- plan comparison -->
+        <div>
+          <h2 style="font-size:18px;font-weight:700;color:#0D0D0F;margin-bottom:12px;">Plans</h2>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">
+            <sc-for list="{{ pl.cards }}" as="c" hint-placeholder-count="2">
+              <div style="{{ c.cardStyle }}">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;min-height:28px;">
+                  <span style="font-size:18px;font-weight:700;color:#0D0D0F;">{{ c.name }}</span>
+                  <sc-if value="{{ c.hasBadge }}" hint-placeholder-val="{{ false }}"><span style="{{ c.badgeStyle }}">{{ c.badge }}</span></sc-if>
+                </div>
+                <div style="display:flex;align-items:baseline;gap:6px;"><span style="font-size:34px;font-weight:800;color:#022F36;letter-spacing:-0.02em;">{{ c.price }}</span><span style="font-size:15px;color:#4A5464;">{{ c.per }}</span></div>
+                <div style="font-size:14px;color:#4A5464;margin:4px 0 16px;min-height:20px;">{{ c.sub }}</div>
+                <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:20px;">
+                  <sc-for list="{{ c.features }}" as="ft" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:9px;font-size:14.5px;color:#23262E;"><i class="icon icon-check" style="font-size:15px;color:#00B16B;"></i>{{ ft }}</div></sc-for>
+                </div>
+                <button onClick="{{ c.onClick }}" disabled="{{ c.isCurrent }}" style="{{ c.btnStyle }}">{{ c.btn }}</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+
+        <!-- billing -->
+        <sc-if value="{{ pl.showBilling }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#fff;border:1px solid #EDEEF0;border-radius:18px;padding:8px 24px;">
+            <sc-for list="{{ pl.billRows }}" as="b" hint-placeholder-count="3">
+              <div style="display:flex;align-items:center;gap:14px;padding:16px 0;border-top:{{ b.border }};">
+                <span style="width:38px;height:38px;border-radius:10px;background:#F0FCFF;color:#1D484F;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="{{ b.icon }}" style="font-size:18px;"></i></span>
+                <div style="flex:1;min-width:0;"><div style="font-size:15px;font-weight:600;color:#0D0D0F;">{{ b.label }}</div><div style="font-size:13.5px;color:#4A5464;margin-top:2px;">{{ b.value }}</div></div>
+                <button onClick="{{ b.onClick }}" style="{{ b.btnStyle }}">{{ b.action }}<i class="{{ b.actionIcon }}" style="font-size:14px;"></i></button>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
       </div>
     </sc-if>
 
@@ -979,6 +1004,342 @@
 
   </main>
 
+  <!-- ===== ACCOUNT MODAL (Clerk) ===== -->
+  <sc-if value="{{ amOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onAmBackdrop }}" style="position:fixed;inset:0;z-index:95;background:rgba(8,20,22,0.5);display:flex;align-items:center;justify-content:center;padding:32px;">
+      <div role="dialog" aria-label="Account" onClick="{{ onAmStop }}" style="position:relative;width:100%;max-width:1060px;height:min(760px,calc(100vh - 64px));background:#fff;border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,0.3);display:flex;overflow:hidden;">
+        <div style="width:300px;flex-shrink:0;background:#F7F7F7;border-right:1px solid #ECEEF0;padding:36px 16px 24px;display:flex;flex-direction:column;">
+          <div style="padding:0 16px;margin-bottom:28px;">
+            <div style="font-size:26px;font-weight:600;color:#022F36;">Account</div>
+            <div style="font-size:15px;color:#4A5464;margin-top:6px;">Manage your account info.</div>
+          </div>
+          <div role="tablist" style="display:flex;flex-direction:column;gap:4px;">
+            <button role="tab" aria-selected="{{ amIsProfile }}" onClick="{{ onAmProfile }}" style="{{ amProfileStyle }}"><i class="icon icon-circle-user" style="font-size:18px;"></i>Profile</button>
+            <button role="tab" aria-selected="{{ amIsSecurity }}" onClick="{{ onAmSecurity }}" style="{{ amSecurityStyle }}"><i class="icon icon-shield-check" style="font-size:18px;"></i>Security</button>
+          </div>
+          <div style="margin-top:auto;text-align:center;font-size:13px;color:#4A5464;">Secured by <b style="font-weight:700;color:#3C4A55;">clerk</b></div>
+        </div>
+        <div style="flex:1;min-width:0;overflow-y:auto;padding:44px 48px;">
+          <button onClick="{{ onAmClose }}" aria-label="Close" style="position:absolute;top:18px;right:18px;width:40px;height:40px;border-radius:8px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#4A5464;" style-hover="background:#F2F5F8;"><i class="icon icon-x" style="font-size:20px;"></i></button>
+          <sc-if value="{{ amIsProfile }}" hint-placeholder-val="{{ true }}">
+            <div>
+              <h2 style="font-size:19px;font-weight:600;color:#022F36;padding-bottom:20px;">Profile details</h2>
+              <div style="display:grid;grid-template-columns:minmax(140px,220px) minmax(0,1fr);gap:20px;align-items:start;padding:26px 0;border-top:1px solid #ECEEF0;align-items:center;">
+                <span style="font-size:15px;color:#022F36;padding-top:2px;">Profile</span>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+                  <span style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#1D484F,#3C5356);color:#fff;font-size:22px;font-weight:700;display:flex;align-items:center;justify-content:center;">D</span>
+                  <span style="font-size:15px;color:#0D0D0F;flex:1;">Dillan Fernando</span>
+                  <button style="background:none;border:none;padding:0;font-family:inherit;font-size:15px;font-weight:500;color:#022F36;cursor:pointer;">Update profile</button>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:minmax(140px,220px) minmax(0,1fr);gap:20px;align-items:start;padding:26px 0;border-top:1px solid #ECEEF0;">
+                <span style="font-size:15px;color:#022F36;padding-top:2px;">Email addresses</span>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                  <span style="font-size:15px;color:#0D0D0F;min-width:0;overflow:hidden;text-overflow:ellipsis;">dillan@gmail.com</span>
+                  <span style="border:1px solid #E1E6EA;border-radius:6px;padding:2px 8px;font-size:13px;color:#4A5464;background:#F7F8F9;white-space:nowrap;">Primary</span><span style="border:1px solid #E1E6EA;border-radius:6px;padding:2px 8px;font-size:13px;color:#4A5464;background:#F7F8F9;white-space:nowrap;">Unverified</span>
+                  <button aria-label="More" style="margin-left:auto;background:none;border:none;cursor:pointer;color:#4A5464;padding:4px;"><i class="icon icon-ellipsis" style="font-size:18px;"></i></button>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:minmax(140px,220px) minmax(0,1fr);gap:20px;align-items:start;padding:26px 0;border-top:1px solid #ECEEF0;border-bottom:1px solid #ECEEF0;align-items:center;">
+                <span style="font-size:15px;color:#022F36;padding-top:2px;">Connected accounts</span>
+                <button style="display:flex;align-items:center;gap:10px;width:100%;background:#F7F8F9;border:none;border-radius:8px;padding:12px 16px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;" style-hover="background:#EEF1F3;"><i class="icon icon-plus" style="font-size:17px;"></i>Connect account<i class="icon icon-arrow-right" style="font-size:16px;"></i></button>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ amIsSecurity }}" hint-placeholder-val="{{ false }}">
+            <div>
+              <h2 style="font-size:19px;font-weight:600;color:#022F36;padding-bottom:20px;">Security</h2>
+              <div style="display:grid;grid-template-columns:minmax(140px,220px) minmax(0,1fr);gap:20px;align-items:start;padding:26px 0;border-top:1px solid #ECEEF0;align-items:center;">
+                <span style="font-size:15px;color:#022F36;padding-top:2px;">Password</span>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;"><span style="font-size:18px;letter-spacing:2px;color:#0D0D0F;">••••••••••</span><button style="background:none;border:none;padding:0;font-family:inherit;font-size:15px;font-weight:500;color:#022F36;cursor:pointer;">Update password</button></div>
+              </div>
+              <div style="display:grid;grid-template-columns:minmax(140px,220px) minmax(0,1fr);gap:20px;align-items:start;padding:26px 0;border-top:1px solid #ECEEF0;">
+                <span style="font-size:15px;color:#022F36;padding-top:2px;">Active devices</span>
+                <div style="display:flex;flex-direction:column;gap:22px;">
+                  <sc-for list="{{ amDevices }}" as="d" hint-placeholder-count="2">
+                    <div style="display:flex;gap:18px;">
+                      <i class="icon icon-laptop" style="font-size:30px;color:#0D0D0F;flex-shrink:0;"></i>
+                      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;font-size:15px;color:#4A5464;">
+                        <div style="display:flex;align-items:center;gap:10px;color:#0D0D0F;">{{ d.name }}<sc-if value="{{ d.current }}" hint-placeholder-val="{{ false }}"><span style="border:1px solid #E1E6EA;border-radius:6px;padding:2px 8px;font-size:13px;color:#4A5464;background:#F7F8F9;white-space:nowrap;">This device</span></sc-if></div>
+                        <span>{{ d.browser }}</span><span>{{ d.ip }}</span><span>{{ d.when }}</span>
+                      </div>
+                      <sc-if value="{{ d.notCurrent }}" hint-placeholder-val="{{ true }}"><button aria-label="More" style="align-self:flex-start;background:none;border:none;cursor:pointer;color:#4A5464;padding:4px;"><i class="icon icon-ellipsis" style="font-size:18px;"></i></button></sc-if>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:minmax(140px,220px) minmax(0,1fr);gap:20px;align-items:start;padding:26px 0;border-top:1px solid #ECEEF0;border-bottom:1px solid #ECEEF0;align-items:center;">
+                <span style="font-size:15px;color:#022F36;padding-top:2px;">Delete account</span>
+                <button style="background:none;border:none;padding:0;font-family:inherit;font-size:15px;font-weight:500;color:#022F36;cursor:pointer;color:#E5484D;text-align:left;">Delete account</button>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== PRICING MODAL ===== -->
+  <sc-if value="{{ prOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:96;background:#E9F9FD;overflow-y:auto;">
+      <button onClick="{{ onPrClose }}" aria-label="Close" style="position:fixed;top:18px;right:22px;width:44px;height:44px;border-radius:10px;border:none;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#4A5464;z-index:2;"><i class="icon icon-x" style="font-size:20px;"></i></button>
+      <div style="max-width:1080px;margin:0 auto;padding:44px 24px 56px;">
+        <div style="text-align:center;margin-bottom:36px;">
+          <h1 style="font-size:32px;font-weight:700;color:#23262E;letter-spacing:-0.01em;">Get Access</h1>
+          <p style="font-size:20px;color:#23262E;margin-top:12px;">Upgrade to get the full auto-apply feature</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:28px;align-items:start;">
+
+          <!-- Starter -->
+          <div style="background:#fff;border:1px solid #DCEBF1;border-radius:14px;overflow:hidden;">
+            <div style="background:#B8E8F5;padding:14px 20px;text-align:center;font-size:16px;font-weight:700;color:#0C2A2C;">Flexible · Cancel anytime</div>
+            <div style="padding:30px 28px 26px;border-bottom:1px solid #EDEEF0;">
+              <div style="text-align:center;font-size:24px;font-weight:700;color:#23262E;margin-bottom:26px;">Job Starter</div>
+              <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+                <div style="display:flex;align-items:baseline;gap:8px;"><span style="font-size:52px;font-weight:800;color:#0D0D0F;line-height:1;letter-spacing:-0.02em;">$19</span><span style="font-size:15px;color:#4A5464;">/ Billed monthly</span></div>
+                <div style="text-align:right;"><div style="font-size:14px;color:#4A5464;">You’ll pay</div><div style="font-size:18px;font-weight:700;color:#23262E;">Just $0.63/day</div></div>
+              </div>
+              <button onClick="{{ onPrStarter }}" style="width:100%;height:50px;border-radius:9999px;background:#fff;border:1.5px solid #5AC8E8;font-family:inherit;font-size:16px;font-weight:600;color:#0E7490;cursor:pointer;" style-hover="background:#F0FCFF;">Upgrade to Starter Monthly</button>
+            </div>
+            <div style="padding:22px 28px;border-bottom:1px solid #EDEEF0;">
+              <div style="font-size:15px;font-weight:600;color:#23262E;margin-bottom:10px;">Swipes</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:18px;color:#23262E;"><i class="icon icon-file-plus" style="font-size:20px;color:#4A5464;"></i>300 swipes a month</div>
+              <div style="font-size:13.5px;color:#4A5464;margin-top:8px;">+5 bonus swipes for every 5-day apply streak</div>
+            </div>
+            <div style="padding:22px 28px 28px;display:flex;flex-direction:column;gap:16px;">
+              <div style="font-size:15px;font-weight:600;color:#23262E;">Everything in Free, plus</div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:16px;color:#23262E;"><span style="width:24px;height:24px;border-radius:50%;background:#5FCB93;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-check" style="font-size:14px;color:#fff;"></i></span>Auto-form submission</div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:16px;color:#23262E;"><span style="width:24px;height:24px;border-radius:50%;background:#5FCB93;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-check" style="font-size:14px;color:#fff;"></i></span>Live application tracking</div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:16px;color:#23262E;"><span style="width:24px;height:24px;border-radius:50%;background:#5FCB93;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-check" style="font-size:14px;color:#fff;"></i></span>Match Preference filters</div>
+              <div style="display:flex;align-items:center;gap:12px;font-size:16px;color:#23262E;"><span style="width:24px;height:24px;border-radius:50%;background:#5FCB93;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-check" style="font-size:14px;color:#fff;"></i></span>Instant job alerts</div>
+              <div style="display:flex;align-items:center;gap:14px;margin-top:10px;">
+                <div style="display:flex;">
+                  <span style="width:42px;height:42px;border-radius:50%;background:#1D484F;border:2px solid #fff;"></span>
+                  <span style="width:42px;height:42px;border-radius:50%;background:#F76638;border:2px solid #fff;margin-left:-12px;"></span>
+                  <span style="width:42px;height:42px;border-radius:50%;background:#5AEBEB;border:2px solid #fff;margin-left:-12px;"></span>
+                </div>
+                <span style="font-size:18px;color:#23262E;">Trusted by over <b style="font-weight:700;">500K</b> job seekers</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Accelerator -->
+          <div style="background:#fff;border:3px solid #FBE38A;border-radius:14px;overflow:hidden;">
+            <div style="background:#FBE38A;padding:13px 20px;text-align:center;font-size:16px;font-weight:700;color:#8A3B0E;">Most popular · Save 14% vs monthly</div>
+            <div style="padding:30px 28px 26px;border-bottom:1px solid #EDEEF0;">
+              <div style="text-align:center;font-size:24px;font-weight:700;color:#23262E;margin-bottom:26px;">Job Accelerator</div>
+              <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
+                <div style="display:flex;align-items:baseline;gap:8px;"><span style="font-size:52px;font-weight:800;color:#0D0D0F;line-height:1;letter-spacing:-0.02em;">$49</span><span style="font-size:15px;color:#4A5464;">/ Billed quarterly</span></div>
+                <div style="text-align:right;"><div style="font-size:14px;color:#4A5464;">You’ll pay</div><div style="font-size:18px;font-weight:700;color:#23262E;">Just $0.54/day</div></div>
+              </div>
+              <button onClick="{{ onPrAccel }}" style="width:100%;height:50px;border-radius:9999px;background:linear-gradient(90deg,#1D7F8F,#14B866);border:none;font-family:inherit;font-size:16px;font-weight:700;color:#fff;cursor:pointer;">Upgrade to Accelerator Quarterly</button>
+            </div>
+            <div style="padding:22px 28px;border-bottom:1px solid #EDEEF0;">
+              <div style="font-size:15px;font-weight:600;color:#23262E;margin-bottom:10px;">Swipes</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:18px;color:#23262E;"><i class="icon icon-file-plus" style="font-size:20px;color:#4A5464;"></i>900 swipes a quarter</div>
+              <div style="font-size:13.5px;color:#4A5464;margin-top:8px;">+5 bonus swipes for every 5-day apply streak</div>
+            </div>
+            <div style="padding:22px 28px 28px;display:flex;flex-direction:column;gap:16px;">
+              <div style="font-size:15px;font-weight:600;color:#23262E;">Everything in Starter, plus</div>
+              <sc-for list="{{ prAccelFeatures }}" as="f" hint-placeholder-count="5">
+                <div style="display:flex;align-items:center;gap:12px;font-size:16px;color:#23262E;"><span style="width:24px;height:24px;border-radius:50%;background:#5FCB93;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-check" style="font-size:14px;color:#fff;"></i></span><span style="flex:1;">{{ f }}</span><span style="background:#FFF4D6;color:#92400E;border-radius:6px;padding:3px 10px;font-size:13px;font-weight:600;">Unlimited</span></div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <p style="text-align:center;font-size:13.5px;color:#4A5464;margin-top:26px;">Credits are only used when an application is submitted. Cancel anytime from Plan &amp; Billing.</p>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== PLAN MODALS ===== -->
+  <sc-if value="{{ pmOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:90;background:rgba(8,20,22,0.5);display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div role="dialog" aria-label="{{ pm.title }}" style="width:100%;max-width:480px;background:#fff;border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,0.3);padding:28px;">
+        <sc-if value="{{ pm.isSuccess }}" hint-placeholder-val="{{ false }}">
+          <div style="width:56px;height:56px;border-radius:50%;background:#E3F7EC;display:flex;align-items:center;justify-content:center;margin-bottom:16px;"><i class="icon icon-circle-check" style="font-size:30px;color:#00B16B;"></i></div>
+        </sc-if>
+        <h2 style="font-size:22px;font-weight:700;color:#0D0D0F;margin-bottom:8px;">{{ pm.title }}</h2>
+        <p style="font-size:15px;line-height:1.55;color:#4A5464;margin-bottom:18px;text-wrap:pretty;">{{ pm.body }}</p>
+        <sc-if value="{{ pm.hasRows }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#F5F8FA;border:1px solid #EDEEF0;border-radius:14px;padding:6px 16px;margin-bottom:20px;">
+            <sc-for list="{{ pm.rows }}" as="r" hint-placeholder-count="3">
+              <div style="display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-top:{{ r.border }};font-size:15px;"><span style="color:#4A5464;">{{ r.k }}</span><span style="{{ r.vStyle }}">{{ r.v }}</span></div>
+            </sc-for>
+          </div>
+        </sc-if>
+        <div style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap;">
+          <sc-if value="{{ pm.hasSecondary }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ onPmSecondary }}" style="background:#fff;border:1px solid #D5DBDF;border-radius:9999px;height:46px;padding:0 22px;font-family:inherit;font-size:15px;font-weight:600;color:#0D0D0F;cursor:pointer;">{{ pm.secondary }}</button>
+          </sc-if>
+          <button onClick="{{ onPmPrimary }}" style="{{ pm.primaryStyle }}">{{ pm.primary }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== APPLICATION DETAIL PANEL ===== -->
+  <sc-if value="{{ adOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:85;display:flex;">
+      <div onClick="{{ onAdClose }}" style="flex:1;min-width:72px;background:rgba(8,20,22,0.45);backdrop-filter:blur(3px);position:relative;">
+        <button onClick="{{ onAdClose }}" aria-label="Close" style="position:absolute;top:22px;right:18px;width:44px;height:44px;border-radius:10px;background:#fff;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(0,0,0,0.15);"><i class="icon icon-x" style="font-size:20px;color:#0D0D0F;"></i></button>
+      </div>
+      <div role="dialog" aria-label="Application details" style="width:min(1080px,90vw);height:100vh;max-height:100vh;overflow-y:auto;overscroll-behavior:contain;background:#F2F5F8;padding:22px;display:block;box-sizing:border-box;">
+        <div style="display:flex;flex-direction:column;gap:18px;">
+
+        <!-- header card -->
+        <div style="flex-shrink:0;background:#fff;border:1px solid #E8EDF1;border-radius:18px;padding:24px 28px;display:flex;gap:20px;justify-content:space-between;flex-wrap:wrap;">
+          <div style="min-width:0;">
+            <div style="font-size:22px;font-weight:700;color:#022F36;margin-bottom:14px;">{{ ad.title }}</div>
+            <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+              <div style="width:64px;height:64px;border-radius:12px;background:{{ ad.logoBg }};color:#fff;font-size:28px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">{{ ad.logoChar }}</div>
+              <div>
+                <div style="font-size:16px;font-weight:700;color:#022F36;margin-bottom:6px;">{{ ad.company }}</div>
+                <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;font-size:15px;color:#23262E;">
+                  <span style="display:flex;align-items:center;gap:7px;"><i class="icon icon-map-pin" style="font-size:17px;"></i>{{ ad.location }}</span>
+                  <span style="display:flex;align-items:center;gap:7px;"><i class="icon icon-house" style="font-size:17px;"></i>On-site</span>
+                  <span style="display:flex;align-items:center;gap:7px;"><i class="icon icon-crown" style="font-size:17px;"></i>{{ ad.level }}</span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+              <span style="display:inline-flex;align-items:center;gap:8px;border:1px solid #E1E6EA;border-radius:9999px;padding:8px 18px;font-size:15px;font-weight:600;color:#022F36;"><i class="icon icon-globe" style="font-size:17px;"></i>On-site</span>
+              <span style="display:inline-flex;align-items:center;gap:8px;border:1px solid #E1E6EA;border-radius:9999px;padding:8px 18px;font-size:15px;font-weight:600;color:#022F36;"><i class="icon icon-briefcase" style="font-size:17px;"></i>Full-Time</span>
+            </div>
+          </div>
+          <div role="tablist" style="align-self:flex-start;display:flex;gap:4px;background:#F2F5F8;border:1px solid #E8EDF1;border-radius:9999px;padding:4px;">
+            <button role="tab" aria-selected="{{ adSegJd }}" onClick="{{ onAdSegJd }}" style="{{ adSegJdStyle }}"><i class="icon icon-file-text" style="font-size:16px;"></i>Job Description</button>
+            <sc-if value="{{ ad.isNeeds }}" hint-placeholder-val="{{ false }}">
+              <button role="tab" aria-selected="{{ adSegMissing }}" onClick="{{ onAdSegMissing }}" style="{{ adSegMissingStyle }}"><i class="icon icon-triangle-alert" style="font-size:16px;color:#F76638;"></i>Missing Info</button>
+            </sc-if>
+          </div>
+        </div>
+
+        <!-- JOB DESCRIPTION -->
+        <sc-if value="{{ adSegJd }}" hint-placeholder-val="{{ true }}">
+          <div style="flex-shrink:0;background:#fff;border:1px solid #E8EDF1;border-radius:18px;padding:22px 28px 28px;">
+            <div role="tablist" style="display:flex;gap:8px;padding-bottom:12px;border-bottom:1px solid #EDEEF0;margin-bottom:22px;">
+              <button role="tab" onClick="{{ onAdTabOverview }}" style="{{ adTabOverviewStyle }}"><i class="icon icon-clipboard-list" style="font-size:17px;"></i>Overview</button>
+              <button role="tab" onClick="{{ onAdTabResume }}" style="{{ adTabResumeStyle }}"><i class="icon icon-file-text" style="font-size:17px;"></i>Resume</button>
+            </div>
+
+            <sc-if value="{{ adIsOverview }}" hint-placeholder-val="{{ true }}">
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,340px);gap:28px;align-items:start;">
+                <div style="display:flex;flex-direction:column;gap:24px;">
+                  <div><div style="font-size:15px;font-weight:700;color:#022F36;margin-bottom:6px;">Role</div><div style="font-size:15px;color:#4A5464;">{{ ad.title }}</div></div>
+                  <div><div style="font-size:15px;font-weight:700;color:#022F36;margin-bottom:6px;">Key Responsibilities</div><div style="font-size:15px;line-height:1.75;color:#4A5464;text-wrap:pretty;">Design, build and maintain backend services and APIs. Collaborate with product and design to ship features end to end. Write tests, review code, and improve reliability and performance of production systems. Participate in on-call and help debug issues across the stack.</div></div>
+                  <div>
+                    <div style="font-size:15px;font-weight:700;color:#022F36;margin-bottom:8px;">Requirements</div>
+                    <div style="display:flex;flex-direction:column;gap:10px;">
+                      <sc-for list="{{ adReqs }}" as="r" hint-placeholder-count="6"><div style="display:flex;align-items:center;gap:12px;font-size:15px;color:#4A5464;"><span style="width:6px;height:6px;border-radius:50%;background:#1D484F;flex-shrink:0;"></span>{{ r }}</div></sc-for>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="background:#EEF5FD;border:1px solid #DCE8F6;border-radius:18px;padding:24px;">
+                  <div style="font-size:17px;font-weight:700;color:#022F36;margin-bottom:18px;">Application Timeline</div>
+                  <div style="display:flex;flex-direction:column;">
+                    <sc-for list="{{ adTimeline }}" as="t" hint-placeholder-count="4">
+                      <div style="display:flex;gap:14px;">
+                        <div style="display:flex;flex-direction:column;align-items:center;width:24px;flex-shrink:0;">
+                          <span style="{{ t.dotStyle }}"><i class="{{ t.icon }}" style="{{ t.iconStyle }}"></i></span>
+                          <sc-if value="{{ t.hasLine }}" hint-placeholder-val="{{ true }}"><span style="{{ t.lineStyle }}"></span></sc-if>
+                        </div>
+                        <div style="padding-bottom:22px;min-width:0;">
+                          <div style="{{ t.labelStyle }}">{{ t.label }}</div>
+                          <div style="font-size:13.5px;color:#4A5464;margin-top:3px;">{{ t.sub }}</div>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                  <sc-if value="{{ ad.isNeeds }}" hint-placeholder-val="{{ false }}">
+                    <button onClick="{{ onAdSegMissing }}" style="margin-top:4px;background:#fff;border:1px solid #D5DBDF;border-radius:9999px;padding:11px 22px;font-family:inherit;font-size:15px;font-weight:600;color:#0D0D0F;cursor:pointer;" style-hover="border-color:#1D484F;">Add info</button>
+                  </sc-if>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ adIsResume }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;justify-content:flex-end;margin-bottom:16px;">
+                <button style="background:#fff;border:1px solid #D5DBDF;border-radius:10px;padding:11px 20px;font-family:inherit;font-size:15px;font-weight:600;color:#0D0D0F;cursor:pointer;">Edit Resume</button>
+              </div>
+              <div style="border:1px solid #E8EDF1;border-radius:16px;overflow:hidden;">
+                <div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) 44px;gap:16px;padding:16px 22px;border-bottom:1px solid #EDEEF0;font-size:14px;font-weight:600;color:#4A5464;">
+                  <span>Resume</span><span>Target Job Title</span><span>Last Edited</span><span></span>
+                </div>
+                <div style="display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr) 44px;gap:16px;align-items:center;padding:16px 22px;border-bottom:1px solid #EDEEF0;">
+                  <div style="display:flex;align-items:center;gap:14px;min-width:0;">
+                    <span style="width:44px;height:44px;border-radius:10px;background:#E7F1FE;color:#1B88FE;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-file-text" style="font-size:20px;"></i></span>
+                    <div style="min-width:0;"><div style="font-size:15px;font-weight:600;color:#0D0D0F;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Dillan_Fernando_Resume.pdf</div><div style="font-size:13px;color:#4A5464;margin-top:3px;">Sent with this application · {{ ad.ago }}</div></div>
+                  </div>
+                  <span style="font-size:15px;color:#022F36;">{{ ad.title }}</span>
+                  <span style="font-size:15px;color:#4A5464;">Oct 26, 2026, 10:51 AM</span>
+                  <button aria-label="More" style="width:36px;height:36px;border-radius:50%;border:1.5px solid #0D0D0F;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="icon icon-ellipsis" style="font-size:16px;"></i></button>
+                </div>
+                <div style="height:420px;background:#F5F6F7;display:flex;align-items:center;justify-content:center;font-size:14px;color:#4A5464;">Résumé preview</div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <!-- MISSING INFO -->
+        <sc-if value="{{ adSegMissing }}" hint-placeholder-val="{{ false }}">
+          <div style="flex-shrink:0;background:#fff;border:1px solid #E8EDF1;border-radius:18px;overflow:hidden;">
+            <div style="padding:26px 30px 28px;">
+              <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px;">
+                <i class="icon icon-triangle-alert" style="font-size:24px;color:#F76638;"></i>
+                <span style="font-size:22px;font-weight:700;color:#0D0D0F;">Missing Details</span>
+                <span style="display:inline-flex;align-items:center;gap:8px;background:#FFF8E6;border:1px solid #F3E3C2;border-radius:9999px;padding:8px 16px;font-size:14.5px;color:#23262E;"><img src="assets/favicon.png" alt="" style="width:22px;height:22px;">We need your input just once! We’ll reuse it for every job.</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:18px;">
+                <sc-for list="{{ adFields }}" as="f" hint-placeholder-count="3">
+                  <label style="display:flex;flex-direction:column;gap:8px;">
+                    <span style="font-size:14px;font-weight:600;color:#23262E;">{{ f.label }}<span style="color:#E5484D;">*</span></span>
+                    <input type="text" placeholder="{{ f.ph }}" style="height:52px;border:1px solid #E1E6EA;border-radius:10px;padding:0 18px;font-family:inherit;font-size:15px;color:#0D0D0F;background:#fff;" style-focus="outline:none;border-color:#1D484F;">
+                  </label>
+                </sc-for>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-top:22px;">
+                <button onClick="{{ onAdSubmitInfo }}" style="background:#022F36;border:none;border-radius:9999px;height:48px;padding:0 28px;font-family:inherit;font-size:15px;font-weight:700;color:#fff;cursor:pointer;" style-hover="background:#1D484F;">Save &amp; continue applying</button>
+              </div>
+            </div>
+            <div style="border-top:1px solid #EDEEF0;padding:22px 30px;">
+              <button onClick="{{ onAdDoneToggle }}" aria-expanded="{{ adDoneOpen }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;background:none;border:none;padding:0;font-family:inherit;cursor:pointer;text-align:left;">
+                <span>
+                  <span style="display:flex;align-items:center;gap:12px;font-size:20px;font-weight:700;color:#0D0D0F;"><i class="icon icon-circle-check" style="font-size:24px;color:#00B16B;"></i>Completed Details</span>
+                  <span style="display:block;font-size:14px;color:#4A5464;margin-top:6px;">You’re all set! Details saved. Edit anytime.</span>
+                </span>
+                <i class="{{ adDoneChevron }}" style="font-size:20px;color:#4A5464;"></i>
+              </button>
+              <sc-if value="{{ adDoneOpen }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:18px;margin-top:20px;">
+                  <sc-for list="{{ adDone }}" as="d" hint-placeholder-count="4">
+                    <label style="display:flex;flex-direction:column;gap:8px;">
+                      <span style="font-size:14px;color:#23262E;line-height:1.45;text-wrap:pretty;">{{ d.k }}<span style="color:#E5484D;">*</span></span>
+                      <sc-if value="{{ d.isText }}" hint-placeholder-val="{{ true }}">
+                        <input type="text" value="{{ d.v }}" style="height:52px;border:1px solid #E1E6EA;border-radius:10px;padding:0 18px;font-family:inherit;font-size:15px;color:#0D0D0F;background:#fff;" style-focus="outline:none;border-color:#1D484F;">
+                      </sc-if>
+                      <sc-if value="{{ d.isSelect }}" hint-placeholder-val="{{ false }}">
+                        <div style="position:relative;">
+                          <select style="width:100%;appearance:none;-webkit-appearance:none;height:52px;border:1px solid #E1E6EA;border-radius:10px;padding:0 44px 0 18px;font-family:inherit;font-size:15px;color:#0D0D0F;background:#fff;cursor:pointer;" style-focus="outline:none;border-color:#1D484F;">
+                            <sc-for list="{{ d.opts }}" as="o" hint-placeholder-count="2"><option value="{{ o.v }}" selected="{{ o.sel }}">{{ o.v }}</option></sc-for>
+                          </select>
+                          <i class="icon icon-chevron-down" style="position:absolute;right:16px;top:16px;font-size:18px;color:#4A5464;pointer-events:none;"></i>
+                        </div>
+                      </sc-if>
+                    </label>
+                  </sc-for>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
   <!-- ===== JOB PREFERENCES MODAL ===== -->
   <sc-if value="{{ prefsOpen }}" hint-placeholder-val="{{ false }}">
     <div style="position:fixed;inset:0;z-index:80;background:rgba(8,20,22,0.55);display:flex;align-items:center;justify-content:center;padding:28px;">
@@ -1084,7 +1445,7 @@
                       </sc-for>
                     </sc-if>
                     <sc-if value="{{ pfNHasCityResults }}" hint-placeholder-val="{{ true }}">
-                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">Cities</div>
+                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">{{ pfNCityHead }}</div>
                       <sc-for list="{{ pfNCityResults }}" as="it" hint-placeholder-count="4">
                         <button onMouseDown="{{ it.onPick }}" role="option" aria-selected="{{ it.on }}" style="width:100%;display:flex;align-items:center;gap:10px;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;{{ it.rowBg }}" style-hover="background:#F0FCFF;"><span style="{{ it.box }}"><sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:13px;color:#fff;"></i></sc-if></span><span>{{ it.name }}</span><span style="color:#4A5464;">{{ it.sub }}</span></button>
                       </sc-for>
@@ -1180,6 +1541,11 @@
     </div>
   </sc-if>
 
+  <!-- ===== NOTICE TOAST ===== -->
+  <sc-if value="{{ hasNotice }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:72;display:flex;align-items:center;gap:10px;background:#0C2A2C;color:#fff;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,0.3);padding:13px 18px;font-size:15px;font-weight:600;white-space:nowrap;"><i class="icon icon-info" style="font-size:18px;color:#5AEBEB;"></i>{{ notice }}</div>
+  </sc-if>
+
   <!-- ===== SKILL TOAST ===== -->
   <sc-if value="{{ skillToast }}" hint-placeholder-val="{{ false }}">
     <div role="status" style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:71;display:flex;align-items:center;gap:10px;background:#0C2A2C;color:#fff;border-radius:12px;box-shadow:0 14px 40px rgba(0,0,0,0.3);padding:12px 18px;font-size:14.5px;font-weight:600;white-space:nowrap;animation:sbIn .25s ease;"><i class="icon icon-circle-check" style="font-size:18px;color:#5AEBEB;"></i>Profile updated — matches will refresh</div>
@@ -1219,7 +1585,7 @@ const CITIES = {"Alabama":["Birmingham","Huntsville","Montgomery","Mobile"],"Ala
 const CA_PROVINCES = ["Alberta","British Columbia","Manitoba","New Brunswick","Newfoundland and Labrador","Nova Scotia","Ontario","Prince Edward Island","Quebec","Saskatchewan","Northwest Territories","Nunavut","Yukon"];
 class Component extends DCLogic {
   state = {
-    screen: 'login',
+    screen: 'jobs',
     scenario: 'free',
     acctTab: 'billing',
     jobsTab: 'matches',
@@ -1387,8 +1753,8 @@ v: (() => {
             const dropped = (loc.cities || []).filter(k => k.split('|')[1] === st).map(k => k.split('|')[0]);
             set({ states: [...(loc.states || []).filter(x => x !== st), st], cities: (loc.cities || []).filter(k => k.split('|')[1] !== st), q: '', ro: true, detected: false,
               note: dropped.length ? (st + ' already includes ' + dropped.join(' and ') + ', so we merged them.') : '' }); };
-          const cityRes = []; allowed.forEach(st => (CITIES[st] || []).forEach(c => { if (!sts.includes(st) && (!q || c.toLowerCase().includes(q) || st.toLowerCase().includes(q))) { const inc = false; const on = inc || cts.includes(ckey(c, st));
-            cityRes.push({ name: c, sub: inc ? ('Included in All of ' + st) : st, on, onPick: inc ? ((e) => { if (e && e.preventDefault) e.preventDefault(); }) : pickCity(c, st),
+          const cityRes = []; allowed.forEach(st => (CITIES[st] || []).forEach((c, ci) => { if (!sts.includes(st) && (q.length < 2 ? (st === 'Texas' && ci < 4) : c.toLowerCase().includes(q))) { const inc = false; const on = inc || cts.includes(ckey(c, st));
+            cityRes.push({ name: c, sub: st + (groups.length > 1 ? (US_STATES.includes(st) ? ' · US' : ' · Canada') : ''), starts: c.toLowerCase().startsWith(q), on, onPick: inc ? ((e) => { if (e && e.preventDefault) e.preventDefault(); }) : pickCity(c, st),
               rowBg: (on ? 'background:#F0FCFF;' : 'background:none;') + (inc ? 'opacity:0.6;cursor:default;' : ''),
               box: `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on ? '#1D484F' : '#fff'};border:1.5px solid ${on ? '#1D484F' : '#A9B3B9'};` }); }  }));
           const stateRes = allowed.filter(st => (q ? st.toLowerCase().includes(q) : false)).slice(0, 8).map(st => { const on = sts.includes(st); return { name: st, on, onPick: pickState(st), incNote: 'Every city in ' + st + ' is included',
@@ -1396,8 +1762,8 @@ v: (() => {
             box: `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on ? '#1D484F' : '#fff'};border:1.5px solid ${on ? '#1D484F' : '#A9B3B9'};` }; });
           const chips = [...cts.map(k => { const [c, st] = k.split('|'); return { name: c + ', ' + st, onRemove: () => set({ cities: loc.cities.filter(x => x !== k), detected: false, note: '' }) }; }),
                          ...sts.map(st => ({ name: 'All of ' + st, onRemove: () => set({ states: loc.states.filter(x => x !== st), note: '' }) }))];
-          const cr = cityRes.slice(0, 60);
-          return { ResultsOpen: !!loc.ro && (cr.length + stateRes.length > 0 || q.length > 0), CityResults: cr, StateResults: stateRes,
+          const cr = cityRes.sort((x, y) => (y.starts - x.starts) || x.name.localeCompare(y.name)).slice(0, q.length < 2 ? 4 : 8);
+          return { ResultsOpen: !!loc.ro && (cr.length + stateRes.length > 0 || q.length > 0), CityHead: q.length < 2 ? 'Near you' : 'Cities', CityResults: cr, StateResults: stateRes,
             HasCityResults: cr.length > 0, HasStateResults: stateRes.length > 0, NoResults: q.length > 0 && cr.length + stateRes.length === 0,
             Chips: chips, HasChips: chips.length > 0, DoneLabel: chips.length ? ('Done · ' + chips.length + ' selected') : 'Done', HasNote: !!loc.note, Note: loc.note || '',
             Detected2: !!loc.detected && cts.length > 0, DetectedText2: 'Detected ' + (cts[0] ? cts[0].split('|')[0] : '') + ' from your network, so you see local jobs first' };
@@ -1672,72 +2038,96 @@ v: (() => {
       banner:null,
       card:{ caption:'Free plan', title:'Subscription Status', badge:'Free', badgeTone:'neutral', badgeIcon:'icon icon-clock',
         showProgress:true, pct:40, barTone:'green', creditLine:'2 of 5 swipes used', creditRight:'3 left', creditTone:'neutral', leftLabel:'Validity', rightLabel:'No expiry · swipes don’t reset', rightTone:'neutral',
-        primary:{label:'Upgrade to Pro',icon:'icon icon-crown'}, secondary:null },
+        primary:{label:'See plans',icon:'icon icon-crown'}, secondary:null },
       billing:{ planName:'Free', price:'$0', cadence:'forever', statusLabel:'Free', statusTone:'neutral',
         alert:null, renewLabel:'Auto-apply credits', renewValue:'2 of 5 used this month',
         payLabel:'Payment method', payValue:'None on file', usedPct:40, usedText:'2 of 5 credits used',
-        primary:{label:'Upgrade to Pro',icon:'icon icon-crown'}, secondary:null, showInvoices:false } },
+        primary:{label:'See plans',icon:'icon icon-crown'}, secondary:null, showInvoices:false } },
 
     active: {
-      promo:false, credits:'120/300', headerBadge:{label:'Pro',tone:'pro',icon:'icon icon-crown'},
+      promo:false, credits:'120/300', headerBadge:{label:'Starter',tone:'pro',icon:'icon icon-crown'},
       cycleUnit:'month', resetDate:'Jul 3, 2026', apps:{ fromFree:0, fromPaid:10, completed:4 },
       banner:null,
       card:{ caption:'Monthly Plan', title:'Subscription', badge:'Active', badgeTone:'success', badgeIcon:'icon icon-circle-check',
         showProgress:true, pct:40, barTone:'green', creditLine:'120 of 300 used', creditRight:'180 left', creditTone:'neutral', leftLabel:'Renews on', rightLabel:'Jul 3, 2026', rightTone:'neutral',
-        primary:{label:'Manage subscription',icon:'icon icon-settings'}, secondary:null },
-      billing:{ planName:'Pro — Monthly', price:'$29', cadence:'per month', statusLabel:'Active', statusTone:'success',
+        primary:{label:'Manage plan',icon:'icon icon-settings'}, secondary:null },
+      billing:{ planName:'Starter — Monthly', price:'$19', cadence:'per month', statusLabel:'Active', statusTone:'success',
         alert:null, renewLabel:'Next renewal', renewValue:'Jul 3, 2026',
         payLabel:'Payment method', payValue:'Visa •••• 4242', usedPct:40, usedText:'120 of 300 auto-applies used',
-        primary:{label:'Manage subscription',icon:'icon icon-settings'}, secondary:{label:'Cancel plan'}, showInvoices:true } },
+        primary:{label:'Manage plan',icon:'icon icon-settings'}, secondary:{label:'Cancel plan'}, showInvoices:true } },
+
+    starter_low: {
+      promo:false, credits:'262/300', headerBadge:{label:'Starter',tone:'pro',icon:'icon icon-crown'},
+      cycleUnit:'month', resetDate:'Jul 3, 2026', apps:{ fromFree:0, fromPaid:10, completed:4 },
+      banner:null,
+      card:{ caption:'Monthly Plan', title:'Subscription', badge:'Active', badgeTone:'success', badgeIcon:'icon icon-circle-check',
+        showProgress:true, pct:87, barTone:'green', creditLine:'262 of 300 used', creditRight:'38 left', creditTone:'neutral', leftLabel:'Renews on', rightLabel:'Jul 3, 2026', rightTone:'neutral',
+        primary:{label:'Manage plan',icon:'icon icon-settings'}, secondary:null },
+      billing:{ planName:'Starter — Monthly', price:'$19', cadence:'per month', statusLabel:'Active', statusTone:'success',
+        alert:null, renewLabel:'Next renewal', renewValue:'Jul 3, 2026',
+        payLabel:'Payment method', payValue:'Visa •••• 4242', usedPct:87, usedText:'262 of 300 auto-applies used',
+        primary:{label:'Manage plan',icon:'icon icon-settings'}, secondary:{label:'Cancel plan'}, showInvoices:true } },
 
     upgraded: {
-      promo:false, credits:'10/300', headerBadge:{label:'Pro',tone:'pro',icon:'icon icon-crown'},
+      promo:false, credits:'10/300', headerBadge:{label:'Starter',tone:'pro',icon:'icon icon-crown'},
       cycleUnit:'month', resetDate:'Jul 28, 2026', apps:{ fromFree:3, fromPaid:10, completed:4 },
       banner:null,
       card:{ caption:'Monthly Plan · upgraded from Free', title:'Subscription', badge:'Active', badgeTone:'success', badgeIcon:'icon icon-circle-check',
         showProgress:true, pct:3, barTone:'green', creditLine:'10 of 300 used', creditRight:'290 left', creditTone:'neutral', leftLabel:'Renews on', rightLabel:'Jul 28, 2026', rightTone:'neutral',
-        primary:{label:'Manage subscription',icon:'icon icon-settings'}, secondary:null },
-      billing:{ planName:'Pro — Monthly', price:'$29', cadence:'per month', statusLabel:'Active', statusTone:'success',
+        primary:{label:'Manage plan',icon:'icon icon-settings'}, secondary:null },
+      billing:{ planName:'Starter — Monthly', price:'$19', cadence:'per month', statusLabel:'Active', statusTone:'success',
         alert:{tone:'neutral', text:'You upgraded from Free on Jun 28, 2026. Your 3 earlier Free applies still show in your history, but they don’t count against your 300 Pro credits.'},
         renewLabel:'Next renewal', renewValue:'Jul 28, 2026',
         payLabel:'Payment method', payValue:'Visa •••• 4242', usedPct:3, usedText:'10 of 300 auto-applies used',
-        primary:{label:'Manage subscription',icon:'icon icon-settings'}, secondary:{label:'Cancel plan'}, showInvoices:true } },
+        primary:{label:'Manage plan',icon:'icon icon-settings'}, secondary:{label:'Cancel plan'}, showInvoices:true } },
 
     quarterly: {
-      promo:false, credits:'240/900', headerBadge:{label:'Pro',tone:'pro',icon:'icon icon-crown'},
+      promo:false, credits:'240/900', headerBadge:{label:'Accelerator',tone:'pro',icon:'icon icon-crown'},
       cycleUnit:'quarter', resetDate:'Sep 1, 2026', apps:{ fromFree:0, fromPaid:240, completed:52 },
       banner:null,
       card:{ caption:'Quarterly Plan', title:'Subscription', badge:'Active', badgeTone:'success', badgeIcon:'icon icon-circle-check',
         showProgress:true, pct:27, barTone:'green', creditLine:'240 of 900 used', creditRight:'660 left', creditTone:'neutral', leftLabel:'Renews on', rightLabel:'Sep 1, 2026', rightTone:'neutral',
-        primary:{label:'Manage subscription',icon:'icon icon-settings'}, secondary:null },
-      billing:{ planName:'Pro — Quarterly', price:'$69', cadence:'per quarter', statusLabel:'Active', statusTone:'success',
+        primary:{label:'Manage plan',icon:'icon icon-settings'}, secondary:null },
+      billing:{ planName:'Accelerator — Quarterly', price:'$49', cadence:'per quarter', statusLabel:'Active', statusTone:'success',
         alert:null, renewLabel:'Next renewal', renewValue:'Sep 1, 2026',
         payLabel:'Payment method', payValue:'Visa •••• 4242', usedPct:27, usedText:'240 of 900 auto-applies used',
-        primary:{label:'Manage subscription',icon:'icon icon-settings'}, secondary:{label:'Cancel plan'}, showInvoices:true } },
+        primary:{label:'Manage plan',icon:'icon icon-settings'}, secondary:{label:'Cancel plan'}, showInvoices:true } },
+
+    accel_new: {
+      promo:false, credits:'120/900', headerBadge:{label:'Accelerator',tone:'pro',icon:'icon icon-crown'},
+      cycleUnit:'quarter', resetDate:'Sep 13, 2026', apps:{ fromFree:0, fromPaid:240, completed:52 },
+      banner:null,
+      card:{ caption:'Quarterly Plan', title:'Subscription', badge:'Active', badgeTone:'success', badgeIcon:'icon icon-circle-check',
+        showProgress:true, pct:13, barTone:'green', creditLine:'120 of 900 used', creditRight:'780 left', creditTone:'neutral', leftLabel:'Renews on', rightLabel:'Sep 13, 2026', rightTone:'neutral',
+        primary:{label:'Manage plan',icon:'icon icon-settings'}, secondary:null },
+      billing:{ planName:'Accelerator — Quarterly', price:'$49', cadence:'per quarter', statusLabel:'Active', statusTone:'success',
+        alert:null, renewLabel:'Next renewal', renewValue:'Sep 13, 2026',
+        payLabel:'Payment method', payValue:'Visa •••• 4242', usedPct:13, usedText:'120 of 900 auto-applies used',
+        primary:{label:'Manage plan',icon:'icon icon-settings'}, secondary:{label:'Cancel plan'}, showInvoices:true } },
 
     cancelling: {
       promo:false, credits:'180/300', headerBadge:{label:'Cancelling',tone:'warn',icon:'icon icon-clock'},
       banner:null,
       card:{ caption:'Monthly Plan', title:'Subscription', badge:'Cancelling', badgeTone:'warn', badgeIcon:'icon icon-clock',
         showProgress:true, pct:60, barTone:'green', creditLine:'180 of 300 used', creditRight:'120 left', creditTone:'neutral', leftLabel:'Access until', rightLabel:'Jul 3, 2026', rightTone:'neutral',
-        primary:{label:'Reactivate — $29/mo',icon:'icon icon-rotate-ccw'}, secondary:{label:'Manage subscription'} },
-      billing:{ planName:'Pro — Monthly', price:'$29', cadence:'per month', statusLabel:'Cancelling', statusTone:'warn',
+        primary:{label:'Reactivate — $19/mo',icon:'icon icon-rotate-ccw'}, secondary:{label:'Manage plan'} },
+      billing:{ planName:'Starter — Monthly', price:'$19', cadence:'per month', statusLabel:'Cancelling', statusTone:'warn',
         alert:{tone:'warn', text:"Auto-renew is off. Your plan stays active until Jul 3, 2026 — after that you'll move to the Free tier."},
         renewLabel:'Access ends', renewValue:'Jul 3, 2026',
         payLabel:'Payment method', payValue:'Visa •••• 4242', usedPct:60, usedText:'180 of 300 credits remaining',
-        primary:{label:'Reactivate plan',icon:'icon icon-rotate-ccw'}, secondary:{label:'Manage subscription'}, showInvoices:true } },
+        primary:{label:'Reactivate plan',icon:'icon icon-rotate-ccw'}, secondary:{label:'Manage plan'}, showInvoices:true } },
 
     ending_soon: {
       promo:false, credits:'360/900', headerBadge:{label:'Ending soon',tone:'warn',icon:'icon icon-clock'},
       banner:null,
       card:{ caption:'Quarterly Plan', title:'Subscription', badge:'Ending soon', badgeTone:'warn', badgeIcon:'icon icon-clock',
         showProgress:true, pct:40, barTone:'green', creditLine:'360 of 900 used', creditRight:'540 at risk', creditTone:'orange', leftLabel:'Access until', rightLabel:'Jul 3, 2026', rightTone:'orange',
-        primary:{label:'Reactivate — $49/Quarter',icon:'icon icon-rotate-ccw'}, secondary:{label:'Manage subscription'} },
-      billing:{ planName:'Pro — Quarterly', price:'$49', cadence:'per quarter', statusLabel:'Ending soon', statusTone:'warn',
+        primary:{label:'Reactivate — $49/Quarter',icon:'icon icon-rotate-ccw'}, secondary:{label:'Manage plan'} },
+      billing:{ planName:'Accelerator — Quarterly', price:'$49', cadence:'per quarter', statusLabel:'Ending soon', statusTone:'warn',
         alert:{tone:'warn', text:'Auto-renew is off. 540 unused credits will expire when your plan ends on Jul 3, 2026.'},
         renewLabel:'Access ends', renewValue:'Jul 3, 2026',
         payLabel:'Payment method', payValue:'Mastercard •••• 5821', usedPct:40, usedText:'360 of 900 credits used · 540 at risk',
-        primary:{label:'Reactivate plan',icon:'icon icon-rotate-ccw'}, secondary:{label:'Manage subscription'}, showInvoices:true } },
+        primary:{label:'Reactivate plan',icon:'icon icon-rotate-ccw'}, secondary:{label:'Manage plan'}, showInvoices:true } },
 
     past_due: {
       promo:false, credits:'0/0', headerBadge:{label:'Past due',tone:'danger',icon:'icon icon-clock'},
@@ -1745,7 +2135,7 @@ v: (() => {
       card:{ caption:'Monthly Plan', title:'Subscription', badge:'Past due', badgeTone:'danger', badgeIcon:'icon icon-clock',
         showProgress:true, pct:0, barTone:'muted', pctText:'Paused', creditLine:'Auto-apply paused', creditRight:'—', creditTone:'danger', leftLabel:'Payment due', rightLabel:'Jun 17, 2026', rightTone:'danger',
         primary:{label:'Update payment',icon:'icon icon-credit-card'}, secondary:null },
-      billing:{ planName:'Pro — Monthly', price:'$29', cadence:'per month', statusLabel:'Past due', statusTone:'danger',
+      billing:{ planName:'Starter — Monthly', price:'$19', cadence:'per month', statusLabel:'Past due', statusTone:'danger',
         alert:{tone:'danger', text:'We couldn\u2019t charge your card. Payment was due Jun 17, 2026. Auto-apply is paused until payment succeeds.'},
         renewLabel:'Payment was due', renewValue:'Jun 17, 2026',
         payLabel:'Payment method', payValue:'Visa •••• 4242 — declined', payTone:'danger', usedPct:0, usedText:'Auto-apply paused',
@@ -1757,7 +2147,7 @@ v: (() => {
       card:{ caption:'Pro Plan', title:'Subscription Status', badge:'Setup failed', badgeTone:'danger', badgeIcon:'icon icon-triangle-alert',
         showProgress:true, pct:0, barTone:'muted', pctText:'Inactive', creditLine:'Not activated', creditRight:'—', creditTone:'danger', leftLabel:'Plan status', rightLabel:'Not activated', rightTone:'danger',
         primary:{label:'Open billing portal',icon:'icon icon-external-link'}, secondary:null },
-      billing:{ planName:'Pro — Monthly', price:'$29', cadence:'per month', statusLabel:'Setup failed', statusTone:'danger',
+      billing:{ planName:'Starter — Monthly', price:'$19', cadence:'per month', statusLabel:'Setup failed', statusTone:'danger',
         alert:{tone:'danger', text:'Your subscription couldn\u2019t be set up — the initial charge didn\u2019t go through. Resolve it in the billing portal to activate Pro.'},
         renewLabel:'Status', renewValue:'Not activated',
         payLabel:'Payment method', payValue:'Card setup incomplete', payTone:'danger', usedPct:0, usedText:'Not activated',
@@ -1768,7 +2158,7 @@ v: (() => {
       banner:{tone:'pink', text:"Checkout didn't complete. Try again when you're ready.", cta:'Go to billing', dismissable:true},
       card:{ caption:'Free plan', title:'Subscription Status', badge:'Free', badgeTone:'neutral', badgeIcon:'icon icon-clock',
         showProgress:true, pct:0, barTone:'green', creditLine:'0 of 5 swipes used', creditRight:'5 left', creditTone:'neutral', leftLabel:'Validity', rightLabel:'No expiry · swipes don’t reset', rightTone:'neutral',
-        primary:{label:'Upgrade to Pro',icon:'icon icon-crown'}, secondary:null },
+        primary:{label:'See plans',icon:'icon icon-crown'}, secondary:null },
       billing:{ planName:'Free', price:'$0', cadence:'forever', statusLabel:'Free', statusTone:'neutral',
         alert:{tone:'warn', text:'Your last checkout didn\u2019t complete, so no plan was started. You can try upgrading again anytime.'},
         renewLabel:'Auto-apply credits', renewValue:'0 of 5 used this month',
@@ -1790,11 +2180,12 @@ v: (() => {
 
   SCEN_ORDER = [
     ['free','Free tier','#9AA7B2'],
-    ['active','Pro — active','#00B16B'],
-    ['upgraded','Pro — upgraded from Free','#00B16B'],
-    ['quarterly','Pro — Quarterly (900)','#00B16B'],
-    ['cancelling','Pro — cancelling','#F0B429'],
-    ['ending_soon','Pro — ending soon','#F0B429'],
+    ['active','Starter — active','#00B16B'],
+    ['starter_low','Starter — running low','#F76638'],
+    ['upgraded','Starter — upgraded from Free','#00B16B'],
+    ['quarterly','Accelerator — Quarterly','#00B16B'],
+    ['cancelling','Starter — cancelling','#F0B429'],
+    ['ending_soon','Accelerator — ending soon','#F0B429'],
     ['past_due','Past due','#F76638'],
     ['setup_failed','Setup failed','#E5484D'],
     ['checkout_failed','Checkout failed (session)','#E5484D'],
@@ -1841,6 +2232,10 @@ v: (() => {
     return `background:${active?'#fff':'transparent'};border:none;border-radius:9999px;padding:7px 14px;font-family:inherit;font-size:13px;font-weight:${active?'700':'600'};color:${active?'#022F36':'#5A6B72'};cursor:pointer;white-space:nowrap;${active?'box-shadow:0 1px 3px rgba(0,0,0,0.12);':''}`;
   }
 
+  amTabStyle(on) {
+    return `display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:none;border-radius:8px;padding:12px 16px;font-family:inherit;font-size:16px;cursor:pointer;color:${on ? '#022F36' : '#4A5464'};background:${on ? '#E9EAEB' : 'transparent'};`;
+  }
+
   acctTabStyle(active) {
     return `display:flex;align-items:center;gap:8px;background:none;border:none;border-bottom:3px solid ${active?'#022F36':'transparent'};padding:12px 16px;margin-bottom:-1px;font-family:inherit;font-size:15px;font-weight:${active?'700':'500'};color:${active?'#022F36':'#7A8694'};cursor:pointer;`;
   }
@@ -1848,10 +2243,10 @@ v: (() => {
   invoicesFor() {
     const [sbg,sfg]=this.toneColors('success');
     const [dbg,dfg]=this.toneColors('danger');
-    const paid = (d,amt) => ({ date:d, desc:'Pro — Monthly', amount:amt, status:'Paid', statusStyle:`background:${sbg};color:${sfg};border-radius:9999px;padding:4px 11px;font-size:12px;font-weight:700;` });
-    const failed = (d,amt) => ({ date:d, desc:'Pro — Monthly', amount:amt, status:'Failed', statusStyle:`background:${dbg};color:${dfg};border-radius:9999px;padding:4px 11px;font-size:12px;font-weight:700;` });
-    if (this.state.scenario==='past_due') return [ failed('Jun 17, 2026','$29.00'), paid('May 17, 2026','$29.00'), paid('Apr 17, 2026','$29.00') ];
-    return [ paid('Jun 3, 2026','$29.00'), paid('May 3, 2026','$29.00'), paid('Apr 3, 2026','$29.00') ];
+    const paid = (d,amt) => ({ date:d, desc:'Starter — Monthly', amount:amt, status:'Paid', statusStyle:`background:${sbg};color:${sfg};border-radius:9999px;padding:4px 11px;font-size:12px;font-weight:700;` });
+    const failed = (d,amt) => ({ date:d, desc:'Starter — Monthly', amount:amt, status:'Failed', statusStyle:`background:${dbg};color:${dfg};border-radius:9999px;padding:4px 11px;font-size:12px;font-weight:700;` });
+    if (this.state.scenario==='past_due') return [ failed('Jun 17, 2026','$19.00'), paid('May 17, 2026','$19.00'), paid('Apr 17, 2026','$19.00') ];
+    return [ paid('Jun 3, 2026','$19.00'), paid('May 3, 2026','$19.00'), paid('Apr 3, 2026','$19.00') ];
   }
 
   scen() { return this.SCEN[this.state.scenario]; }
@@ -1886,6 +2281,63 @@ v: (() => {
     return { all, list: list.map(a => this.appRow(a, st)) };
   }
 
+  adVals(st) {
+    const a = st.appDetail;
+    if (!a) return { adOpen: false };
+    const segBtn = (on) => `display:flex;align-items:center;gap:8px;border:none;border-radius:9999px;padding:10px 18px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;background:${on ? '#fff' : 'transparent'};color:${on ? '#0D0D0F' : '#4A5464'};box-shadow:${on ? '0 1px 3px rgba(0,0,0,0.12)' : 'none'};`;
+    const tabBtn = (on) => `display:flex;align-items:center;gap:9px;border:none;border-radius:10px;padding:11px 18px;font-family:inherit;font-size:16px;font-weight:600;cursor:pointer;background:${on ? '#F2F5F8' : 'transparent'};color:${on ? '#0D0D0F' : '#4A5464'};`;
+    const seg = st.appSeg || 'jd', tab = st.appTab || 'overview';
+    const T = 'Oct 26, 2026 · 10:51 AM';
+    const done = (label, sub) => ({ label, sub: sub || T, k: 'done' });
+    const cur  = (label, sub, k) => ({ label, sub, k });
+    const todo = (label, sub) => ({ label, sub: sub || 'Up next', k: 'todo' });
+    const steps = {
+      needs:     [done('You applied to the job'), done('Processing application'), done('Submitting application'), cur('Information needed', 'Add the missing details so we can finish', 'warn'), todo('Submitted')],
+      queued:    [done('You applied to the job'), cur('Processing application', 'Checking everything is ready', 'live'), todo('Submitting application'), todo('Submitted')],
+      applying:  [done('You applied to the job'), done('Processing application'), cur('Submitting application', 'Filling the employer’s form now', 'live'), todo('Submitted')],
+      submitted: [done('You applied to the job'), done('Processing application'), done('Submitting application'), done('Submitted', T + ' · 1 credit used')],
+      failed:    [done('You applied to the job'), done('Processing application'), cur('Couldn’t apply', (a.failReason || 'The job closed') + ' · credit returned', 'fail')],
+      manual:    [done('You applied to the job'), cur('Apply on your own', 'This employer’s site needs you to apply directly · no credit used', 'info')],
+    }[a.state] || [];
+    const look = {
+      done: ['#00B16B','#fff','icon icon-check','solid #00B16B'], live: ['#1B88FE','#fff','icon icon-loader-circle','dashed #9DC3F0'],
+      warn: ['#FFE7DC','#F76638','icon icon-circle-help','dashed #C7D3DF'], fail: ['#E8ECEF','#4A5464','icon icon-x','dashed #C7D3DF'],
+      info: ['#E0F4FA','#0E93B5','icon icon-external-link','dashed #C7D3DF'], todo: ['#fff','#A9B3B9','icon icon-circle','dashed #C7D3DF'],
+    };
+    const tl = steps.map((x, i) => { const L = look[x.k]; const nextTodo = steps[i + 1] && steps[i + 1].k === 'todo';
+      return { label: x.label, sub: x.sub, icon: L[2], hasLine: i < steps.length - 1,
+        dotStyle: `width:24px;height:24px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${L[0]};${x.k === 'todo' ? 'border:1.5px solid #C7D3DF;' : ''}`,
+        iconStyle: `font-size:${x.k === 'todo' ? 0 : 14}px;color:${L[1]};${x.k === 'live' ? 'animation:spin 1.6s linear infinite;' : ''}`,
+        lineStyle: `flex:1;width:0;min-height:30px;border-left:2px ${x.k === 'done' && !nextTodo && steps[i + 1] && steps[i + 1].k === 'done' ? 'solid #00B16B' : 'dashed #9FB0BE'};`,
+        labelStyle: `font-size:16px;font-weight:600;color:${x.k === 'todo' ? '#7A8694' : '#0D0D0F'};` }; });
+    const level = /senior|staff|lead|principal/i.test(a.title) ? 'Senior' : /intern|junior|entry|new grad/i.test(a.title) ? 'Entry' : 'Mid';
+    return {
+      adOpen: true,
+      ad: { ...a, location: (a.meta || '').split('·')[0].trim() || 'United States', level, isNeeds: a.state === 'needs' },
+      onAdClose: () => this.setState({ appDetail: null }),
+      adSegJd: seg === 'jd', adSegMissing: seg === 'missing',
+      adSegJdStyle: segBtn(seg === 'jd'), adSegMissingStyle: segBtn(seg === 'missing'),
+      onAdSegJd: () => this.setState({ appSeg: 'jd' }), onAdSegMissing: () => this.setState({ appSeg: 'missing' }),
+      adIsOverview: tab === 'overview', adIsResume: tab === 'resume',
+      adTabOverviewStyle: tabBtn(tab === 'overview'), adTabResumeStyle: tabBtn(tab === 'resume'),
+      onAdTabOverview: () => this.setState({ appTab: 'overview' }), onAdTabResume: () => this.setState({ appTab: 'resume' }),
+      adReqs: ['3+ years building production software','Strong in TypeScript, Go or Python','REST APIs and distributed systems','SQL and NoSQL databases','CI/CD, Git and code review','Clear written communication'],
+      adTimeline: tl,
+      adFields: [{ label:'Expected salary (USD / year)', ph:'e.g. 120,000' }, { label:'CGPA / GPA', ph:'e.g. 3.6 out of 4.0' }],
+      onAdSubmitInfo: () => this.setState({ appDetail: null, skillToast: 'Saved. Bloom will submit this within 24 hours.' }),
+      adDoneOpen: !!st.appDoneOpen,
+      onAdDoneToggle: () => this.setState(s => ({ appDoneOpen: !s.appDoneOpen })),
+      adDoneChevron: st.appDoneOpen ? 'icon icon-chevron-up' : 'icon icon-chevron-down',
+      adDone: [
+        { k: 'First Name', v: 'Dillan', isText: true },
+        { k: 'Last Name', v: 'Fernando', isText: true },
+        { k: 'Email', v: 'dillan@gmail.com', isText: true },
+        { k: 'This is an onsite role in ' + ((a.meta || '').split('·')[0].trim() || 'the listed location') + ', and relocation assistance is not available. Do you currently live within a reasonable commuting distance?', isSelect: true,
+          opts: [{ v: 'Yes', sel: false }, { v: 'No', sel: true }] },
+      ],
+    };
+  }
+
   appRow(a, st) {
     const S = {
       needs:     { label:'Needs you', dot:'#F76638', bg:'#FFF4EF', bd:'#F9D9CB', fg:'#C2410C' },
@@ -1900,7 +2352,7 @@ v: (() => {
     const subText = a.state === 'needs' ? (a.needText + ' · then submits within 24h')
              : a.state === 'queued' ? 'In line · submits within 24h'
              : a.state === 'submitted' ? ('Submitted ' + a.ago)
-             : a.state === 'failed' ? (a.failReason + ' · 1 credit refunded') : '';
+             : a.state === 'failed' ? a.failReason : '';
     const tipText = {
       needs: 'Bloom needs a couple of answers before it can apply. Everything you’ve already answered is saved — finish this and it submits within 24 hours. We’ll also email you.',
       queued: a.ticker ? 'Bloom is checking everything is ready before submitting. If anything’s missing, we’ll ask you here.' : 'Info received — in line for your Bloom agent. It submits within 24 hours.',
@@ -1922,6 +2374,10 @@ v: (() => {
       subColor: a.state === 'needs' ? '#C2410C' : '#7A8694',
       tickText: tick,
       subText,
+      onOpen: () => this.setState({ appDetail: { title:a.title, company:a.company, logoChar:a.logoChar, logoBg:a.logoBg, meta:a.meta, state:a.state, ago:a.ago, failReason:a.failReason }, appTab:'overview', appSeg: a.state === 'needs' ? 'missing' : 'jd', appDoneOpen:false }),
+      ...(() => { const c = { queued:['Credit on hold','icon icon-clock','#92400E'], applying:['Credit on hold','icon icon-clock','#92400E'], needs:['Credit on hold','icon icon-clock','#92400E'],
+          submitted:['1 credit used','icon icon-circle-check','#4A5464'], failed:['Credit returned','icon icon-rotate-ccw','#00824D'], manual:['No credit used','icon icon-circle-minus','#4A5464'] }[a.state];
+        return c ? { hasCredit:true, creditNote:c[0], creditIcon:c[1], creditInk:c[2] } : { hasCredit:false }; })(),
     };
   }
 
@@ -1938,7 +2394,8 @@ v: (() => {
     const used = parseInt(parts[0], 10) || 0;
     const total = parseInt(parts[1], 10) || 0;
     const paid = total >= 30;
-    const left = Math.max(total - used, 0);
+    const hold = Math.min(sc.hold != null ? sc.hold : 1 + st.applied.length + (st.pending && st.pending.type === 'apply' ? 1 : 0), Math.max(total - used, 0));
+    const left = Math.max(total - used - hold, 0);
     const leftPct = total > 0 ? Math.round((left / total) * 100) : 0;
     const exhausted = total > 0 && left === 0;
     const low = !paid && total > 0 && left <= 2;
@@ -1957,7 +2414,9 @@ v: (() => {
 
     return {
       planLabel: sc.headerBadge.label, paid,
-      used, total, left, leftPct, exhausted, low,
+      used, total, left, hold, leftPct, exhausted, low,
+      badgeText: left + ' left' + (hold ? ' · ' + hold + ' on hold' : ''),
+      hasHold: hold > 0, holdLine: hold + ' on hold for applications in progress',
       hasAllowance: total > 0,
       bigLeft: total > 0 ? String(left) : '0',
       leftWord: left === 1 ? 'apply left' : 'applies left',
@@ -1970,8 +2429,8 @@ v: (() => {
       upgradeTitle: exhausted ? "You're out of free applies"
                    : low ? `Only ${left} free ${left === 1 ? 'apply' : 'applies'} left`
                    : 'Want to apply faster?',
-      upgradeSub: 'Pro gives you 300 auto-applies every month.',
-      upgradeCta: exhausted ? 'Upgrade to keep applying' : 'Upgrade to Pro — $29/mo',
+      upgradeSub: 'Starter gives you 300 auto-applies every month.',
+      upgradeCta: exhausted ? 'Upgrade to keep applying' : 'Upgrade to Starter — $19/mo',
       allTime, inProgress, completed,
       splitInProgStyle: `width:${allTime>0?Math.round((inProgress/allTime)*100):0}%;background:#1D484F;`,
       splitDoneStyle: `width:${allTime>0?Math.round((completed/allTime)*100):0}%;background:#00B16B;`,
@@ -1989,7 +2448,118 @@ v: (() => {
 
   set(s) { this.setState({ scenario:s, checkoutDismissed:false, avatarMenu:false }); }
   go(s) { this.setState({ screen:s, avatarMenu:false }); }
-  goBillingTab() { this.setState({ screen:'account', acctTab:'billing', avatarMenu:false }); }
+  goBillingTab() { this.setState({ screen:'plan', avatarMenu:false, creditsHover:false }); }
+  planKind(k) { return ['quarterly','ending_soon','accel_new'].includes(k) ? 'accel' : ['active','upgraded','starter_low','cancelling','past_due'].includes(k) ? 'starter' : 'free'; }
+
+  planVals(st, sc) {
+    const kind = this.planKind(st.scenario);
+    const ci = this.creditInfo(sc, st);
+    const total = ci.total, used = ci.used, hold = ci.hold, left = ci.left;
+    const lowPct = total ? left / total : 1;
+    const toast = (t) => { this.setState({ notice: t }); clearTimeout(this._pt); this._pt = setTimeout(() => this.setState({ notice: null }), 2600); };
+    const openUp = () => this.setState({ screen: 'plan', pm: 'upgrade', creditsHover: false, avatarMenu: false });
+    const b = sc.billing || {};
+    const [sbg, sfg] = this.toneColors(b.statusTone || 'neutral');
+    const statusStyle = `background:${sbg};color:${sfg};border-radius:9999px;padding:4px 12px;font-size:13px;font-weight:700;`;
+    const pillBtn = (dark) => `width:100%;height:46px;border-radius:9999px;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;${dark ? 'background:#022F36;border:none;color:#fff;' : 'background:#fff;border:1.5px solid #022F36;color:#022F36;'}`;
+    const curBtn = 'width:100%;height:46px;border-radius:9999px;font-family:inherit;font-size:15px;font-weight:700;background:#F2F5F8;border:none;color:#4A5464;cursor:default;';
+    const planCard = (id, name, price, per, sub, features, badge) => {
+      const isCurrent = (id === 'starter' && kind === 'starter') || (id === 'accel' && kind === 'accel');
+      let btn = 'Current plan', onClick = () => {};
+      if (!isCurrent) {
+        if (kind === 'free') { btn = 'Choose ' + name; onClick = () => toast('Opens checkout for ' + name); }
+        else if (id === 'accel') { btn = 'Switch to Quarterly'; onClick = openUp; }
+        else { btn = 'Switch to Monthly'; onClick = () => this.setState({ pm: 'downgrade' }); }
+      }
+      return { name, price, per, sub, features, isCurrent, onClick, btn, hasBadge: !!badge || isCurrent,
+        badge: isCurrent ? 'Current plan' : badge,
+        badgeStyle: isCurrent ? 'background:#E0FAFA;color:#022F36;border-radius:9999px;padding:4px 12px;font-size:12.5px;font-weight:700;' : 'background:#FFF4EF;color:#C2410C;border-radius:9999px;padding:4px 12px;font-size:12.5px;font-weight:700;',
+        cardStyle: `background:#fff;border:${isCurrent ? '2px solid #1D484F' : '1px solid #EDEEF0'};border-radius:18px;padding:22px;display:flex;flex-direction:column;`,
+        btnStyle: isCurrent ? curBtn : pillBtn(id === 'accel') };
+    };
+    const portal = (t) => () => toast('Opens the billing portal: ' + t);
+    const linkBtn = 'display:flex;align-items:center;gap:6px;background:none;border:1px solid #E5E7EB;border-radius:9999px;padding:8px 14px;font-family:inherit;font-size:14px;font-weight:600;color:#1D484F;cursor:pointer;white-space:nowrap;';
+    const endDate = b.renewValue || sc.resetDate || 'Jul 3, 2026';
+    const planShort = kind === 'accel' ? 'Accelerator' : 'Starter';
+    const pm = st.pm;
+    const rows = (arr) => arr.map((r, i) => ({ ...r, border: i ? '1px solid #E5E7EB' : 'none', vStyle: `font-weight:${r.strong ? 700 : 600};color:#0D0D0F;` }));
+    const pmMap = {
+      upgrade: { title: 'Switch to Accelerator Quarterly', body: 'You’ll get 900 swipes right away. We’ll credit the unused days of your Starter plan.',
+        hasRows: true, rows: rows([{ k: 'Accelerator, 3 months', v: '$49.00' }, { k: 'Credit for 20 unused days', v: '−$12.67' }, { k: 'You pay today', v: '$36.33', strong: true }, { k: 'Next bill', v: '$49 on Sep 13, 2026' }, { k: 'Swipes', v: '300 → 900 now' }]),
+        primary: 'Pay $36.33 and switch', secondary: 'Cancel', hasSecondary: true },
+      success: { isSuccess: true, title: 'You’re on Accelerator', body: '900 swipes are ready for this quarter. Your next bill is $49 on Sep 13, 2026.',
+        primary: 'View credits', secondary: 'Done', hasSecondary: true },
+      downgrade: { title: 'Switch to Starter Monthly?', body: 'You keep Accelerator and your swipes until ' + endDate + '. After that you’ll pay $19/month for 300 swipes.',
+        primary: 'Switch at end of period', secondary: 'Keep Accelerator', hasSecondary: true },
+      cancel: { title: 'Cancel your plan?', body: 'You keep ' + planShort + ' until ' + endDate + '. After that you move to Free with 5 swipes. Unused swipes expire then.',
+        primary: 'Continue in billing portal', secondary: 'Keep my plan', hasSecondary: true },
+    }[pm];
+    const reset = kind === 'free' ? 'Free swipes don’t reset' : ('Resets ' + (sc.resetDate || endDate));
+    const hist = [
+      ['Backend Engineer','ShutterTech','S','#0D0D0F','Oct 26','hold'],['Platform Engineer','HubSpot','H','#FF7A59','Oct 26','hold'],
+      ['Software Engineer','Miro','M','#FFD02F','Oct 25','used'],['Full Stack Engineer','Notion','N','#0D0D0F','Oct 24','used'],
+      ['Frontend Engineer','Linear','L','#5E6AD2','Oct 24','returned'],['Senior Backend Engineer','Ramp','R','#D4F24A','Oct 23','used'],
+      ['Mobile Engineer','Discord','D','#5865F2','Oct 22','used'],['Software Engineer II','Vercel','V','#0D0D0F','Oct 21','returned'],
+    ];
+    const SL = { used: ['1 credit used','#E3F7EC','#00824D'], hold: ['On hold','#FFF7E8','#92400E'], returned: ['Credit returned','#F1F4F6','#4A5464'] };
+    const f = st.credFilter || 'all';
+    const fl = [['all','All'],['used','Used'],['hold','On hold'],['returned','Returned']];
+    let hi = 0;
+    hist.forEach(h => { if (h[5] === 'hold' || h[5] === 'used0') { h[5] = hi < hold ? 'hold' : 'used'; hi++; } });
+    for (let i = hist.length - 1; hi < hold && i >= 0; i--) { if (hist[i][5] === 'used') { hist[i][5] = 'hold'; hi++; } }
+    const histRows = hist.filter(h => f === 'all' || h[5] === f).map(h => ({ job: h[0], company: h[1], logoChar: h[2], logoBg: h[3], date: h[4], status: SL[h[5]][0],
+      pill: `background:${SL[h[5]][1]};color:${SL[h[5]][2]};border-radius:9999px;padding:5px 12px;font-size:13px;font-weight:700;white-space:nowrap;` }));
+    const showLow = kind !== 'accel' && total > 0 && lowPct < 0.2 && !['past_due','setup_failed','cancelled'].includes(st.scenario);
+    return {
+      isPlan: st.screen === 'plan',
+      showPlanBadge: !['active','upgraded','starter_low','quarterly','accel_new'].includes(st.scenario),
+      ddReset: reset,
+      ddFreeUp: kind === 'free' && !!this.creditInfo(sc, st).showUpgrade,
+      ddStarterLow: kind === 'starter' && lowPct < 0.2,
+      ddStarterLink: kind === 'starter' && lowPct >= 0.2,
+      onOpenUpgrade: openUp,
+      onUndoDowngrade: () => this.setState({ downgradePending: false }),
+      pl: {
+        name: kind === 'free' ? 'Free' : (b.planName || planShort), status: b.statusLabel || 'Free', statusStyle,
+        priceLine: kind === 'free' ? '$0 · 5 swipes, no expiry' : (b.price + ' ' + (b.cadence || '') + ' · ' + total + ' swipes'),
+        renewLine: kind === 'free' ? 'Upgrade any time. Your applications stay in your history.' : ((b.renewLabel || 'Renews') + ' ' + endDate),
+        hasNote: !!st.downgradePending && kind === 'accel', note: 'Switching to Starter Monthly on ' + endDate + '.', noteUndo: true,
+        showSwitchUp: kind === 'starter' && !['past_due','cancelling'].includes(st.scenario),
+        showBilling: kind !== 'free',
+        cards: [
+          planCard('starter', 'Starter', '$19', '/month', 'Billed monthly', ['300 auto-applies every month', 'Live application tracking', 'Match Preference filters']),
+          planCard('accel', 'Accelerator', '$49', '/quarter', '$16.33/month · Save 14% vs monthly', ['900 auto-applies per quarter', 'Everything in Starter', 'Priority matching (80%+)'], 'Most popular · Save 14%'),
+        ],
+        billRows: [
+          { icon: 'icon icon-credit-card', label: 'Payment methods, invoices & cancellation', value: 'Managed securely in the billing portal', action: 'Manage subscription', actionIcon: 'icon icon-external-link', onClick: portal('subscription') },
+        ].map((r, i) => ({ ...r, border: i ? '1px solid #F0F1F3' : 'none', btnStyle: linkBtn })),
+      },
+      pmOpen: !!pmMap,
+      pm: pmMap ? { isSuccess: false, hasRows: false, rows: [], ...pmMap,
+        primaryStyle: 'background:#022F36;border:none;border-radius:9999px;height:46px;padding:0 24px;font-family:inherit;font-size:15px;font-weight:700;color:#fff;cursor:pointer;' } : {},
+      onPmSecondary: () => this.setState({ pm: null }),
+      onPmPrimary: () => {
+        if (pm === 'upgrade') this.setState({ pm: 'success', scenario: 'accel_new', downgradePending: false });
+        else if (pm === 'success') this.setState({ pm: null, screen: 'credits' });
+        else if (pm === 'downgrade') { this.setState({ pm: null, downgradePending: true }); toast('You’ll switch to Starter on ' + endDate); }
+        else if (pm === 'cancel') { this.setState({ pm: null }); toast('Opens the billing portal to cancel'); }
+      },
+      cr: {
+        left, hasHold: hold > 0, holdLine: hold + ' on hold for applications in progress',
+        usedLine: used + ' of ' + total + ' used this ' + (kind === 'accel' ? 'quarter' : kind === 'starter' ? 'month' : 'plan'),
+        planName: kind === 'free' ? 'Free' : planShort,
+        planPill: 'background:#E0FAFA;color:#022F36;border-radius:9999px;padding:4px 12px;font-size:13px;font-weight:700;',
+        ringStyle: `width:148px;height:148px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:conic-gradient(${showLow ? '#F76638' : '#1D484F'} 0 ${total ? Math.round(used / total * 100) : 0}%, #F0B429 0 ${total ? Math.round((used + hold) / total * 100) : 0}%, #E0FAFA 0);`,
+        resetLine: reset,
+        hasStreak: kind !== 'free', streakBonus: '+10 bonus swipes', streakNote: '\u00a0earned from your 7-day apply streak',
+        showLow, lowSub: kind === 'free' ? 'Upgrade to Starter for 300 swipes a month.' : 'Get 900 swipes with Quarterly. You only pay the difference today.',
+        lowCta: kind === 'free' ? 'See plans' : 'Switch to Quarterly', onLowCta: kind === 'free' ? () => this.setState({ screen: 'plan' }) : openUp,
+        filters: fl.map(([k, l]) => ({ label: l, on: f === k, onClick: () => this.setState({ credFilter: k }),
+          style: `border-radius:9999px;padding:7px 14px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;${f === k ? 'background:#022F36;color:#fff;border:1px solid #022F36;' : 'background:#fff;color:#23262E;border:1px solid #E5E7EB;'}` })),
+        rows: histRows, empty: histRows.length === 0,
+      },
+    };
+  }
 
   renderVals() {
     const st = this.state;
@@ -2049,10 +2619,19 @@ v: (() => {
       pctText: c.pctText || `${c.pct}% used`,
       pctStyle: `font-size:13px;font-weight:700;color:${c.rightTone==='orange'?'#F76638':c.rightTone==='danger'?'#B23B3B':'#1D484F'};`,
       hasSubLine: !!c.subLine, subLine: c.subLine || '',
-      primaryLabel: c.primary.label, primaryIcon: c.primary.icon,
-      hasSecondary: !!c.secondary, secondaryLabel: c.secondary ? c.secondary.label : '',
-      onPrimary: () => this.goBillingTab(),
-      onSecondary: () => this.goBillingTab(),
+      ...(() => {
+        const kind = this.planKind(st.scenario);
+        const portal = () => { this.setState({ notice: 'Opens the billing portal in a new tab' }); clearTimeout(this._pt); this._pt = setTimeout(() => this.setState({ notice: null }), 2600); };
+        const pricing = () => this.setState({ prOpen: true });
+        const upQ = () => this.setState({ screen: 'plan', pm: 'upgrade' });
+        const healthy = ['active','upgraded','starter_low','quarterly','accel_new'].includes(st.scenario);
+        if (kind === 'free') return { primaryLabel: c.primary.label, primaryIcon: c.primary.icon, onPrimary: pricing, hasSecondary: false, secondaryLabel: '', onSecondary: () => {} };
+        if (healthy) return {
+          primaryLabel: 'Manage subscription', primaryIcon: 'icon icon-external-link', onPrimary: portal,
+          hasSecondary: kind === 'starter', secondaryLabel: 'Switch to Quarterly · save 14%', onSecondary: upQ };
+        return { primaryLabel: c.primary.label, primaryIcon: c.primary.icon, onPrimary: portal,
+          hasSecondary: !!c.secondary, secondaryLabel: 'Manage subscription', onSecondary: portal };
+      })(),
     };
 
     // billing object
@@ -2109,9 +2688,22 @@ v: (() => {
       // nav + shell
       navItems,
       promoShow: sc.promo,
-      onUpgrade: () => this.goBillingTab(),
+      onUpgrade: () => this.setState({ prOpen: true, creditsHover: false, avatarMenu: false }),
+      prOpen: !!st.prOpen,
+      onPrClose: () => this.setState({ prOpen: false }),
+      onPrStarter: () => this.setState({ prOpen: false, scenario: 'upgraded', screen: 'plan' }),
+      onPrAccel: () => this.setState({ prOpen: false, scenario: 'accel_new', screen: 'plan' }),
+      prAccelFeatures: ['AI résumé review', 'Recruiter outreach drafts', 'Cold outreach & referral emails', 'Priority matching (80%+ fit)', 'Be first to apply on new roles'],
       goBilling: () => this.goBillingTab(),
-      goAccount: () => this.setState({ screen:'account', acctTab:'profile', avatarMenu:false }),
+      goAccount: () => this.setState({ amOpen: true, amTab: 'profile', avatarMenu: false }),
+      amOpen: !!st.amOpen, amIsProfile: (st.amTab || 'profile') === 'profile', amIsSecurity: st.amTab === 'security',
+      onAmProfile: () => this.setState({ amTab: 'profile' }), onAmSecurity: () => this.setState({ amTab: 'security' }),
+      amProfileStyle: this.amTabStyle((st.amTab || 'profile') === 'profile'), amSecurityStyle: this.amTabStyle(st.amTab === 'security'),
+      onAmClose: () => this.setState({ amOpen: false }), onAmBackdrop: () => this.setState({ amOpen: false }), onAmStop: (e) => e.stopPropagation(),
+      amDevices: [
+        { name: 'Macintosh', current: true, notCurrent: false, browser: 'Chrome 141.0.0.0', ip: '72.182.10.44 (Austin, US)', when: 'Today at 10:08 AM' },
+        { name: 'iPhone', current: false, notCurrent: true, browser: 'Safari 19.0', ip: '72.182.10.51 (Austin, US)', when: 'Yesterday at 9:33 PM' },
+      ],
       headerBadgeStyle,
       sc,
       creditsHover: st.creditsHover,
@@ -2197,6 +2789,10 @@ v: (() => {
         onToggle: () => this.setState({ workExpandedIdx: st.workExpandedIdx === i ? -1 : i }) })),
       skillsList: ['adobe xd','blender','css','figma','html','illustrator','indesign','javascript','photoshop','procreate','sketch','ui','ux','web design'],
       isApplications: st.screen==='applications',
+      isCredits: st.screen==='credits',
+      hasNotice: !!st.notice, notice: st.notice || '',
+      ...this.planVals(st, sc),
+      goCredits: () => this.setState({ screen: 'credits', creditsHover: false }),
       isAccount: st.screen==='account',
       // jobs
       jobsHeading: isMatches ? 'Your top role matches' : 'Saved jobs',
@@ -2207,7 +2803,9 @@ v: (() => {
       reviewedCount,
       showMomentum: isMatches && reviewedCount > 0,
       onNext: () => this.doSkip(dpos),
-      onApply: () => this.doApply(job),
+      alreadyApplied: st.applied.includes(job.id) || (st.pending && st.pending.type === 'apply' && st.pending.id === job.id),
+      canApply: !(st.applied.includes(job.id) || (st.pending && st.pending.type === 'apply' && st.pending.id === job.id)),
+      onApply: () => { if (st.applied.includes(job.id)) { this.setState({ skillToast: 'You’ve already applied to this job. No credit used.' }); return; } this.doApply(job); },
       onNotInterested: () => this.doPass(job),
       onRefreshMatches: () => this.setState({ mPos: 0 }),
       pendingShow: !!st.pending,
@@ -2294,10 +2892,11 @@ v: (() => {
       acctIsBilling: st.acctTab==='billing',
       acctGoProfile: () => this.setState({ acctTab:'profile' }),
       acctGoSecurity: () => this.setState({ acctTab:'security' }),
-      acctGoBilling: () => this.setState({ acctTab:'billing' }),
+      acctGoBilling: () => this.setState({ screen:'plan', avatarMenu:false }),
       acctTabProfileStyle: this.acctTabStyle(st.acctTab==='profile'),
       acctTabSecurityStyle: this.acctTabStyle(st.acctTab==='security'),
       acctTabBillingStyle: this.acctTabStyle(st.acctTab==='billing'),
+      ...this.adVals(st),
       appsList: (() => { const b = this.buildApps(st); return b.list; })(),
       appCounts: (() => {
         const all = this.buildApps(st).all;
