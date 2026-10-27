@@ -292,7 +292,7 @@
                 <div style="margin-top:6px;">
                   <h3 style="display:flex;align-items:center;gap:10px;font-size:21px;font-weight:700;color:#0D0D0F;margin-bottom:12px;"><i class="icon icon-contact" style="font-size:20px;color:#1D484F;"></i>Company</h3>
                   <p style="font-size:15px;line-height:1.7;color:#3C4450;max-width:760px;">{{ job.about }}</p>
-                  <a style="display:inline-block;margin-top:12px;font-size:15px;font-weight:600;color:#1D6FB8;cursor:pointer;text-decoration:underline;">Show Original Job Description</a>
+                  <button onClick="{{ onOpenJd }}" style="display:inline-block;margin-top:12px;background:none;border:none;padding:0;font-family:inherit;font-size:15px;font-weight:600;color:#1D6FB8;cursor:pointer;text-decoration:underline;">Show original job description</button>
                   <div style="background:#F8F9FA;border:1px solid #EDEEF0;border-radius:12px;padding:16px 20px;margin-top:16px;max-width:430px;">
                     <div style="font-size:15px;font-weight:600;color:#23262E;margin-bottom:8px;">Compensation Overview</div>
                     <div style="display:flex;align-items:center;gap:10px;"><span style="width:26px;height:26px;border-radius:50%;background:#5AEBEB;display:flex;align-items:center;justify-content:center;color:#022F36;font-weight:800;font-size:14px;">$</span><span style="font-size:16px;font-weight:700;color:#0D0D0F;">{{ job.comp }}</span></div>
@@ -1253,6 +1253,30 @@
           </div>
         </div>
         <p style="text-align:center;font-size:13.5px;color:#4A5464;margin-top:26px;">Credits are only used when an application is submitted. Cancel anytime from Plan &amp; Billing.</p>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== ORIGINAL JOB DESCRIPTION ===== -->
+  <sc-if value="{{ jdOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onCloseJd }}" style="position:fixed;inset:0;z-index:96;background:rgba(8,20,22,0.55);display:flex;align-items:center;justify-content:center;padding:32px;">
+      <div role="dialog" aria-label="Job Description" onClick="{{ onJdStop }}" style="width:100%;max-width:820px;max-height:calc(100vh - 64px);background:#fff;border-radius:16px;box-shadow:0 30px 80px rgba(0,0,0,0.3);display:flex;flex-direction:column;overflow:hidden;">
+        <div style="padding:24px 32px;border-bottom:1px solid #ECEEF0;display:flex;flex-direction:column;gap:4px;">
+          <h2 style="font-size:24px;font-weight:700;color:#0D0D0F;">Job Description</h2>
+          <div style="font-size:14px;color:#4A5464;">{{ job.title }} · {{ job.company }} · as posted by the employer</div>
+        </div>
+        <div style="flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:24px 32px;display:flex;flex-direction:column;gap:18px;font-size:16px;line-height:1.6;color:#3C4450;">
+          <sc-for list="{{ jdBlocks }}" as="b" hint-placeholder-count="5">
+            <sc-if value="{{ b.isHead }}" hint-placeholder-val="{{ false }}"><div style="font-weight:700;color:#23262E;margin-top:4px;">{{ b.text }}</div></sc-if>
+            <sc-if value="{{ b.isPara }}" hint-placeholder-val="{{ true }}"><p style="text-wrap:pretty;">{{ b.text }}</p></sc-if>
+            <sc-if value="{{ b.isList }}" hint-placeholder-val="{{ false }}">
+              <ul style="padding-left:22px;display:flex;flex-direction:column;gap:8px;"><sc-for list="{{ b.items }}" as="li" hint-placeholder-count="4"><li>{{ li }}</li></sc-for></ul>
+            </sc-if>
+          </sc-for>
+        </div>
+        <div style="padding:16px 32px;border-top:1px solid #ECEEF0;display:flex;justify-content:flex-end;">
+          <button onClick="{{ onCloseJd }}" style="background:#022F36;border:none;border-radius:9999px;height:46px;padding:0 28px;font-family:inherit;font-size:16px;font-weight:700;color:#fff;cursor:pointer;" style-hover="background:#1D484F;">Close</button>
+        </div>
       </div>
     </div>
   </sc-if>
@@ -2895,6 +2919,22 @@ v: (() => {
       skillsList: ['adobe xd','blender','css','figma','html','illustrator','indesign','javascript','photoshop','procreate','sketch','ui','ux','web design'],
       isApplications: st.screen==='applications',
       isCredits: st.screen==='credits',
+      jdOpen: !!st.jdOpen,
+      onOpenJd: () => this.setState({ jdOpen: true }),
+      onCloseJd: () => this.setState({ jdOpen: false }),
+      onJdStop: (e) => e.stopPropagation(),
+      jdBlocks: [
+        ['p', 'We’re looking for a Software Engineer to join our Collaboration team and build features used by millions of people every day.'],
+        ['h', 'What you’ll do:'],
+        ['l', ['Design, build and ship product features across the stack', 'Write clean, well-tested TypeScript and Go code', 'Work with product and design to turn ideas into shipped features', 'Review code and help keep our CI/CD pipeline healthy']],
+        ['h', 'What we’re looking for:'],
+        ['l', ['3+ years of professional software engineering experience', 'Strong experience with React and TypeScript', 'Experience designing and consuming REST APIs', 'Familiarity with Git-based workflows and system design', 'Clear written and spoken communication']],
+        ['h', 'Nice to have:'],
+        ['l', ['Experience with real-time collaboration or canvas apps', 'Python for tooling and data work']],
+        ['h', 'Benefits:'],
+        ['l', ['Competitive salary and equity', 'Flexible hybrid working', 'Learning and development budget', 'Health, dental and vision coverage']],
+        ['p', 'We’re an equal opportunity employer and welcome applicants from all backgrounds.'],
+      ].map(([t, v]) => ({ isHead: t === 'h', isPara: t === 'p', isList: t === 'l', text: t === 'l' ? '' : v, items: t === 'l' ? v : [] })),
       hasNotice: !!st.notice, notice: st.notice || '',
       ...this.planVals(st, sc),
       goCredits: () => this.setState({ screen: 'credits', creditsHover: false }),
