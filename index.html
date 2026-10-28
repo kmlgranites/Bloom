@@ -774,8 +774,11 @@
     <sc-if value="{{ isCredits }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Apply Credits" style="max-width:900px;margin:0 auto;padding:32px 24px 90px;display:flex;flex-direction:column;gap:20px;">
         <div>
-          <button onClick="{{ goJobs }}" style="display:flex;align-items:center;gap:7px;background:none;border:none;padding:0;margin-bottom:14px;font-family:inherit;font-size:14px;font-weight:700;color:#1D484F;cursor:pointer;"><i class="icon icon-arrow-left" style="font-size:16px;"></i>Back to jobs</button>
-          <h1 style="font-size:28px;font-weight:700;color:#022F36;letter-spacing:-0.02em;">Apply credits</h1>
+          <button onClick="{{ goJobs }}" style="display:flex;align-items:center;gap:7px;background:none;border:none;padding:0;margin-bottom:8px;font-family:inherit;font-size:14px;font-weight:700;color:#1D484F;cursor:pointer;"><i class="icon icon-arrow-left" style="font-size:16px;"></i>Back to jobs</button>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+            <h1 style="font-size:28px;font-weight:700;color:#022F36;letter-spacing:-0.02em;">Apply credits</h1>
+            <button onClick="{{ cr.onHeadCta }}" style="display:flex;align-items:center;gap:8px;background:{{ cr.headCtaBg }};border:{{ cr.headCtaBorder }};border-radius:9999px;height:44px;padding:0 22px;font-family:inherit;font-size:15px;font-weight:700;color:{{ cr.headCtaInk }};cursor:pointer;white-space:nowrap;"><i class="{{ cr.headCtaIcon }}" style="font-size:16px;"></i>{{ cr.headCta }}</button>
+          </div>
         </div>
 
         <div style="background:#fff;border:1px solid #EDEEF0;border-radius:18px;padding:26px 28px;display:flex;gap:30px;align-items:center;flex-wrap:wrap;">
@@ -812,31 +815,39 @@
           </div>
         </sc-if>
 
+        <!-- this cycle breakdown -->
         <div style="background:#fff;border:1px solid #EDEEF0;border-radius:18px;padding:22px 24px;">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
-            <h2 style="font-size:18px;font-weight:700;color:#0D0D0F;">History</h2>
-            <div role="tablist" style="display:flex;gap:6px;flex-wrap:wrap;">
-              <sc-for list="{{ cr.filters }}" as="f" hint-placeholder-count="4">
-                <button role="tab" aria-selected="{{ f.on }}" onClick="{{ f.onClick }}" style="{{ f.style }}">{{ f.label }}</button>
-              </sc-for>
-            </div>
-          </div>
-          <div style="display:flex;flex-direction:column;">
-            <sc-for list="{{ cr.rows }}" as="r" hint-placeholder-count="6">
-              <div style="display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid #F0F1F3;">
-                <div style="width:38px;height:38px;border-radius:10px;background:{{ r.logoBg }};color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">{{ r.logoChar }}</div>
-                <div style="flex:1;min-width:0;">
-                  <div style="font-size:15px;font-weight:600;color:#0D0D0F;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.job }}</div>
-                  <div style="font-size:13.5px;color:#4A5464;margin-top:2px;">{{ r.company }} · {{ r.date }}</div>
-                </div>
-                <span style="{{ r.pill }}">{{ r.status }}</span>
-              </div>
+          <h2 style="font-size:18px;font-weight:700;color:#0D0D0F;margin-bottom:16px;">{{ cr.cycleHead }}</h2>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
+            <sc-for list="{{ cr.stats }}" as="t" hint-placeholder-count="3">
+              <button onClick="{{ t.onClick }}" aria-label="{{ t.aria }}" style="background:#F5F8FA;border:1px solid transparent;border-radius:14px;padding:16px 18px;font-family:inherit;text-align:left;cursor:pointer;" style-hover="background:#F0FCFF;border-color:#B8EAF5;">
+                <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#4A5464;"><span style="width:9px;height:9px;border-radius:50%;background:{{ t.dot }};"></span><span style="flex:1;">{{ t.label }}</span><i class="icon icon-arrow-right" style="font-size:15px;color:#1D484F;"></i></div>
+                <div style="font-size:28px;font-weight:800;color:#022F36;margin-top:6px;line-height:1;">{{ t.value }}</div>
+                <div style="font-size:13px;color:#4A5464;margin-top:6px;">{{ t.note }}</div>
+              </button>
             </sc-for>
-            <sc-if value="{{ cr.empty }}" hint-placeholder-val="{{ false }}">
-              <div style="padding:22px 0;text-align:center;font-size:14px;color:#4A5464;border-top:1px solid #F0F1F3;">Nothing here yet.</div>
-            </sc-if>
           </div>
         </div>
+
+        <!-- returned credits -->
+        <div style="background:#fff;border:1px solid #EDEEF0;border-radius:18px;padding:22px 24px;">
+          <h2 style="font-size:18px;font-weight:700;color:#0D0D0F;">Credits returned</h2>
+          <div style="font-size:14px;color:#4A5464;margin:4px 0 8px;">These applications couldn’t be submitted, so the credit came back to you.</div>
+          <sc-for list="{{ cr.returned }}" as="r" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:14px;padding:13px 0;border-top:1px solid #F0F1F3;">
+              <div style="width:38px;height:38px;border-radius:10px;background:{{ r.logoBg }};color:#fff;font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">{{ r.logoChar }}</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:15px;font-weight:600;color:#0D0D0F;">{{ r.company }} · {{ r.job }}</div>
+                <div style="font-size:13.5px;color:#4A5464;margin-top:2px;">{{ r.reason }}</div>
+              </div>
+              <span style="font-size:13.5px;font-weight:600;color:#00824D;white-space:nowrap;">+1 · {{ r.date }}</span>
+            </div>
+          </sc-for>
+          <sc-if value="{{ cr.noReturned }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:14px 0 2px;font-size:14px;color:#4A5464;border-top:1px solid #F0F1F3;">No returned credits this cycle.</div>
+          </sc-if>
+        </div>
+
       </div>
     </sc-if>
 
@@ -849,9 +860,8 @@
         <p style="font-size:15px;color:#5A6B72;margin-bottom:20px;">Your Bloom agent applies in the background — most applications are submitted within 24 hours.</p>
 
         <!-- overall application progress -->
-        <div style="background:#5AC8E3;border-radius:20px;padding:18px 20px 20px;margin-bottom:24px;">
-          <h2 style="font-size:20px;font-weight:600;color:#fff;margin:0 4px 14px;">Overall Application Progress</h2>
-          <div style="background:#fff;border-radius:18px;padding:18px 20px 20px;">
+        <div style="margin-bottom:24px;">
+          <div style="background:#fff;border:1px solid #EDEEF0;border-radius:18px;padding:18px 20px 20px;box-shadow:0 2px 6px rgba(0,0,0,0.04);">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:16px;">
               <div style="display:flex;align-items:center;gap:12px;">
                 <i class="icon icon-shield" style="font-size:26px;color:#F76638;"></i>
@@ -941,6 +951,13 @@
               <div style="flex:1;min-width:0;">
                 <div style="font-size:16px;font-weight:700;color:#0D0D0F;">{{ a.title }}</div>
                 <div style="font-size:14px;color:#5A6B72;margin-top:2px;">{{ a.company }} · {{ a.meta }}</div>
+                <sc-if value="{{ a.hasFailActions }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;">
+                    <sc-for list="{{ a.failActions }}" as="fa" hint-placeholder-count="2">
+                      <button onClick="{{ fa.onClick }}" style="{{ fa.style }}"><i class="{{ fa.icon }}" style="font-size:14px;"></i>{{ fa.label }}</button>
+                    </sc-for>
+                  </div>
+                </sc-if>
                 <sc-if value="{{ a.hasCredit }}" hint-placeholder-val="{{ false }}">
                   <div style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:13px;font-weight:600;color:{{ a.creditInk }};"><i class="{{ a.creditIcon }}" style="font-size:14px;"></i>{{ a.creditNote }}</div>
                 </sc-if>
@@ -1241,7 +1258,6 @@
             <div style="padding:22px 28px;border-bottom:1px solid #EDEEF0;">
               <div style="font-size:15px;font-weight:600;color:#23262E;margin-bottom:10px;">Swipes</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:18px;color:#23262E;"><i class="icon icon-file-plus" style="font-size:20px;color:#4A5464;"></i>300 swipes a month</div>
-              <div style="font-size:13.5px;color:#4A5464;margin-top:8px;">+5 bonus swipes for every 5-day apply streak</div>
             </div>
             <div style="padding:22px 28px 28px;display:flex;flex-direction:column;gap:16px;">
               <div style="font-size:15px;font-weight:600;color:#23262E;">Everything in Free, plus</div>
@@ -1274,7 +1290,6 @@
             <div style="padding:22px 28px;border-bottom:1px solid #EDEEF0;">
               <div style="font-size:15px;font-weight:600;color:#23262E;margin-bottom:10px;">Swipes</div>
               <div style="display:flex;align-items:center;gap:10px;font-size:18px;color:#23262E;"><i class="icon icon-file-plus" style="font-size:20px;color:#4A5464;"></i>900 swipes a quarter</div>
-              <div style="font-size:13.5px;color:#4A5464;margin-top:8px;">+5 bonus swipes for every 5-day apply streak</div>
             </div>
             <div style="padding:22px 28px 28px;display:flex;flex-direction:column;gap:16px;">
               <div style="font-size:15px;font-weight:600;color:#23262E;">Everything in Starter, plus</div>
@@ -2364,9 +2379,11 @@ v: (() => {
       ticker:['Tailoring your résumé to this role','Drafting your application answers','Lining up your Bloom agent'] },
     { logoChar:'C', logoBg:'#FF6B35', title:'DevOps Engineer', company:'ChargeBee', meta:'Houston, US · Remote', state:'submitted', ago:'2 days ago' },
     { logoChar:'G', logoBg:'#4285F4', title:'Senior Software Engineer', company:'Google', meta:'Mountain View, CA', state:'submitted', ago:'3 days ago' },
-    { logoChar:'E', logoBg:'#FFCE00', title:'Full Stack Developer', company:'Exness', meta:'Atlanta, GA · Fulltime', state:'failed', failReason:'Job is no longer available', ago:'1 day ago' },
+    { logoChar:'E', logoBg:'#FFCE00', title:'Full Stack Developer', company:'Exness', meta:'Atlanta, GA · Fulltime', state:'failed', failCode:'closed', failReason:'The job closed before we could submit', ago:'1 day ago' },
+    { logoChar:'S', logoBg:'#635BFF', title:'Backend Engineer', company:'Stripe', meta:'Seattle, WA · Hybrid', state:'failed', failCode:'ours', failReason:'Didn’t submit within 24 hours', ago:'1 day ago' },
+    { logoChar:'W', logoBg:'#0A2540', title:'Software Engineer', company:'Workday', meta:'Pleasanton, CA · Hybrid', state:'failed', failCode:'blocked', failReason:'Workday’s site blocked automated applications', ago:'2 days ago' },
     { logoChar:'C', logoBg:'#6B7A8F', title:'Cloud Architect', company:'Compass Real Estate', meta:'Houston, US · Fulltime', state:'manual', ago:'5h ago' },
-    { logoChar:'P', logoBg:'#1A1A2E', title:'Platform Engineer', company:'Palantir', meta:'Denver, CO · On-site', state:'failed', failReason:'Employer requires US citizenship', ago:'2 days ago' },
+    { logoChar:'P', logoBg:'#1A1A2E', title:'Platform Engineer', company:'Palantir', meta:'Denver, CO · On-site', state:'failed', failCode:'info', failReason:'The form needed your security clearance status', ago:'2 days ago' },
   ];
 
   appChip(active) {
@@ -2423,7 +2440,8 @@ v: (() => {
       return { logoChar:j.logoChar, logoBg:j.logoBg, title:j.title, company:j.company, meta:j.location||'', state:'queued', tickOffset:0, ago:'Just now',
         ticker:['Tailoring your résumé to this role','Drafting your application answers','Lining up your Bloom agent'] };
     });
-    const all = [...live, ...this.APPS];
+    const ov = st.appOv || {};
+    const all = [...live, ...this.APPS.filter(a => ov[a.title] !== 'hidden').map(a => ov[a.title] === 'queued' ? { ...a, state: 'queued' } : a)];
     const order = { submitted:0, applying:1, needs:2, queued:3, manual:4, failed:5 };
     all.sort((a,b) => order[a.state] - order[b.state]);
     const tabbed = all.filter(a => st.appsTab === 'closed' ? a.state === 'failed' : a.state !== 'failed');
@@ -2500,6 +2518,8 @@ v: (() => {
   }
 
   appRow(a, st) {
+    const ov = (st.appOv || {})[a.title];
+    if (ov === 'queued') a = { ...a, state: 'queued', ago: 'Just now', ticker: ['Retrying your application', 'Checking everything is ready', 'Lining up your Bloom agent'] };
     const S = {
       needs:     { label:'Needs you', dot:'#F76638', bg:'#FFF4EF', bd:'#F9D9CB', fg:'#C2410C' },
       queued:    { label:'Queued', dot:'#F59E0B', bg:'#FFF7E8', bd:'#F3E3C2', fg:'#92400E', pulse: !!a.ticker },
@@ -2535,9 +2555,21 @@ v: (() => {
       subColor: a.state === 'needs' ? '#C2410C' : '#7A8694',
       tickText: tick,
       subText,
+      ...(() => {
+        if (a.state !== 'failed') return { hasFailActions: false, failActions: [] };
+        const tries = (st.appTries || {})[a.title] || 0;
+        const btn = (dark) => `display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:9999px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;${dark ? 'background:#1D484F;border:none;color:#fff;' : 'background:#fff;border:1px solid #D5DBDF;color:#23262E;'}`;
+        const toast = (t) => { this.setState({ skillToast: t }); clearTimeout(this._pt); this._pt = setTimeout(() => this.setState({ skillToast: null }), 2600); };
+        const stop = (fn) => (e) => { if (e && e.stopPropagation) e.stopPropagation(); fn(); };
+        const retry = { label: 'Retry', icon: 'icon icon-rotate-cw', style: btn(true), onClick: stop(() => { this.setState(st2 => ({ appOv: { ...(st2.appOv || {}), [a.title]: 'queued' }, appTries: { ...(st2.appTries || {}), [a.title]: tries + 1 } })); toast('Retrying · 1 credit on hold'); }) };
+        const own = { label: 'Apply on ' + a.company, icon: 'icon icon-external-link', style: btn(true), onClick: stop(() => toast('Opens ' + a.company + '’s job page')) };
+        const info = { label: 'Add info', icon: 'icon icon-pencil', style: btn(true), onClick: stop(() => toast('Opens the missing questions')) };
+        const remove = { label: 'Remove', icon: 'icon icon-trash-2', style: btn(false), onClick: stop(() => { this.setState(st2 => ({ appOv: { ...(st2.appOv || {}), [a.title]: 'hidden' } })); toast('Removed from your list'); }) };
+        const primary = a.failCode === 'blocked' ? own : a.failCode === 'info' ? info : a.failCode === 'closed' ? null : (tries < 2 ? retry : own);
+        return { hasFailActions: true, failActions: [primary, remove].filter(Boolean) };
+      })(),
       onOpen: () => this.setState({ appDetail: { title:a.title, company:a.company, logoChar:a.logoChar, logoBg:a.logoBg, meta:a.meta, state:a.state, ago:a.ago, failReason:a.failReason }, appTab:'overview', appSeg: a.state === 'needs' ? 'missing' : 'jd', appDoneOpen:false }),
-      ...(() => { const c = { queued:['Credit on hold','icon icon-clock','#92400E'], applying:['Credit on hold','icon icon-clock','#92400E'], needs:['Credit on hold','icon icon-clock','#92400E'],
-          submitted:['1 credit used','icon icon-circle-check','#4A5464'], failed:['Credit returned','icon icon-rotate-ccw','#00824D'], manual:['No credit used','icon icon-circle-minus','#4A5464'] }[a.state];
+      ...(() => { const c = { failed:['Credit returned','icon icon-rotate-ccw','#00824D'], manual:['No credit used','icon icon-circle-minus','#4A5464'] }[a.state];
         return c ? { hasCredit:true, creditNote:c[0], creditIcon:c[1], creditInk:c[2] } : { hasCredit:false }; })(),
     };
   }
@@ -2618,7 +2650,7 @@ v: (() => {
     const total = ci.total, used = ci.used, hold = ci.hold, left = ci.left;
     const lowPct = total ? left / total : 1;
     const toast = (t) => { this.setState({ notice: t }); clearTimeout(this._pt); this._pt = setTimeout(() => this.setState({ notice: null }), 2600); };
-    const openUp = () => this.setState({ screen: 'plan', pm: 'upgrade', creditsHover: false, avatarMenu: false });
+    const openUp = () => { this.setState({ creditsHover: false, avatarMenu: false }); toast('Opens the billing portal to switch to Accelerator Quarterly'); };
     const b = sc.billing || {};
     const [sbg, sfg] = this.toneColors(b.statusTone || 'neutral');
     const statusStyle = `background:${sbg};color:${sfg};border-radius:9999px;padding:4px 12px;font-size:13px;font-weight:700;`;
@@ -2712,12 +2744,41 @@ v: (() => {
         planPill: 'background:#E0FAFA;color:#022F36;border-radius:9999px;padding:4px 12px;font-size:13px;font-weight:700;',
         ringStyle: `width:148px;height:148px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:conic-gradient(${showLow ? '#F76638' : '#1D484F'} 0 ${total ? Math.round(used / total * 100) : 0}%, #F0B429 0 ${total ? Math.round((used + hold) / total * 100) : 0}%, #E0FAFA 0);`,
         resetLine: reset,
-        hasStreak: kind !== 'free', streakBonus: '+10 bonus swipes', streakNote: '\u00a0earned from your 7-day apply streak',
+        hasStreak: false, streakBonus: '+10 bonus swipes', streakNote: '\u00a0earned from your 7-day apply streak',
         showLow, lowSub: kind === 'free' ? 'Upgrade to Starter for 300 swipes a month.' : 'Get 900 swipes with Quarterly. You only pay the difference today.',
         lowCta: kind === 'free' ? 'See plans' : 'Switch to Quarterly', onLowCta: kind === 'free' ? () => this.setState({ screen: 'plan' }) : openUp,
         filters: fl.map(([k, l]) => ({ label: l, on: f === k, onClick: () => this.setState({ credFilter: k }),
           style: `border-radius:9999px;padding:7px 14px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;${f === k ? 'background:#022F36;color:#fff;border:1px solid #022F36;' : 'background:#fff;color:#23262E;border:1px solid #E5E7EB;'}` })),
         rows: histRows, empty: histRows.length === 0,
+        headCta: kind === 'free' ? 'Upgrade' : kind === 'starter' ? 'Switch to Quarterly' : 'Plan & Billing',
+        headCtaIcon: kind === 'free' ? 'icon icon-crown' : kind === 'starter' ? 'icon icon-arrow-up-right' : 'icon icon-credit-card',
+        headCtaBg: kind === 'accel' ? '#FFFFFF' : '#022F36',
+        headCtaBorder: kind === 'accel' ? '1px solid #D5DBDF' : 'none',
+        headCtaInk: kind === 'accel' ? '#022F36' : '#FFFFFF',
+        onHeadCta: kind === 'free' ? () => this.setState({ prOpen: true }) : kind === 'starter' ? openUp : () => this.setState({ screen: 'plan' }),
+        ...(() => {
+          const onHold = hold;
+          const ret = [
+            { company: 'Workday', logoChar: 'W', logoBg: '#0A2540', job: 'Software Engineer', reason: 'Site blocked automated applications', date: 'Oct 24' },
+            { company: 'Exness', logoChar: 'E', logoBg: '#1F1F1F', job: 'Backend Engineer', reason: 'The job closed before we could submit', date: 'Oct 21' },
+          ];
+          const usedN = used;
+          const cyc = kind === 'free' ? [] : (kind === 'accel'
+            ? [['Q2 2026', 842, 900], ['Q1 2026', 615, 900]]
+            : [['Sep 2026', 287, 300], ['Aug 2026', 241, 300], ['Jul 2026', 300, 300]]);
+          return {
+            cycleHead: kind === 'free' ? ('Your ' + total + ' free swipes') : kind === 'accel' ? 'Your swipes this quarter' : 'Your swipes this month',
+            stats: [
+              { label: 'Used', value: usedN, note: 'Applications submitted', dot: '#00B16B', aria: 'View submitted applications', onClick: () => this.setState({ screen: 'applications', appsTab: 'active', fStatus: 'Submitted', fSearch: '', fDate: 'All time', fType: 'All' }) },
+              { label: 'On hold', value: onHold, note: 'Charged once submitted', dot: '#F0B429', aria: 'View applications in progress', onClick: () => this.setState({ screen: 'applications', appsTab: 'active', fStatus: 'In progress', fSearch: '', fDate: 'All time', fType: 'All' }) },
+              { label: 'Returned', value: ret.length, note: 'Couldn’t be submitted', dot: '#8A98A5', aria: 'View applications that couldn’t be submitted', onClick: () => this.setState({ screen: 'applications', appsTab: 'closed', fStatus: 'All', fSearch: '', fDate: 'All time', fType: 'All' }) },
+            ],
+            returned: ret, noReturned: ret.length === 0,
+            hasCycles: cyc.length > 0,
+            cycles: cyc.map(([l, u, t]) => ({ label: l, text: u + ' of ' + t + ' used',
+              bar: `height:100%;border-radius:9999px;background:#1D484F;width:${Math.round(u / t * 100)}%;` })),
+          };
+        })(),
       },
     };
   }
@@ -2784,7 +2845,7 @@ v: (() => {
         const kind = this.planKind(st.scenario);
         const portal = () => { this.setState({ notice: 'Opens the billing portal in a new tab' }); clearTimeout(this._pt); this._pt = setTimeout(() => this.setState({ notice: null }), 2600); };
         const pricing = () => this.setState({ prOpen: true });
-        const upQ = () => this.setState({ screen: 'plan', pm: 'upgrade' });
+        const upQ = () => { this.setState({ skillToast: 'Opens the billing portal to switch to Accelerator Quarterly' }); clearTimeout(this._pt); this._pt = setTimeout(() => this.setState({ skillToast: null }), 2600); };
         const healthy = ['active','upgraded','starter_low','quarterly','accel_new'].includes(st.scenario);
         if (kind === 'free') return { primaryLabel: c.primary.label, primaryIcon: c.primary.icon, onPrimary: pricing, hasSecondary: false, secondaryLabel: '', onSecondary: () => {} };
         if (healthy) return {
@@ -3107,7 +3168,7 @@ v: (() => {
         const n = (fn) => all.filter(fn).length;
         const go = (f) => () => this.setState({ appsTab: 'active', fStatus: f, openFilter: null });
         return {
-          streakTitle: 'No Active Streak', streakSub: 'Apply on 5 days in a row to earn +10 bonus swipes',
+          streakTitle: 'No Active Streak', streakSub: 'Apply on 5 days in a row to earn a streak badge',
           needs: { n: n(a => a.state === 'needs'), onClick: go('Needs you') },
           manual: { n: n(a => a.state === 'manual'), onClick: go('Needs you') },
           submitting: { n: n(a => a.state === 'applying' || a.state === 'queued'), onClick: go('In progress') },

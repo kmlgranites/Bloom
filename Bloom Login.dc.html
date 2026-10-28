@@ -282,6 +282,85 @@
         </div>
       </div>
     </sc-if>
+    <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Onboarding · Resume review" style="width:100%;max-width:820px;margin:auto;display:flex;flex-direction:column;gap:14px;">
+        <button onClick="{{ onRvBack }}" style="align-self:flex-start;display:flex;align-items:center;gap:7px;background:none;border:none;padding:0;font-family:inherit;font-size:14px;font-weight:700;color:#1D484F;cursor:pointer;"><i class="icon icon-arrow-left" style="font-size:16px;"></i>Upload a different resume</button>
+        <h1 style="font-size:34px;font-weight:700;color:#0D0D0F;letter-spacing:-0.02em;">Here’s what we found</h1>
+        <p style="font-size:16px;color:#4A5464;margin-bottom:8px;">Check your details before Bloom applies for you. {{ rvSummary }}</p>
+
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:14px;overflow:hidden;">
+            <button onClick="{{ rvContact.onToggle }}" aria-expanded="{{ rvContact.open }}" style="width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;padding:16px 20px;font-family:inherit;cursor:pointer;text-align:left;">
+              <i class="icon icon-user" style="font-size:20px;color:#1D484F;"></i>
+              <span style="flex:1;font-size:17px;font-weight:700;color:#0D0D0F;">Contact</span>
+              <span style="{{ rvContact.flagStyle }}"><i class="{{ rvContact.flagIcon }}" style="font-size:14px;"></i>{{ rvContact.flagText }}</span>
+              <i class="{{ rvContact.chev }}" style="font-size:18px;color:#4A5464;"></i>
+            </button>
+            <sc-if value="{{ rvContact.open }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:4px 20px 20px;border-top:1px solid #F0F1F3;display:flex;flex-direction:column;gap:14px;">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0 16px;"><div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">Full name</label><input type="text" defaultValue="Dillan Fernando" style="{{ rvFieldStyle }}"></div><div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">Email</label><input type="text" defaultValue="dillan@gmail.com" style="{{ rvFieldStyle }}"></div><div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">Phone</label><input type="text" defaultValue="+1 512 555 0142" style="{{ rvFieldStyle }}"></div><div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">Location</label><input type="text" defaultValue="Austin, TX" style="{{ rvFieldStyle }}"></div></div>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:14px;overflow:hidden;">
+            <button onClick="{{ rvExp.onToggle }}" aria-expanded="{{ rvExp.open }}" style="width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;padding:16px 20px;font-family:inherit;cursor:pointer;text-align:left;">
+              <i class="icon icon-briefcase" style="font-size:20px;color:#1D484F;"></i>
+              <span style="flex:1;font-size:17px;font-weight:700;color:#0D0D0F;">Experience</span>
+              <span style="{{ rvExp.flagStyle }}"><i class="{{ rvExp.flagIcon }}" style="font-size:14px;"></i>{{ rvExp.flagText }}</span>
+              <i class="{{ rvExp.chev }}" style="font-size:18px;color:#4A5464;"></i>
+            </button>
+            <sc-if value="{{ rvExp.open }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:4px 20px 20px;border-top:1px solid #F0F1F3;display:flex;flex-direction:column;gap:14px;">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0 16px;">
+                  <div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">Job title</label><input type="text" value="{{ rvTitle }}" onChange="{{ onRvTitle }}" style="{{ rvFieldStyle }}"></div>
+                  <div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">Company</label><input type="text" defaultValue="Acme Corp" style="{{ rvFieldStyle }}"></div><div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">Start date</label><input type="text" defaultValue="Jun 2022" style="{{ rvFieldStyle }}"></div>
+                  <div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">End date</label><input type="text" value="{{ rvEnd }}" onChange="{{ onRvEnd }}" placeholder="e.g. Present or Aug 2025" style="{{ rvEndStyle }}">
+                    <sc-if value="{{ rvEndMissing }}" hint-placeholder-val="{{ true }}"><div style="font-size:13px;color:#92400E;margin-top:6px;">We couldn’t find an end date. Type “Present” if you still work here.</div></sc-if>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:14px;overflow:hidden;">
+            <button onClick="{{ rvEdu.onToggle }}" aria-expanded="{{ rvEdu.open }}" style="width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;padding:16px 20px;font-family:inherit;cursor:pointer;text-align:left;">
+              <i class="icon icon-graduation-cap" style="font-size:20px;color:#1D484F;"></i>
+              <span style="flex:1;font-size:17px;font-weight:700;color:#0D0D0F;">Education</span>
+              <span style="{{ rvEdu.flagStyle }}"><i class="{{ rvEdu.flagIcon }}" style="font-size:14px;"></i>{{ rvEdu.flagText }}</span>
+              <i class="{{ rvEdu.chev }}" style="font-size:18px;color:#4A5464;"></i>
+            </button>
+            <sc-if value="{{ rvEdu.open }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:4px 20px 20px;border-top:1px solid #F0F1F3;display:flex;flex-direction:column;gap:14px;">
+                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0 16px;">
+                  <div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">School</label><input type="text" defaultValue="University of Texas at Austin" style="{{ rvFieldStyle }}"></div><div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">Degree</label><input type="text" defaultValue="B.S. Computer Science" style="{{ rvFieldStyle }}"></div>
+                  <div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">CGPA / GPA</label><input type="text" value="{{ rvGpa }}" onChange="{{ onRvGpa }}" placeholder="e.g. 3.6 out of 4.0" style="{{ rvGpaStyle }}">
+                    <sc-if value="{{ rvGpaMissing }}" hint-placeholder-val="{{ true }}"><div style="font-size:13px;color:#92400E;margin-top:6px;">Not found in your resume. Many forms ask for it, so adding it avoids a pause later.</div></sc-if>
+                  </div>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:14px;overflow:hidden;">
+            <button onClick="{{ rvSkills.onToggle }}" aria-expanded="{{ rvSkills.open }}" style="width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;padding:16px 20px;font-family:inherit;cursor:pointer;text-align:left;">
+              <i class="icon icon-sparkles" style="font-size:20px;color:#1D484F;"></i>
+              <span style="flex:1;font-size:17px;font-weight:700;color:#0D0D0F;">Skills</span>
+              <span style="{{ rvSkills.flagStyle }}"><i class="{{ rvSkills.flagIcon }}" style="font-size:14px;"></i>{{ rvSkills.flagText }}</span>
+              <i class="{{ rvSkills.chev }}" style="font-size:18px;color:#4A5464;"></i>
+            </button>
+            <sc-if value="{{ rvSkills.open }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:4px 20px 20px;border-top:1px solid #F0F1F3;display:flex;flex-direction:column;gap:14px;">
+                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;"><sc-for list="{{ rvSkillList }}" as="sk" hint-placeholder-count="8"><span style="background:#F0FCFF;border:1px solid #B8EAF5;color:#022F36;border-radius:9999px;padding:6px 14px;font-size:14px;font-weight:600;">{{ sk }}</span></sc-for></div>
+              </div>
+            </sc-if>
+          </div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:22px;margin-top:18px;flex-wrap:wrap;">
+          <button onClick="{{ onRvDone }}" style="background:#022F36;border:none;border-radius:9999px;height:56px;padding:0 48px;font-family:inherit;font-size:18px;font-weight:600;color:#fff;cursor:pointer;" style-hover="background:#1D484F;">Looks good, continue</button>
+          <button onClick="{{ onRvDone }}" style="background:none;border:none;padding:0;font-family:inherit;font-size:15px;font-weight:600;color:#1D484F;cursor:pointer;text-decoration:underline;">Skip for now</button>
+        </div>
+        <div style="text-align:center;font-size:13px;color:#4A5464;">You can edit these any time in Profile.</div>
+      </div>
+    </sc-if>
     <sc-if value="{{ isImport }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Onboarding · Import" style="width:100%;max-width:820px;margin:auto;display:flex;flex-direction:column;align-items:center;">
         <div style="display:flex;align-items:center;justify-content:center;margin-bottom:56px;">
@@ -435,6 +514,33 @@ class Component extends DCLogic {
     if (f.size > 5 * 1024 * 1024) return this.setState({ fileErr: 'That file is over 5MB. Try a smaller version.', file: null });
     this.setState({ file: { name: f.name, size: f.size }, fileErr: '' });
   }
+  reviewVals(st) {
+    const rv = st.rv || { title: 'Software Engineer', end: '', gpa: '', open: { exp: true, edu: true } };
+    const set = (p) => this.setState(s => ({ rv: { ...(s.rv || rv), ...p } }));
+    const flagsExp = rv.end ? 0 : 1, flagsEdu = rv.gpa ? 0 : 1;
+    const head = (open, flags) => ({ open, flagText: flags ? (flags + ' to check') : 'Looks good',
+      flagStyle: flags ? 'display:inline-flex;align-items:center;gap:6px;background:#FFF7E8;color:#92400E;border-radius:9999px;padding:4px 12px;font-size:13px;font-weight:700;' : 'display:inline-flex;align-items:center;gap:6px;background:#E3F7EC;color:#00824D;border-radius:9999px;padding:4px 12px;font-size:13px;font-weight:700;',
+      flagIcon: flags ? 'icon icon-triangle-alert' : 'icon icon-circle-check', chev: open ? 'icon icon-chevron-up' : 'icon icon-chevron-down' });
+    const tog = (k) => () => set({ open: { ...rv.open, [k]: !rv.open[k] } });
+    const field = 'width:100%;box-sizing:border-box;background:#fff;border:1px solid #D5DBDF;border-radius:8px;height:44px;padding:0 14px;font-family:inherit;font-size:15px;color:#0D0D0F;';
+    const fieldFlag = 'width:100%;box-sizing:border-box;background:#FFFBF0;border:1.5px solid #F0B429;border-radius:8px;height:44px;padding:0 14px;font-family:inherit;font-size:15px;color:#0D0D0F;';
+    return {
+      rvContact: { ...head(!!rv.open.contact, 0), onToggle: tog('contact') },
+      rvExp: { ...head(!!rv.open.exp, flagsExp), onToggle: tog('exp') },
+      rvEdu: { ...head(!!rv.open.edu, flagsEdu), onToggle: tog('edu') },
+      rvSkills: { ...head(!!rv.open.skills, 0), onToggle: tog('skills') },
+      rvTitle: rv.title, onRvTitle: (e) => set({ title: e.target.value }),
+      rvEnd: rv.end, onRvEnd: (e) => set({ end: e.target.value }), rvEndStyle: rv.end ? field : fieldFlag, rvEndMissing: !rv.end,
+      rvGpa: rv.gpa, onRvGpa: (e) => set({ gpa: e.target.value }), rvGpaStyle: rv.gpa ? field : fieldFlag, rvGpaMissing: !rv.gpa,
+      rvFieldStyle: field,
+      rvTotalFlags: flagsExp + flagsEdu,
+      rvSummary: (flagsExp + flagsEdu) ? ((flagsExp + flagsEdu) + ' detail' + ((flagsExp + flagsEdu) > 1 ? 's' : '') + ' to check. Fixing them now means fewer questions later.') : 'Everything looks good.',
+      rvSkillList: ['TypeScript', 'React', 'Node.js', 'Python', 'AWS', 'PostgreSQL', 'Docker', 'REST APIs'],
+      onRvDone: (e) => this.signIn(e),
+      onRvBack: (e) => this.go(e, 'import'),
+    };
+  }
+
   importVals(st) {
     const has = !!st.file;
     const kb = has ? st.file.size / 1024 : 0;
@@ -450,7 +556,7 @@ class Component extends DCLogic {
       onDrop: (e) => { e.preventDefault(); this.setState({ dragOver: false }); this.pickFile(e.dataTransfer.files && e.dataTransfer.files[0]); },
       continueDisabled: !has,
       continueStyle: `margin-top:40px;height:56px;padding:0 56px;border:none;border-radius:9999px;font-family:inherit;font-size:19px;font-weight:600;transition:background .15s;${has ? 'background:#022F36;color:#FFFFFF;cursor:pointer;' : 'background:#D9F2F2;color:#8FB5B8;cursor:not-allowed;'}`,
-      onContinue: (e) => { if (has) this.signIn(e); },
+      onContinue: (e) => { if (has) this.go(e, 'review'); },
     };
   }
 
@@ -630,6 +736,8 @@ v: (() => {
       onObNext: (e) => this.go(e, 'import'),
       onBackToPrefs: (e) => this.go(e, 'prefs'),
       isImport: st.stage === 'import',
+      isReview: st.stage === 'review',
+      ...this.reviewVals(st),
       ...this.importVals(st),
       isWelcome: st.stage === 'welcome',
       isSignin: st.stage === 'signin',
