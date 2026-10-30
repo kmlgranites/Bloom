@@ -34,6 +34,8 @@
   @keyframes spin{to{transform:rotate(360deg);}}
   @keyframes skPopA{0%{transform:scale(1);}40%{transform:scale(1.12);}100%{transform:scale(1);}}
   @keyframes skPopB{0%{transform:scale(1);}40%{transform:scale(1.12);}100%{transform:scale(1);}}
+  @keyframes sheetUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+  @keyframes drawerIn{from{transform:translateX(-100%);}to{transform:translateX(0);}}
   @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.45;transform:scale(0.8);}}
   @keyframes sbIn{from{opacity:0;transform:translate(-50%,16px);}to{opacity:1;transform:translate(-50%,0);}}
   /* ---- responsive: phones/tablets ---- */
@@ -48,6 +50,28 @@
     .nav-label{display:none !important;}
   }
   @media (max-width:760px){
+    .top-nav{display:none !important;}
+    .burger{display:flex !important;}
+    .logo-full,.plan-badge,.promo-pill{display:none !important;}
+    .logo-mark{display:block !important;}
+    .hdr-right{gap:8px !important;}
+    .cred-full{display:none !important;}
+    .cr-page{padding:20px 16px 90px !important;gap:16px !important;}
+    .cr-page h1{font-size:24px !important;}
+    .cr-hero{flex-direction:column !important;align-items:stretch !important;gap:18px !important;padding:20px !important;}
+    .cr-hero > div:first-child{align-self:center;}
+    .cr-hero-text{min-width:0 !important;}
+    .cr-stats{grid-template-columns:minmax(0,1fr) !important;gap:8px !important;}
+    .cred-bridge{display:none !important;}
+    .cred-scrim{display:block !important;}
+    .cred-handle{display:flex !important;}
+    .cred-dd-head{display:none !important;}
+    .cred-dd{position:fixed !important;left:0 !important;right:0 !important;top:auto !important;bottom:0 !important;width:auto !important;max-height:85vh;overflow-y:auto;border-radius:22px 22px 0 0 !important;border-bottom:none !important;padding:20px 20px 28px !important;z-index:97 !important;animation:sheetUp .24s ease-out;}
+    .cred-short{display:inline-flex !important;}
+    .cred-dd{padding-bottom:0 !important;}
+    .cred-foot{position:sticky;bottom:0;background:#fff;margin:16px -20px 0 !important;padding:12px 20px 22px !important;flex-direction:column;align-items:stretch !important;gap:12px;}
+    .cred-foot-btn{justify-content:center;width:100%;height:48px;border:1.5px solid #1D484F !important;border-radius:9999px !important;font-size:15px !important;}
+    body:has(.cred-dd) .demo-dock{display:none !important;}
     .jobs-page{padding:16px 14px 90px !important;}
     .jobs-head h1{font-size:20px !important;}
     .job-card{padding:20px 16px !important;border-radius:18px !important;}
@@ -75,9 +99,11 @@
 
   <!-- ===== HEADER ===== -->
   <header class="app-header" style="flex-shrink:0;background:#FFFFFF;border-bottom:1px solid #ECECEC;height:76px;display:flex;align-items:center;gap:18px;padding:0 26px;position:relative;z-index:60;">
-    <img src="assets/bloom-logo.svg" alt="Bloom" style="height:32px;flex-shrink:0;">
+    <button class="burger" onClick="{{ onDrawerOpen }}" aria-label="Open menu" aria-expanded="{{ drawerOpen }}" style="display:none;width:44px;height:44px;margin-left:-6px;border:none;border-radius:10px;background:none;color:#022F36;cursor:pointer;align-items:center;justify-content:center;flex-shrink:0;" style-hover="background:#F0FCFF;"><i class="icon icon-menu" style="font-size:24px;"></i></button>
+    <img class="logo-full" src="assets/bloom-logo.svg" alt="Bloom" style="height:32px;flex-shrink:0;">
+    <img class="logo-mark" src="assets/favicon.png" alt="Bloom" style="display:none;height:32px;width:32px;flex-shrink:0;object-fit:contain;">
 
-    <nav style="display:flex;align-items:stretch;height:100%;gap:2px;margin-left:6px;">
+    <nav class="top-nav" style="display:flex;align-items:stretch;height:100%;gap:2px;margin-left:6px;">
       <sc-for list="{{ navItems }}" as="tab" hint-placeholder-count="4">
         <button onClick="{{ tab.onClick }}" style="{{ tab.style }}">
           <i class="{{ tab.iconClass }}" style="{{ tab.iconStyle }}"></i>
@@ -86,7 +112,7 @@
       </sc-for>
     </nav>
 
-    <div style="flex:1;display:flex;justify-content:flex-end;align-items:center;gap:12px;">
+    <div class="hdr-right" style="flex:1;min-width:0;display:flex;justify-content:flex-end;align-items:center;gap:12px;">
       <sc-if value="{{ promoShow }}" hint-placeholder-val="{{ true }}">
         <div class="promo-pill" style="display:flex;align-items:center;gap:11px;border:1px solid #ECECEC;border-radius:9999px;padding:6px 7px 6px 16px;">
           <span style="font-size:14px;color:#23262E;white-space:nowrap;"><i class="icon icon-sparkles" style="font-size:12px;color:#F76638;margin-right:5px;"></i>Get <b>100+</b> Job Auto Applies at <b>Just $19</b></span>
@@ -95,30 +121,35 @@
       </sc-if>
 
       <sc-if value="{{ showPlanBadge }}" hint-placeholder-val="{{ true }}">
-        <button onClick="{{ goBilling }}" title="Plan &amp; Billing" style="{{ headerBadgeStyle }}">
+        <button class="plan-badge" onClick="{{ goBilling }}" title="Plan &amp; Billing" style="{{ headerBadgeStyle }}">
           <i class="{{ sc.headerBadge.icon }}" style="font-size:13px;"></i>
           <span>{{ sc.headerBadge.label }}</span>
         </button>
       </sc-if>
 
       <div style="position:relative;" onMouseEnter="{{ onCreditsEnter }}" onMouseLeave="{{ onCreditsLeave }}">
-        <div onClick="{{ goCredits }}" role="button" style="display:flex;align-items:center;gap:7px;border:1px solid #ECECEC;border-radius:9999px;padding:5px 7px 5px 14px;cursor:pointer;">
+        <div onClick="{{ onCreditsChip }}" role="button" aria-haspopup="dialog" aria-expanded="{{ creditsHover }}" style="display:flex;align-items:center;gap:7px;border:1px solid #ECECEC;border-radius:9999px;padding:5px 7px 5px 14px;cursor:pointer;">
           <i class="icon icon-sparkles" style="font-size:13px;color:#022F36;"></i>
           <span class="credits-label" style="font-size:14px;font-weight:600;color:#23262E;white-space:nowrap;">Apply Credits</span>
-          <span style="background:#E0FAFA;color:#022F36;font-weight:700;border-radius:9999px;padding:4px 12px;font-size:13px;white-space:nowrap;">{{ credInfo.badgeText }}</span>
+          <span class="cred-full" style="background:#E0FAFA;color:#022F36;font-weight:700;border-radius:9999px;padding:4px 12px;font-size:13px;white-space:nowrap;">{{ credInfo.badgeText }}</span>
+          <span class="cred-short" style="display:none;align-items:center;gap:5px;background:#E0FAFA;color:#022F36;font-weight:700;border-radius:9999px;padding:4px 10px;font-size:13px;white-space:nowrap;">{{ credShort }} left<sc-if value="{{ credHasHold }}" hint-placeholder-val="{{ false }}"><span aria-label="Credits on hold" style="width:7px;height:7px;border-radius:50%;background:#F59E0B;"></span></sc-if></span>
         </div>
 
         <sc-if value="{{ creditsHover }}" hint-placeholder-val="{{ false }}">
-          <div style="position:absolute;top:32px;right:0;width:340px;height:16px;"></div>
-          <div style="position:absolute;top:46px;right:0;width:340px;background:#fff;border:1px solid #E5E7EB;border-radius:16px;box-shadow:0 16px 40px rgba(0,0,0,0.16);padding:18px;z-index:60;">
+          <div class="cred-bridge" style="position:absolute;top:32px;right:0;width:340px;height:16px;"></div>
+          <div class="cred-scrim" onClick="{{ onCreditsClose }}" style="display:none;position:fixed;inset:0;z-index:96;background:rgba(8,20,22,0.45);"></div>
+          <div class="cred-dd" role="dialog" aria-label="Apply credits" style="position:absolute;top:46px;right:0;width:340px;background:#fff;border:1px solid #E5E7EB;border-radius:16px;box-shadow:0 16px 40px rgba(0,0,0,0.16);padding:18px;z-index:60;">
+            <div class="cred-handle" style="display:none;align-items:center;justify-content:space-between;margin:-4px 0 12px;">
+              <span style="display:flex;align-items:center;gap:8px;"><span style="font-size:17px;font-weight:700;color:#0D0D0F;">Apply credits</span><span style="{{ credPlanPill }}">{{ credInfo.planLabel }}</span></span>
+              <button onClick="{{ onCreditsClose }}" aria-label="Close" style="width:40px;height:40px;border:none;border-radius:10px;background:#F2F5F8;color:#4A5464;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="icon icon-x" style="font-size:18px;"></i></button>
+            </div>
 
             <!-- ZONE 1 · CREDITS (billing cycle) -->
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <div class="cred-dd-head" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
               <div style="display:flex;align-items:center;gap:8px;">
-                <span style="font-size:15px;font-weight:700;color:#0D0D0F;">Apply Credits</span>
+                <span style="font-size:15px;font-weight:700;color:#0D0D0F;">Apply credits</span>
                 <span style="{{ credPlanPill }}">{{ credInfo.planLabel }}</span>
               </div>
-              <span style="font-size:12px;font-weight:700;color:#7A8694;text-transform:uppercase;letter-spacing:0.04em;">{{ credCycleTag }}</span>
             </div>
             <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:10px;">
               <span style="{{ credInfo.bigStyle }}">{{ credInfo.bigLeft }}</span>
@@ -130,7 +161,6 @@
               <div style="display:flex;align-items:center;gap:6px;margin-top:8px;font-size:13px;font-weight:600;color:#92400E;"><i class="icon icon-clock" style="font-size:14px;"></i>{{ credInfo.holdLine }}</div>
             </sc-if>
 
-            <div style="font-size:13px;color:#4A5464;margin-top:8px;">{{ ddReset }}</div>
             <!-- upgrade nudge (free plan) -->
             <sc-if value="{{ ddFreeUp }}" hint-placeholder-val="{{ false }}">
               <div style="{{ credUpgradeBox }}">
@@ -147,8 +177,8 @@
                 <button onClick="{{ onOpenUpgrade }}" style="width:100%;background:#022F36;border:none;border-radius:9999px;height:38px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;">Switch to Quarterly</button>
               </div>
             </sc-if>
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:13px;border-top:1px solid #EDEEF0;">
-              <button onClick="{{ goCredits }}" style="display:flex;align-items:center;gap:6px;border:none;background:none;padding:0;font-family:inherit;font-size:14px;font-weight:700;color:#1D484F;cursor:pointer;">View details<i class="icon icon-arrow-right" style="font-size:15px;"></i></button>
+            <div class="cred-foot" style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:13px;border-top:1px solid #EDEEF0;">
+              <button class="cred-foot-btn" onClick="{{ goCredits }}" style="display:flex;align-items:center;gap:6px;border:none;background:none;padding:0;font-family:inherit;font-size:14px;font-weight:700;color:#1D484F;cursor:pointer;">View details<i class="icon icon-arrow-right" style="font-size:15px;"></i></button>
               <sc-if value="{{ ddStarterLink }}" hint-placeholder-val="{{ false }}">
                 <button onClick="{{ onOpenUpgrade }}" style="display:flex;align-items:center;gap:5px;border:none;background:none;padding:0;font-family:inherit;font-size:14px;font-weight:700;color:#C2410C;cursor:pointer;"><i class="icon icon-crown" style="font-size:14px;"></i>Upgrade</button>
               </sc-if>
@@ -772,7 +802,7 @@
       </div>
     </sc-if>
     <sc-if value="{{ isCredits }}" hint-placeholder-val="{{ false }}">
-      <div data-screen-label="Apply Credits" style="max-width:900px;margin:0 auto;padding:32px 24px 90px;display:flex;flex-direction:column;gap:20px;">
+      <div data-screen-label="Apply Credits" class="cr-page" style="max-width:900px;margin:0 auto;padding:32px 24px 90px;box-sizing:border-box;width:100%;display:flex;flex-direction:column;gap:20px;">
         <div>
           <button onClick="{{ goJobs }}" style="display:flex;align-items:center;gap:7px;background:none;border:none;padding:0;margin-bottom:8px;font-family:inherit;font-size:14px;font-weight:700;color:#1D484F;cursor:pointer;"><i class="icon icon-arrow-left" style="font-size:16px;"></i>Back to jobs</button>
           <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
@@ -781,14 +811,14 @@
           </div>
         </div>
 
-        <div style="background:#fff;border:1px solid #EDEEF0;border-radius:18px;padding:26px 28px;display:flex;gap:30px;align-items:center;flex-wrap:wrap;">
+        <div class="cr-hero" style="background:#fff;border:1px solid #EDEEF0;border-radius:18px;padding:26px 28px;display:flex;gap:30px;align-items:center;flex-wrap:wrap;">
           <div style="{{ cr.ringStyle }}">
             <div style="width:124px;height:124px;border-radius:50%;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;">
               <span style="font-size:34px;font-weight:800;color:#022F36;line-height:1;">{{ cr.left }}</span>
               <span style="font-size:13px;font-weight:600;color:#4A5464;margin-top:4px;">left</span>
             </div>
           </div>
-          <div style="flex:1;min-width:240px;display:flex;flex-direction:column;gap:12px;">
+          <div class="cr-hero-text" style="flex:1;min-width:240px;display:flex;flex-direction:column;gap:12px;">
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
               <span style="font-size:20px;font-weight:700;color:#0D0D0F;">{{ cr.usedLine }}</span>
               <span style="{{ cr.planPill }}">{{ cr.planName }}</span>
@@ -818,7 +848,7 @@
         <!-- this cycle breakdown -->
         <div style="background:#fff;border:1px solid #EDEEF0;border-radius:18px;padding:22px 24px;">
           <h2 style="font-size:18px;font-weight:700;color:#0D0D0F;margin-bottom:16px;">{{ cr.cycleHead }}</h2>
-          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
+          <div class="cr-stats" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;">
             <sc-for list="{{ cr.stats }}" as="t" hint-placeholder-count="3">
               <button onClick="{{ t.onClick }}" aria-label="{{ t.aria }}" style="background:#F5F8FA;border:1px solid transparent;border-radius:14px;padding:16px 18px;font-family:inherit;text-align:left;cursor:pointer;" style-hover="background:#F0FCFF;border-color:#B8EAF5;">
                 <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#4A5464;"><span style="width:9px;height:9px;border-radius:50%;background:{{ t.dot }};"></span><span style="flex:1;">{{ t.label }}</span><i class="icon icon-arrow-right" style="font-size:15px;color:#1D484F;"></i></div>
@@ -1157,6 +1187,29 @@
     </sc-if>
 
   </main>
+
+  <!-- ===== MOBILE NAV DRAWER ===== -->
+  <sc-if value="{{ drawerOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onDrawerClose }}" style="position:fixed;inset:0;z-index:96;background:rgba(8,20,22,0.45);">
+      <div role="dialog" aria-label="Menu" onClick="{{ onDrawerStop }}" style="position:absolute;left:0;top:0;bottom:0;width:min(300px,84vw);background:#FFFFFF;box-shadow:8px 0 30px rgba(0,0,0,0.18);display:flex;flex-direction:column;animation:drawerIn .22s ease-out;">
+        <div style="display:flex;align-items:center;justify-content:space-between;height:76px;padding:0 14px 0 20px;border-bottom:1px solid #ECECEC;">
+          <img src="assets/bloom-logo.svg" alt="Bloom" style="height:30px;">
+          <button onClick="{{ onDrawerClose }}" aria-label="Close menu" style="width:44px;height:44px;border:none;border-radius:10px;background:none;color:#4A5464;cursor:pointer;display:flex;align-items:center;justify-content:center;" style-hover="background:#F2F5F8;"><i class="icon icon-x" style="font-size:22px;"></i></button>
+        </div>
+        <nav style="display:flex;flex-direction:column;gap:4px;padding:14px 12px;">
+          <sc-for list="{{ drawerItems }}" as="d" hint-placeholder-count="3">
+            <button onClick="{{ d.onClick }}" aria-current="{{ d.current }}" style="{{ d.style }}"><i class="{{ d.iconClass }}" style="{{ d.iconStyle }}"></i>{{ d.label }}</button>
+          </sc-for>
+        </nav>
+        <div style="margin-top:auto;padding:14px 12px 20px;border-top:1px solid #ECECEC;display:flex;flex-direction:column;gap:10px;">
+          <button onClick="{{ onDrawerPlan }}" style="display:flex;align-items:center;gap:14px;width:100%;height:52px;padding:0 16px;border:none;border-radius:10px;font-family:inherit;font-size:16px;font-weight:500;color:#23262E;background:transparent;cursor:pointer;text-align:left;" style-hover="background:#F0FCFF;"><i class="icon icon-credit-card" style="font-size:20px;color:#4A5464;"></i>Plan &amp; Billing<span style="{{ headerBadgeStyle }}margin-left:auto;padding:4px 10px;font-size:12.5px;cursor:pointer;">{{ sc.headerBadge.label }}</span></button>
+          <sc-if value="{{ promoShow }}" hint-placeholder-val="{{ true }}">
+            <button onClick="{{ onDrawerUpgrade }}" style="width:100%;height:48px;border:none;border-radius:9999px;background:#1D484F;color:#fff;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;" style-hover="background:#022F36;">Upgrade Now · $19/mo</button>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </sc-if>
 
   <!-- ===== ACCOUNT MODAL (Clerk) ===== -->
   <sc-if value="{{ amOpen }}" hint-placeholder-val="{{ false }}">
@@ -1729,7 +1782,7 @@
 
   <!-- ===== SCENARIO DOCK ===== -->
   <sc-if value="{{ dockOpen }}" hint-placeholder-val="{{ true }}">
-    <div style="position:fixed;left:18px;bottom:18px;width:280px;max-height:calc(100vh - 36px);overflow-y:auto;background:#0C2A2C;border-radius:16px;box-shadow:0 18px 48px rgba(0,0,0,0.32);padding:14px 14px 16px;z-index:60;color:#fff;">
+    <div class="demo-dock" style="position:fixed;left:18px;bottom:18px;width:280px;max-height:calc(100vh - 36px);overflow-y:auto;background:#0C2A2C;border-radius:16px;box-shadow:0 18px 48px rgba(0,0,0,0.32);padding:14px 14px 16px;z-index:60;color:#fff;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
         <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:0.04em;color:#5AEBEB;"><i class="icon icon-flask-conical" style="font-size:15px;"></i>SUBSCRIPTION STATE</div>
         <button onClick="{{ toggleDock }}" title="Collapse" style="background:rgba(255,255,255,0.12);border:none;color:#fff;cursor:pointer;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;" style-hover="background:rgba(255,255,255,0.24);"><i class="icon icon-x" style="font-size:16px;"></i></button>
@@ -1750,7 +1803,7 @@
     </div>
   </sc-if>
   <sc-if value="{{ dockClosed }}" hint-placeholder-val="{{ false }}">
-    <button onClick="{{ toggleDock }}" style="position:fixed;left:18px;bottom:18px;background:#0C2A2C;color:#fff;border:none;border-radius:9999px;padding:11px 18px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;z-index:60;display:flex;align-items:center;gap:8px;box-shadow:0 10px 28px rgba(0,0,0,0.3);"><i class="icon icon-flask-conical" style="font-size:15px;color:#5AEBEB;"></i>Demo states</button>
+    <button class="demo-dock" onClick="{{ toggleDock }}" style="position:fixed;left:18px;bottom:18px;background:#0C2A2C;color:#fff;border:none;border-radius:9999px;padding:11px 18px;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;z-index:60;display:flex;align-items:center;gap:8px;box-shadow:0 10px 28px rgba(0,0,0,0.3);"><i class="icon icon-flask-conical" style="font-size:15px;color:#5AEBEB;"></i>Demo states</button>
   </sc-if>
 
 </div>
@@ -2909,6 +2962,18 @@ v: (() => {
     return {
       // nav + shell
       navItems,
+      onCreditsChip: () => { if (window.matchMedia('(max-width:760px)').matches) this.setState(s => ({ creditsHover: !s.creditsHover, avatarMenu: false, drawerOpen: false })); else this.setState({ screen: 'credits', creditsHover: false }); },
+      onCreditsClose: () => this.setState({ creditsHover: false }),
+      drawerOpen: !!st.drawerOpen,
+      onDrawerOpen: () => this.setState({ drawerOpen: true, avatarMenu: false, creditsHover: false }),
+      onDrawerClose: () => this.setState({ drawerOpen: false }),
+      onDrawerStop: (e) => e.stopPropagation(),
+      onDrawerPlan: () => this.setState({ drawerOpen: false, screen: 'plan' }),
+      onDrawerUpgrade: () => this.setState({ drawerOpen: false, prOpen: true }),
+      drawerItems: navDef.map(([key, label, icon]) => { const on = st.screen === key; return { label, iconClass: icon, current: on ? 'page' : 'false',
+        onClick: () => { this.setState({ drawerOpen: false }); this.go(key); },
+        iconStyle: `font-size:20px;color:${on ? '#1D484F' : '#4A5464'};`,
+        style: `display:flex;align-items:center;gap:14px;width:100%;height:52px;padding:0 16px;border:none;border-radius:10px;font-family:inherit;font-size:16px;font-weight:${on ? 700 : 500};color:${on ? '#022F36' : '#23262E'};background:${on ? '#F0FCFF' : 'transparent'};cursor:pointer;text-align:left;` }; }),
       promoShow: sc.promo,
       onUpgrade: () => this.setState({ prOpen: true, creditsHover: false, avatarMenu: false }),
       prOpen: !!st.prOpen,
@@ -3012,6 +3077,7 @@ v: (() => {
       skillsList: ['adobe xd','blender','css','figma','html','illustrator','indesign','javascript','photoshop','procreate','sketch','ui','ux','web design'],
       isApplications: st.screen==='applications',
       isCredits: st.screen==='credits',
+      ...(() => { const ci = this.creditInfo(sc, st); return { credShort: String(ci.left), credHasHold: !!ci.hasHold }; })(),
       jdOpen: !!st.jdOpen,
       onOpenJd: () => this.setState({ jdOpen: true }),
       onCloseJd: () => this.setState({ jdOpen: false }),
