@@ -235,6 +235,9 @@
                 </sc-if>
               </div>
               
+              <sc-if value="{{ obNLow }}" hint-placeholder-val="{{ false }}">
+                <div role="status" style="display:flex;gap:9px;align-items:flex-start;font-size:13.5px;line-height:1.45;color:#4A5464;"><i class="icon icon-info" style="font-size:15px;color:#1D484F;margin-top:1px;flex-shrink:0;"></i>Smaller cities have fewer openings. You can add more locations any time.</div>
+              </sc-if>
               <sc-if value="{{ obNHasNote }}" hint-placeholder-val="{{ false }}">
                 <div style="font-size:13px;color:#4A5464;">{{ obNNote }}</div>
               </sc-if>
@@ -468,6 +471,7 @@ const TITLES = {
   'DevOps / Cloud': [{ name: 'Titles', items: ['DevOps Engineer','Cloud Engineer','Platform Engineer','Site Reliability Engineer'] }],
   'QA / Testing': [{ name: 'Titles', items: ['QA Engineer','Test Automation Engineer','SDET','Manual QA Tester'] }],
 };
+const JOBN = (k) => { let h = 0; for (const ch of k) h = (h * 31 + ch.charCodeAt(0)) >>> 0; const big = ['Austin','Dallas','Houston','San Francisco','New York','Seattle','Toronto','Los Angeles','Chicago','Boston','Vancouver','San Jose','Atlanta','Denver']; return big.includes(k) ? 60 + (h % 140) : 2 + (h % 14); };
 class Component extends DCLogic {
   state = { stage: 'signin', file: null, fileErr: '', dragOver: false, obFunc: 'Software Engineering', obTitles: ['Software Engineer'], titlesOpen: false, obLoc: 'United States',
     obTypes: { full: true, part: false, intern: false },
@@ -607,11 +611,13 @@ v: (() => {
             const dropped = (loc.cities || []).filter(k => k.split('|')[1] === st).map(k => k.split('|')[0]);
             set({ states: [...(loc.states || []).filter(x => x !== st), st], cities: (loc.cities || []).filter(k => k.split('|')[1] !== st), q: '', ro: true, detected: false,
               note: dropped.length ? (st + ' already includes ' + dropped.join(' and ') + ', so we merged them.') : '' }); };
-          const cityRes = []; allowed.forEach(st => (CITIES[st] || []).forEach((c, ci) => { if (!sts.includes(st) && (q.length < 2 ? (st === 'Texas' && ci < 4) : c.toLowerCase().includes(q))) { const inc = false; const on = inc || cts.includes(ckey(c, st));
-            cityRes.push({ name: c, sub: st + (groups.length > 1 ? (US_STATES.includes(st) ? ' · US' : ' · Canada') : ''), starts: c.toLowerCase().startsWith(q), on, onPick: inc ? ((e) => { if (e && e.preventDefault) e.preventDefault(); }) : pickCity(c, st),
+          const cityRes = []; allowed.forEach(st => (CITIES[st] || []).forEach((c, ci) => { if ((q.length < 2 ? (st === 'Texas' && ci < 4) : (c.toLowerCase().includes(q) || (sts.includes(st) && st.toLowerCase().includes(q))))) { const inc = sts.includes(st); const on = inc || cts.includes(ckey(c, st));
+            cityRes.push({ name: c, sub: inc ? ('Included in All of ' + st) : (st + (groups.length > 1 ? (US_STATES.includes(st) ? ' · US' : ' · Canada') : '')), starts: c.toLowerCase().startsWith(q),
+              count: JOBN(c) < 10 ? ('Few jobs · ' + JOBN(c)) : (JOBN(c) + ' jobs'),
+              countStyle: `font-size:13px;font-weight:600;white-space:nowrap;color:${JOBN(c) < 10 ? '#92400E' : '#4A5464'};`, on, onPick: inc ? ((e) => { if (e && e.preventDefault) e.preventDefault(); }) : pickCity(c, st),
               rowBg: (on ? 'background:#F0FCFF;' : 'background:none;') + (inc ? 'opacity:0.6;cursor:default;' : ''),
               box: `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on ? '#1D484F' : '#fff'};border:1.5px solid ${on ? '#1D484F' : '#A9B3B9'};` }); }  }));
-          const stateRes = allowed.filter(st => (q ? st.toLowerCase().includes(q) : false)).slice(0, 8).map(st => { const on = sts.includes(st); return { name: st, on, onPick: pickState(st), incNote: 'Every city in ' + st + ' is included',
+          const stateRes = allowed.filter(st => (q ? st.toLowerCase().includes(q) : false)).slice(0, 8).map(st => { const on = sts.includes(st); return { name: st, on, count: (CITIES[st] || []).reduce((n, c) => n + JOBN(c), 0) + ' jobs', onPick: pickState(st), incNote: 'Every city in ' + st + ' is included',
             rowBg: on ? 'background:#F0FCFF;' : 'background:none;',
             box: `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on ? '#1D484F' : '#fff'};border:1.5px solid ${on ? '#1D484F' : '#A9B3B9'};` }; });
           const chips = [...cts.map(k => { const [c, st] = k.split('|'); return { name: c + ', ' + st, onRemove: () => set({ cities: loc.cities.filter(x => x !== k), detected: false, note: '' }) }; }),
@@ -619,6 +625,17 @@ v: (() => {
           const cr = cityRes.sort((x, y) => (y.starts - x.starts) || x.name.localeCompare(y.name)).slice(0, q.length < 2 ? 4 : 8);
           return { ResultsOpen: !!loc.ro && (cr.length + stateRes.length > 0 || q.length > 0), CityHead: q.length < 2 ? 'Near you' : 'Cities', CityResults: cr, StateResults: stateRes,
             HasCityResults: cr.length > 0, HasStateResults: stateRes.length > 0, NoResults: q.length > 0 && cr.length + stateRes.length === 0,
+            ...(() => {
+              const sel = cts.reduce((n, k) => n + JOBN(k.split('|')[0]), 0) + sts.reduce((n, st) => n + (CITIES[st] || []).reduce((m, c) => m + JOBN(c), 0), 0);
+              const low = cts.length > 0 && sts.length === 0 && cts.every(k => JOBN(k.split('|')[0]) < 60);
+              const fixes = [];
+              const stsOfCities = [...new Set(cts.map(k => k.split('|')[1]))].filter(st => !sts.includes(st));
+              stsOfCities.slice(0, 2).forEach(st => { const add = (CITIES[st] || []).reduce((m, c) => m + JOBN(c), 0) - cts.filter(k => k.endsWith('|' + st)).reduce((m, k) => m + JOBN(k.split('|')[0]), 0);
+                fixes.push({ label: 'All of ' + st, gain: '+' + add, onClick: pickState(st) }); });
+              const big = ['Austin|Texas','Dallas|Texas','Houston|Texas','Toronto|Ontario','Vancouver|British Columbia','Seattle|Washington','New York|New York'].filter(k => allowed.includes(k.split('|')[1]) && !cts.includes(k) && !sts.includes(k.split('|')[1]));
+              if (fixes.length < 2 && big[0]) { const [c, st] = big[0].split('|'); fixes.push({ label: c + ', ' + st, gain: '+' + JOBN(c), onClick: pickCity(c, st) }); }
+              return { Low: low, LowTitle: 'Only ' + sel + ' jobs match these locations.', LowSub: 'Smaller cities have fewer openings. Add a nearby area to see more matches.', LowFixes: fixes };
+            })(),
             Chips: chips, HasChips: chips.length > 0, DoneLabel: chips.length ? ('Done · ' + chips.length + ' selected') : 'Done', HasNote: !!loc.note, Note: loc.note || '',
             Detected2: !!loc.detected && cts.length > 0, DetectedText2: 'Detected ' + (cts[0] ? cts[0].split('|')[0] : '') + ' from your network, so you see local jobs first' };
         })(),

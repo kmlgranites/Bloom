@@ -233,7 +233,7 @@
           <div style="display:flex;align-items:center;gap:12px;">
             <h1 style="font-size:24px;font-weight:700;color:#022F36;">{{ jobsHeading }}</h1>
             <sc-if value="{{ showCountBadge }}" hint-placeholder-val="{{ true }}">
-              <span style="display:inline-flex;align-items:center;gap:6px;background:#022F36;color:#fff;border-radius:9999px;padding:5px 13px;font-size:13px;font-weight:700;"><i class="icon icon-sparkles" style="font-size:13px;color:#5AEBEB;"></i>30+ matches</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;background:#022F36;color:#fff;border-radius:9999px;padding:5px 13px;font-size:13px;font-weight:700;"><i class="icon icon-sparkles" style="font-size:13px;color:#5AEBEB;"></i>{{ matchBadge }}</span>
             </sc-if>
           </div>
           <sc-if value="{{ isMatches }}" hint-placeholder-val="{{ true }}">
@@ -1463,7 +1463,34 @@
             <div role="tablist" style="display:flex;gap:8px;padding-bottom:12px;border-bottom:1px solid #EDEEF0;margin-bottom:22px;">
               <button role="tab" onClick="{{ onAdTabOverview }}" style="{{ adTabOverviewStyle }}"><i class="icon icon-clipboard-list" style="font-size:17px;"></i>Overview</button>
               <button role="tab" onClick="{{ onAdTabResume }}" style="{{ adTabResumeStyle }}"><i class="icon icon-file-text" style="font-size:17px;"></i>Resume</button>
+              <sc-if value="{{ adHasReceipt }}" hint-placeholder-val="{{ false }}"><button role="tab" onClick="{{ onAdTabReceipt }}" style="{{ adTabReceiptStyle }}"><i class="icon icon-receipt-text" style="font-size:17px;"></i>Receipt</button></sc-if>
             </div>
+
+            <sc-if value="{{ adIsReceipt }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:18px;">
+                <div style="border:1px solid #E8EDF1;border-radius:14px;padding:6px 18px;">
+                  <sc-for list="{{ rc.sumRows }}" as="r" hint-placeholder-count="5">
+                    <div style="display:grid;grid-template-columns:minmax(120px,170px) minmax(0,1fr);gap:14px;padding:12px 0;border-top:{{ r.border }};font-size:14.5px;">
+                      <span style="color:#4A5464;">{{ r.k }}</span>
+                      <span style="min-width:0;"><span style="display:block;font-weight:600;color:#0D0D0F;overflow-wrap:anywhere;">{{ r.v }}</span><sc-if value="{{ r.hasNote }}" hint-placeholder-val="{{ false }}"><span style="display:flex;gap:6px;align-items:flex-start;font-size:13px;color:#4A5464;margin-top:4px;line-height:1.45;"><i class="icon icon-info" style="font-size:14px;margin-top:1px;flex-shrink:0;"></i>{{ r.note }}</span></sc-if></span>
+                    </div>
+                  </sc-for>
+                </div>
+
+                <div style="display:flex;align-items:center;gap:16px;border:1px solid #E8EDF1;border-radius:14px;padding:16px 18px;flex-wrap:wrap;">
+                  <span style="width:48px;height:56px;border-radius:8px;background:#FFF4EF;border:1px solid #F9D9CB;color:#C2410C;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:800;"><i class="icon icon-file-text" style="font-size:20px;margin-bottom:2px;"></i>PDF</span>
+                  <div style="flex:1;min-width:180px;">
+                    <div style="font-size:15px;font-weight:700;color:#0D0D0F;overflow-wrap:anywhere;">{{ rcPdfName }}</div>
+                    <div style="font-size:13.5px;color:#4A5464;margin-top:3px;">{{ rc.countLine }}</div>
+                  </div>
+                  <div style="display:flex;gap:10px;">
+                    <button onClick="{{ rc.onViewPdf }}" style="display:flex;align-items:center;gap:8px;background:#1D484F;border:none;border-radius:9999px;height:42px;padding:0 20px;font-family:inherit;font-size:14.5px;font-weight:700;color:#fff;cursor:pointer;" style-hover="background:#022F36;"><i class="icon icon-eye" style="font-size:16px;"></i>View</button>
+                    <button onClick="{{ rc.onDownload }}" aria-label="Download receipt" style="display:flex;align-items:center;justify-content:center;width:42px;height:42px;background:#fff;border:1px solid rgba(0,0,0,0.25);border-radius:9999px;cursor:pointer;color:#1D484F;"><i class="icon icon-download" style="font-size:17px;"></i></button>
+                  </div>
+                </div>
+                <div style="font-size:13px;color:#4A5464;line-height:1.5;">The PDF shows every question on the employer’s form, the answer Bloom sent, and where each answer came from.</div>
+              </div>
+            </sc-if>
 
             <sc-if value="{{ adIsOverview }}" hint-placeholder-val="{{ true }}">
               <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,340px);gap:28px;align-items:start;">
@@ -1577,6 +1604,43 @@
           </div>
         </sc-if>
 
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- ===== RECEIPT PDF VIEW ===== -->
+  <sc-if value="{{ rcPdfOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ rcOnPdfClose }}" style="position:fixed;inset:0;z-index:130;background:rgba(8,20,22,0.6);overflow-y:auto;padding:28px 16px;">
+      <div onClick="{{ rcOnPdfStop }}" style="max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;color:#fff;">
+          <span style="font-size:15px;font-weight:600;">{{ rcPdfName }}</span>
+          <div style="display:flex;gap:8px;">
+            <button onClick="{{ rcOnPdfDownload }}" style="display:flex;align-items:center;gap:7px;background:#fff;border:none;border-radius:9999px;height:40px;padding:0 16px;font-family:inherit;font-size:14px;font-weight:700;color:#022F36;cursor:pointer;"><i class="icon icon-download" style="font-size:16px;"></i>Download</button>
+            <button onClick="{{ rcOnPdfClose }}" aria-label="Close" style="width:40px;height:40px;border:none;border-radius:9999px;background:rgba(255,255,255,0.15);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="icon icon-x" style="font-size:18px;"></i></button>
+          </div>
+        </div>
+        <div style="background:#fff;border-radius:6px;box-shadow:0 20px 50px rgba(0,0,0,0.35);padding:48px 52px;font-family:'Proxima Soft',system-ui,sans-serif;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:2px solid #022F36;padding-bottom:18px;margin-bottom:22px;">
+            <img src="assets/bloom-logo.svg" alt="Bloom" style="height:28px;">
+            <span style="font-size:13px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.08em;">Application receipt</span>
+          </div>
+          <div style="display:flex;flex-direction:column;margin-bottom:26px;">
+            <sc-for list="{{ rcPdfSum }}" as="r" hint-placeholder-count="5">
+              <div style="display:grid;grid-template-columns:170px minmax(0,1fr);gap:14px;padding:7px 0;font-size:13.5px;"><span style="color:#4A5464;">{{ r.k }}</span><span style="font-weight:600;color:#0D0D0F;overflow-wrap:anywhere;">{{ r.v }}</span></div>
+            </sc-for>
+          </div>
+          <sc-for list="{{ rcPdfSections }}" as="sec" hint-placeholder-count="3">
+            <div style="margin-bottom:22px;">
+              <div style="font-size:14px;font-weight:700;color:#022F36;margin-bottom:6px;">{{ sec.name }}</div>
+              <sc-for list="{{ sec.items }}" as="q" hint-placeholder-count="3">
+                <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) 110px;gap:14px;padding:9px 0;border-top:1px solid #E5E7EB;font-size:13px;line-height:1.45;">
+                  <span style="color:#4A5464;">{{ q.q }}</span><span style="color:#0D0D0F;">{{ q.a }}</span><span style="color:#4A5464;text-align:right;">{{ q.src }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+          <div style="border-top:1px solid #E5E7EB;padding-top:14px;font-size:12px;color:#4A5464;">Generated by Bloom · {{ rcPdfStamp }}</div>
         </div>
       </div>
     </div>
@@ -1703,6 +1767,16 @@
                 </sc-if>
               </div>
               
+              <sc-if value="{{ pfNLow }}" hint-placeholder-val="{{ false }}">
+                <div role="status" style="display:flex;flex-direction:column;gap:10px;background:#FFF7E8;border:1px solid #F3E3C2;border-radius:12px;padding:12px 14px;">
+                  <div style="display:flex;gap:9px;align-items:flex-start;font-size:14px;line-height:1.45;color:#23262E;"><i class="icon icon-info" style="font-size:16px;color:#92400E;margin-top:1px;flex-shrink:0;"></i><span><b style="font-weight:700;">{{ pfNLowTitle }}</b> {{ pfNLowSub }}</span></div>
+                  <div style="display:flex;flex-wrap:wrap;gap:8px;padding-left:25px;">
+                    <sc-for list="{{ pfNLowFixes }}" as="lf" hint-placeholder-count="1">
+                      <button onClick="{{ lf.onClick }}" style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #E5E7EB;border-radius:9999px;height:36px;padding:0 14px;font-family:inherit;font-size:13.5px;font-weight:600;color:#022F36;cursor:pointer;" style-hover="background:#F0FCFF;border-color:#B8EAF5;"><i class="icon icon-plus" style="font-size:14px;"></i>{{ lf.label }}<span style="color:#00824D;font-weight:700;">{{ lf.gain }}</span></button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-if>
               <sc-if value="{{ pfNHasNote }}" hint-placeholder-val="{{ false }}">
                 <div style="font-size:13px;color:#4A5464;">{{ pfNNote }}</div>
               </sc-if>
@@ -1765,7 +1839,7 @@
 
         <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;padding:14px 24px;border-top:1px solid #F0F1F3;flex-shrink:0;">
           <button onClick="{{ onClosePrefs }}" style="background:#fff;border:none;font-family:inherit;font-size:14px;font-weight:700;color:#23262E;padding:11px 18px;border-radius:9999px;cursor:pointer;">Close</button>
-          <button onClick="{{ onUpdatePrefs }}" style="background:#0C2A2C;border:none;font-family:inherit;font-size:14px;font-weight:700;color:#fff;padding:11px 24px;border-radius:9999px;cursor:pointer;" style-hover="background:#022F36;">Update</button>
+          <button onClick="{{ onUpdatePrefs }}" style="background:#0C2A2C;border:none;font-family:inherit;font-size:14px;font-weight:700;color:#fff;padding:11px 24px;border-radius:9999px;cursor:pointer;" style-hover="background:#022F36;">{{ updateLabel }}</button>
         </div>
       </div>
     </div>
@@ -1828,10 +1902,11 @@
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900},&quot;matchCap&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;30+&quot;,&quot;100+&quot;,&quot;Exact&quot;],&quot;default&quot;:&quot;30+&quot;,&quot;tsType&quot;:&quot;'30+' | '100+' | 'Exact'&quot;,&quot;section&quot;:&quot;Match count&quot;}}">
 const US_STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
 const CITIES = {"Alabama":["Birmingham","Huntsville","Montgomery","Mobile"],"Alaska":["Anchorage","Fairbanks","Juneau"],"Arizona":["Phoenix","Tucson","Scottsdale","Tempe","Mesa"],"Arkansas":["Little Rock","Fayetteville","Bentonville"],"California":["San Francisco","Los Angeles","San Jose","San Diego","Palo Alto","Mountain View","Sunnyvale","Oakland","Irvine","Sacramento"],"Colorado":["Denver","Boulder","Colorado Springs","Fort Collins"],"Connecticut":["Hartford","Stamford","New Haven"],"Delaware":["Wilmington","Dover"],"Florida":["Miami","Tampa","Orlando","Jacksonville","Fort Lauderdale"],"Georgia":["Atlanta","Alpharetta","Savannah","Augusta"],"Hawaii":["Honolulu"],"Idaho":["Boise","Idaho Falls"],"Illinois":["Chicago","Naperville","Evanston","Champaign"],"Indiana":["Indianapolis","Fort Wayne","Bloomington"],"Iowa":["Des Moines","Cedar Rapids","Iowa City"],"Kansas":["Wichita","Overland Park","Kansas City"],"Kentucky":["Louisville","Lexington"],"Louisiana":["New Orleans","Baton Rouge"],"Maine":["Portland","Bangor"],"Maryland":["Baltimore","Bethesda","Rockville","Columbia"],"Massachusetts":["Boston","Cambridge","Somerville","Waltham","Worcester"],"Michigan":["Detroit","Ann Arbor","Grand Rapids"],"Minnesota":["Minneapolis","St. Paul","Rochester"],"Mississippi":["Jackson","Gulfport"],"Missouri":["St. Louis","Kansas City","Springfield"],"Montana":["Bozeman","Missoula","Billings"],"Nebraska":["Omaha","Lincoln"],"Nevada":["Las Vegas","Reno","Henderson"],"New Hampshire":["Manchester","Nashua","Portsmouth"],"New Jersey":["Jersey City","Newark","Princeton","Hoboken"],"New Mexico":["Albuquerque","Santa Fe"],"New York":["New York City","Brooklyn","Buffalo","Rochester","Albany"],"North Carolina":["Raleigh","Charlotte","Durham","Chapel Hill"],"North Dakota":["Fargo","Bismarck"],"Ohio":["Columbus","Cleveland","Cincinnati","Dayton"],"Oklahoma":["Oklahoma City","Tulsa"],"Oregon":["Portland","Beaverton","Eugene","Bend"],"Pennsylvania":["Philadelphia","Pittsburgh","Harrisburg"],"Rhode Island":["Providence"],"South Carolina":["Charleston","Greenville","Columbia"],"South Dakota":["Sioux Falls","Rapid City"],"Tennessee":["Nashville","Memphis","Knoxville","Chattanooga"],"Texas":["Austin","Dallas","Houston","San Antonio","Plano","Fort Worth"],"Utah":["Salt Lake City","Lehi","Provo"],"Vermont":["Burlington"],"Virginia":["Arlington","Richmond","Reston","McLean","Virginia Beach"],"Washington":["Seattle","Bellevue","Redmond","Tacoma","Spokane"],"West Virginia":["Charleston","Morgantown"],"Wisconsin":["Milwaukee","Madison","Green Bay"],"Wyoming":["Cheyenne","Jackson"],"Alberta":["Calgary","Edmonton"],"British Columbia":["Vancouver","Victoria","Burnaby","Surrey"],"Manitoba":["Winnipeg"],"New Brunswick":["Moncton","Fredericton","Saint John"],"Newfoundland and Labrador":["St. John's"],"Nova Scotia":["Halifax"],"Ontario":["Toronto","Ottawa","Waterloo","Mississauga","Hamilton","London"],"Prince Edward Island":["Charlottetown"],"Quebec":["Montreal","Quebec City","Laval"],"Saskatchewan":["Saskatoon","Regina"],"Northwest Territories":["Yellowknife"],"Nunavut":["Iqaluit"],"Yukon":["Whitehorse"]};
 const CA_PROVINCES = ["Alberta","British Columbia","Manitoba","New Brunswick","Newfoundland and Labrador","Nova Scotia","Ontario","Prince Edward Island","Quebec","Saskatchewan","Northwest Territories","Nunavut","Yukon"];
+const JOBN = (k) => { let h = 0; for (const ch of k) h = (h * 31 + ch.charCodeAt(0)) >>> 0; const big = ['Austin','Dallas','Houston','San Francisco','New York','Seattle','Toronto','Los Angeles','Chicago','Boston','Vancouver','San Jose','Atlanta','Denver']; return big.includes(k) ? 60 + (h % 140) : 2 + (h % 14); };
 class Component extends DCLogic {
   state = {
     screen: 'jobs',
@@ -2002,11 +2077,13 @@ v: (() => {
             const dropped = (loc.cities || []).filter(k => k.split('|')[1] === st).map(k => k.split('|')[0]);
             set({ states: [...(loc.states || []).filter(x => x !== st), st], cities: (loc.cities || []).filter(k => k.split('|')[1] !== st), q: '', ro: true, detected: false,
               note: dropped.length ? (st + ' already includes ' + dropped.join(' and ') + ', so we merged them.') : '' }); };
-          const cityRes = []; allowed.forEach(st => (CITIES[st] || []).forEach((c, ci) => { if (!sts.includes(st) && (q.length < 2 ? (st === 'Texas' && ci < 4) : c.toLowerCase().includes(q))) { const inc = false; const on = inc || cts.includes(ckey(c, st));
-            cityRes.push({ name: c, sub: st + (groups.length > 1 ? (US_STATES.includes(st) ? ' · US' : ' · Canada') : ''), starts: c.toLowerCase().startsWith(q), on, onPick: inc ? ((e) => { if (e && e.preventDefault) e.preventDefault(); }) : pickCity(c, st),
+          const cityRes = []; allowed.forEach(st => (CITIES[st] || []).forEach((c, ci) => { if ((q.length < 2 ? (st === 'Texas' && ci < 4) : (c.toLowerCase().includes(q) || (sts.includes(st) && st.toLowerCase().includes(q))))) { const inc = sts.includes(st); const on = inc || cts.includes(ckey(c, st));
+            cityRes.push({ name: c, sub: inc ? ('Included in All of ' + st) : (st + (groups.length > 1 ? (US_STATES.includes(st) ? ' · US' : ' · Canada') : '')), starts: c.toLowerCase().startsWith(q),
+              count: JOBN(c) < 10 ? ('Few jobs · ' + JOBN(c)) : (JOBN(c) + ' jobs'),
+              countStyle: `font-size:13px;font-weight:600;white-space:nowrap;color:${JOBN(c) < 10 ? '#92400E' : '#4A5464'};`, on, onPick: inc ? ((e) => { if (e && e.preventDefault) e.preventDefault(); }) : pickCity(c, st),
               rowBg: (on ? 'background:#F0FCFF;' : 'background:none;') + (inc ? 'opacity:0.6;cursor:default;' : ''),
               box: `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on ? '#1D484F' : '#fff'};border:1.5px solid ${on ? '#1D484F' : '#A9B3B9'};` }); }  }));
-          const stateRes = allowed.filter(st => (q ? st.toLowerCase().includes(q) : false)).slice(0, 8).map(st => { const on = sts.includes(st); return { name: st, on, onPick: pickState(st), incNote: 'Every city in ' + st + ' is included',
+          const stateRes = allowed.filter(st => (q ? st.toLowerCase().includes(q) : false)).slice(0, 8).map(st => { const on = sts.includes(st); return { name: st, on, count: (CITIES[st] || []).reduce((n, c) => n + JOBN(c), 0) + ' jobs', onPick: pickState(st), incNote: 'Every city in ' + st + ' is included',
             rowBg: on ? 'background:#F0FCFF;' : 'background:none;',
             box: `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on ? '#1D484F' : '#fff'};border:1.5px solid ${on ? '#1D484F' : '#A9B3B9'};` }; });
           const chips = [...cts.map(k => { const [c, st] = k.split('|'); return { name: c + ', ' + st, onRemove: () => set({ cities: loc.cities.filter(x => x !== k), detected: false, note: '' }) }; }),
@@ -2014,6 +2091,20 @@ v: (() => {
           const cr = cityRes.sort((x, y) => (y.starts - x.starts) || x.name.localeCompare(y.name)).slice(0, q.length < 2 ? 4 : 8);
           return { ResultsOpen: !!loc.ro && (cr.length + stateRes.length > 0 || q.length > 0), CityHead: q.length < 2 ? 'Near you' : 'Cities', CityResults: cr, StateResults: stateRes,
             HasCityResults: cr.length > 0, HasStateResults: stateRes.length > 0, NoResults: q.length > 0 && cr.length + stateRes.length === 0,
+            ...(() => {
+              const sel = cts.reduce((n, k) => n + JOBN(k.split('|')[0]), 0) + sts.reduce((n, st) => n + (CITIES[st] || []).reduce((m, c) => m + JOBN(c), 0), 0);
+              const tot = this.matchCount(st); const low = tot < 25;
+              const simNear = (patch) => Math.max(0, this.matchCount({ ...st, prefs: { ...st.prefs, near: { ...st.prefs.near, ...patch } } }) - tot);
+              const fixes = [];
+              const stsOfCities = [...new Set(cts.map(k => k.split('|')[1]))].filter(st => !sts.includes(st));
+              stsOfCities.slice(0, 2).forEach(st => { const add = (CITIES[st] || []).reduce((m, c) => m + JOBN(c), 0) - cts.filter(k => k.endsWith('|' + st)).reduce((m, k) => m + JOBN(k.split('|')[0]), 0);
+                fixes.push({ label: 'All of ' + st, gain: '+' + simNear({ states: [...(loc.states || []), st], cities: (loc.cities || []).filter(k => !k.endsWith('|' + st)) }), onClick: pickState(st) }); });
+              const big = ['Austin|Texas','Dallas|Texas','Houston|Texas','Toronto|Ontario','Vancouver|British Columbia','Seattle|Washington','New York|New York'].filter(k => allowed.includes(k.split('|')[1]) && !cts.includes(k) && !sts.includes(k.split('|')[1]));
+              if (fixes.length < 2 && big[0]) { const [c, st] = big[0].split('|'); fixes.push({ label: c + ', ' + st, gain: '+' + simNear({ cities: [...(loc.cities || []), big[0]] }), onClick: pickCity(c, st) }); }
+              if (!(st.prefs.arrangement || {}).remote) { const g = Math.max(0, this.matchCount({ ...st, prefs: { ...st.prefs, arrangement: { ...st.prefs.arrangement, remote: true } } }) - tot);
+                fixes.push({ label: 'Include Remote', gain: '+' + g, onClick: () => this.toggleArrangement('remote') }); }
+              return { Low: low, LowTitle: tot === 0 ? 'No matches with these filters.' : ('Only ' + tot + (tot === 1 ? ' match' : ' matches') + ' with these filters.'), LowSub: 'Add a nearby area or include remote roles to see more.', LowFixes: fixes.filter(f => f.gain !== '+0').slice(0, 3) };
+            })(),
             Chips: chips, HasChips: chips.length > 0, DoneLabel: chips.length ? ('Done · ' + chips.length + ' selected') : 'Done', HasNote: !!loc.note, Note: loc.note || '',
             Detected2: !!loc.detected && cts.length > 0, DetectedText2: 'Detected ' + (cts[0] ? cts[0].split('|')[0] : '') + ' from your network, so you see local jobs first' };
         })(),
@@ -2036,6 +2127,28 @@ v: (() => {
     clearTimeout(this._bt); this._bt = setTimeout(() => this.setState({ skillToast: null }), 2600);
   }
   closePrefs() { this.setState({ prefsOpen: false }); }
+  matchCount(st) {
+    const p = st.prefs, a = p.arrangement || {}, n = p.near || {};
+    const on = (o) => Object.values(o || {}).filter(Boolean).length;
+    let loc = 0;
+    if (a.hybrid || a.onsite) {
+      if (n.mode === 'any') loc += 300;
+      else loc += (n.cities || []).filter(k => !(n.states || []).includes(k.split('|')[1])).reduce((m, k) => m + JOBN(k.split('|')[0]), 0)
+               + (n.states || []).reduce((m, x) => m + (CITIES[x] || []).reduce((q, c) => q + JOBN(c), 0), 0);
+    }
+    if (a.remote) loc += 140;
+    // an empty group means "no filter", not "nothing matches"
+    const lv = on(p.levels) ? Math.min(1, 0.35 + on(p.levels) * 0.25) : 1;
+    const ty = on(p.types) ? Math.min(1, (p.types.full ? 0.85 : 0) + (on(p.types) - (p.types.full ? 1 : 0)) * 0.15) : 1;
+    const sb = (p.func === 'Software Engineering' && on(p.subs)) ? Math.min(1, 0.3 + on(p.subs) * 0.2) : 1;
+    return Math.round(loc * lv * ty * sb);
+  }
+  matchLabel(nm) {
+    const capSetting = this.props.matchCap ?? '30+';
+    const cap = capSetting === '100+' ? 100 : capSetting === '30+' ? 30 : Infinity;
+    if (nm === 0) return 'No matches';
+    return (nm >= cap ? cap + '+' : nm) + (nm === 1 ? ' match' : ' matches');
+  }
   toggleType(k) { this.setState(s => ({ prefs: { ...s.prefs, types: { ...s.prefs.types, [k]: !s.prefs.types[k] } } })); }
   toggleLevel(k) { this.setState(s => ({ prefs: { ...s.prefs, levels: { ...s.prefs.levels, [k]: !s.prefs.levels[k] } } })); }
   toggleLocation(k) { this.setState(s => ({ prefs: { ...s.prefs, locations: { ...s.prefs.locations, [k]: !s.prefs.locations[k] } } })); }
@@ -2487,6 +2600,80 @@ v: (() => {
     return `background:${active?'#fff':'transparent'};border:none;border-radius:9999px;padding:7px 14px;font-family:inherit;font-size:13px;font-weight:${active?'700':'600'};color:${active?'#022F36':'#5A6B72'};cursor:pointer;white-space:nowrap;${active?'box-shadow:0 1px 3px rgba(0,0,0,0.12);':''}`;
   }
 
+  receiptVals(a, st, T) {
+    const c = a.company || 'the employer';
+    const ats = { Miro: 'Greenhouse', Linear: 'Ashby', Notion: 'Greenhouse', HubSpot: 'Workday', ShutterTech: 'Lever' }[c] || ['Greenhouse','Lever','Ashby','Workday'][(c.charCodeAt(0) || 0) % 4];
+    const sent = a.state === 'submitted', notSent = a.state === 'failed' || a.state === 'manual';
+    const reviewOn = st.reviewOn !== false, reviewLeft = st.reviewLeft ?? 3;
+    const toast = (t) => { this.setState({ skillToast: t }); clearTimeout(this._rt); this._rt = setTimeout(() => this.setState({ skillToast: null }), 2600); };
+    const SRC = {
+      Profile: ['#E0FAFA', '#022F36', 'icon icon-user'], Resume: ['#EFF6FF', '#1041B7', 'icon icon-file-text'],
+      Preferences: ['#E3F7EC', '#00824D', 'icon icon-sliders-horizontal'], 'You answered': ['#F5F6F7', '#23262E', 'icon icon-message-circle'],
+      'Written by Bloom': ['#FFF4EF', '#C2410C', 'icon icon-sparkles'], 'Needs you': ['#FFF4EF', '#C2410C', 'icon icon-triangle-alert'],
+    };
+    const onsite = a.state === 'needs' ? ['Not answered yet', 'Needs you'] : ['Yes', 'You answered'];
+    const jobLoc = (a.meta || '').split('·')[0].trim() || 'the office';
+    const remote = /remote/i.test(a.meta || '');
+    const workQ = remote ? 'This role is remote. Can you work in a US time zone?' : 'This role is based in ' + jobLoc + '. Are you willing to work from that location?';
+    const raw = [
+      ['Contact details', 'icon icon-id-card', [
+        ['Full name', 'Dillan Fernando', 'Profile'], ['Phone', '+1 (512) 555‑0148', 'Profile'],
+        ['Location', 'Austin, Texas', 'Profile'], ['LinkedIn', 'linkedin.com/in/dillanfernando', 'Profile']]],
+      ['Experience & education', 'icon icon-graduation-cap', [
+        ['Current job title', 'Software Engineer II at Vercel', 'Resume'], ['Years of experience', '5', 'Resume'],
+        ['Highest degree', 'B.Tech, Computer Science · CGPA 8.4 / 10', 'Profile']]],
+      ['Eligibility & pay', 'icon icon-lock', [
+        ['Are you authorized to work in the United States?', 'Yes', 'Preferences'],
+        ['Will you now or in the future require sponsorship?', 'No', 'Preferences'],
+        ['Expected annual salary', '$140,000', 'Profile']]],
+      ['Screening questions', 'icon icon-message-square-text', [
+        ['Why do you want to work at ' + c + '?', 'I want to work on products that a lot of people rely on every day, and ' + c + ' is one of them. I’d like to bring my experience building fast, reliable backend services at Vercel to help ' + c + ' keep scaling.', 'Written by Bloom', true],
+        ['Describe a system you designed end to end.', 'At Vercel I designed a build-queue service in Go that cut median deploy wait time by 38%. I owned the API design, the Postgres schema and the rollout, and wrote the on-call runbook.', 'Written by Bloom', true],
+        [workQ, onsite[0], onsite[1]]]],
+      ['Voluntary self-identification', 'icon icon-shield', [
+        ['Gender', 'I prefer not to answer', 'Profile'], ['Veteran status', 'I am not a protected veteran', 'Profile']]],
+    ];
+    const sections = raw.map(([name, icon, items]) => ({ name, icon, items: items.map(([q, ans, src, long], i) => { const S = SRC[src];
+      return { q, a: ans, src, srcIcon: S[2], border: i ? '1px solid #F0F1F3' : 'none',
+        srcStyle: `display:inline-flex;align-items:center;gap:5px;flex-shrink:0;white-space:nowrap;background:${S[0]};color:${S[1]};border-radius:9999px;padding:3px 10px;font-size:12px;font-weight:700;`,
+        aStyle: `font-size:15px;line-height:1.55;color:${src === 'Needs you' ? '#C2410C' : '#0D0D0F'};font-weight:${long ? 400 : 600};${long ? 'background:#FAFAFA;border-radius:10px;padding:10px 12px;' : ''}` }; }) }));
+    const qCount = raw.reduce((n, x) => n + x[2].length, 0);
+    const drafted = raw.reduce((n, x) => n + x[2].filter(i => i[2] === 'Written by Bloom').length, 0);
+    const fileName = 'Dillan_Fernando_Resume.pdf';
+    const sum = [
+      { k: sent ? 'Submitted to' : 'Will be sent to', v: c + ' · ' + a.title },
+      { k: 'Applied through', v: ats },
+      { k: sent ? 'Submitted' : 'Status', v: sent ? T : a.state === 'needs' ? 'Waiting for your answer' : 'Not sent yet' },
+      { k: 'Resume sent', v: fileName },
+    ].map((r, i) => ({ ...r, hasNote: !!r.note, note: r.note || '', border: i ? '1px solid #F0F1F3' : 'none' }));
+    const pdfName = c.replace(/\s+/g, '') + '_Application_Receipt.pdf';
+    return {
+      rc: {
+        notSent, notSentSub: a.state === 'manual' ? 'This employer’s site needs you to apply directly, so Bloom didn’t fill anything in.' : 'The job closed before Bloom could submit, so no answers were sent and your credit was returned.',
+        hasAnswers: !notSent, showApprove: reviewOn && a.state === 'queued' && reviewLeft > 0,
+        sumRows: sum,
+        countLine: qCount + ' answers sent · ' + drafted + ' written by Bloom',
+        sections,
+        onViewPdf: () => this.setState({ rcPdf: true }),
+        onDownload: () => toast('Downloading ' + pdfName),
+        onApprove: () => { this.setState({ reviewLeft: Math.max(reviewLeft - 1, 0) }); toast('Approved · Bloom is submitting your application'); },
+        reviewOn,
+        reviewSub: reviewOn ? ('On for your first 5 applications · ' + reviewLeft + ' left. Bloom pauses so you can check answers before sending.') : 'Off. Bloom sends applications as soon as they’re filled in.',
+        onToggleReview: () => this.setState({ reviewOn: !reviewOn }),
+        switchStyle: `position:relative;width:48px;height:28px;flex-shrink:0;border:none;border-radius:9999px;cursor:pointer;padding:0;background:${reviewOn ? '#1D484F' : '#C9D0D4'};transition:background .2s;`,
+        knobStyle: `position:absolute;top:4px;left:${reviewOn ? 24 : 4}px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:left .2s;`,
+      },
+      rcPdfOpen: !!st.rcPdf && !notSent,
+      rcPdfName: pdfName,
+      rcPdfSum: sum.map(r => ({ k: r.k, v: r.v })),
+      rcPdfSections: sections,
+      rcPdfStamp: T,
+      rcOnPdfClose: () => this.setState({ rcPdf: false }),
+      rcOnPdfStop: (e) => e.stopPropagation(),
+      rcOnPdfDownload: () => toast('Downloading ' + pdfName),
+    };
+  }
+
   amTabStyle(on) {
     return `display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:none;border-radius:8px;padding:12px 16px;font-family:inherit;font-size:16px;cursor:pointer;color:${on ? '#022F36' : '#4A5464'};background:${on ? '#E9EAEB' : 'transparent'};`;
   }
@@ -2542,7 +2729,7 @@ v: (() => {
     if (!a) return { adOpen: false };
     const segBtn = (on) => `display:flex;align-items:center;gap:8px;border:none;border-radius:9999px;padding:10px 18px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;background:${on ? '#fff' : 'transparent'};color:${on ? '#0D0D0F' : '#4A5464'};box-shadow:${on ? '0 1px 3px rgba(0,0,0,0.12)' : 'none'};`;
     const tabBtn = (on) => `display:flex;align-items:center;gap:9px;border:none;border-radius:10px;padding:11px 18px;font-family:inherit;font-size:16px;font-weight:600;cursor:pointer;background:${on ? '#F2F5F8' : 'transparent'};color:${on ? '#0D0D0F' : '#4A5464'};`;
-    const seg = st.appSeg || 'jd', tab = st.appTab || 'overview';
+    const seg = st.appSeg || 'jd', tab = (st.appTab === 'receipt' && a.state !== 'submitted') ? 'overview' : (st.appTab || 'overview');
     const T = 'Oct 26, 2026 · 10:51 AM';
     const done = (label, sub) => ({ label, sub: sub || T, k: 'done' });
     const cur  = (label, sub, k) => ({ label, sub, k });
@@ -2574,8 +2761,11 @@ v: (() => {
       adSegJd: seg === 'jd', adSegMissing: seg === 'missing',
       adSegJdStyle: segBtn(seg === 'jd'), adSegMissingStyle: segBtn(seg === 'missing'),
       onAdSegJd: () => this.setState({ appSeg: 'jd' }), onAdSegMissing: () => this.setState({ appSeg: 'missing' }),
-      adIsOverview: tab === 'overview', adIsResume: tab === 'resume',
-      adTabOverviewStyle: tabBtn(tab === 'overview'), adTabResumeStyle: tabBtn(tab === 'resume'),
+      adIsOverview: tab === 'overview', adIsResume: tab === 'resume', adIsReceipt: tab === 'receipt',
+      adTabOverviewStyle: tabBtn(tab === 'overview'), adTabResumeStyle: tabBtn(tab === 'resume'), adTabReceiptStyle: tabBtn(tab === 'receipt'),
+      onAdTabReceipt: () => this.setState({ appTab: 'receipt' }),
+      adHasReceipt: a.state === 'submitted',
+      ...this.receiptVals(a, st, T),
       onAdTabOverview: () => this.setState({ appTab: 'overview' }), onAdTabResume: () => this.setState({ appTab: 'resume' }),
       adReqs: ['3+ years building production software','Strong in TypeScript, Go or Python','REST APIs and distributed systems','SQL and NoSQL databases','CI/CD, Git and code review','Clear written communication'],
       adTimeline: tl,
@@ -3161,6 +3351,7 @@ v: (() => {
       prefsOpen: st.prefsOpen,
       onClosePrefs: () => this.closePrefs(),
       onUpdatePrefs: () => this.closePrefs(),
+      ...(() => { const nm = this.matchCount(st); return { matchBadge: this.matchLabel(nm), updateLabel: 'Update · ' + (nm === 0 ? 'No matches' : nm + (nm === 1 ? ' match' : ' matches')) }; })(),
       prefFunc: st.prefs.func,
       subOptions: [['fe','Frontend'],['be','Backend'],['fs','Full Stack'],['mobile','Mobile'],['devops','DevOps / Cloud'],['qa','QA / Testing']].map(([k,label]) => { const on = st.prefs.subs[k]; return { label, onClick: () => this.toggleSub(k), chipStyle: this.chipStyle(on), chipHover: this.chipHoverStyle(on), chipFocus: this.chipFocusStyle(), checkIcon: this.chipCheckIcon(on), checkIconStyle: this.chipCheckColor(on) }; }),
       subHint: Object.values(st.prefs.subs).some(Boolean) ? 'Pick any that fit' : 'None picked — showing all of Software Engineering',
