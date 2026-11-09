@@ -285,85 +285,6 @@
         </div>
       </div>
     </sc-if>
-    <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
-      <div data-screen-label="Onboarding · Resume review" style="width:100%;max-width:820px;margin:auto;display:flex;flex-direction:column;gap:14px;">
-        <button onClick="{{ onRvBack }}" style="align-self:flex-start;display:flex;align-items:center;gap:7px;background:none;border:none;padding:0;font-family:inherit;font-size:14px;font-weight:700;color:#1D484F;cursor:pointer;"><i class="icon icon-arrow-left" style="font-size:16px;"></i>Upload a different resume</button>
-        <h1 style="font-size:34px;font-weight:700;color:#0D0D0F;letter-spacing:-0.02em;">Here’s what we found</h1>
-        <p style="font-size:16px;color:#4A5464;margin-bottom:8px;">Check your details before Bloom applies for you. {{ rvSummary }}</p>
-
-          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:14px;overflow:hidden;">
-            <button onClick="{{ rvContact.onToggle }}" aria-expanded="{{ rvContact.open }}" style="width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;padding:16px 20px;font-family:inherit;cursor:pointer;text-align:left;">
-              <i class="icon icon-user" style="font-size:20px;color:#1D484F;"></i>
-              <span style="flex:1;font-size:17px;font-weight:700;color:#0D0D0F;">Contact</span>
-              <span style="{{ rvContact.flagStyle }}"><i class="{{ rvContact.flagIcon }}" style="font-size:14px;"></i>{{ rvContact.flagText }}</span>
-              <i class="{{ rvContact.chev }}" style="font-size:18px;color:#4A5464;"></i>
-            </button>
-            <sc-if value="{{ rvContact.open }}" hint-placeholder-val="{{ false }}">
-              <div style="padding:4px 20px 20px;border-top:1px solid #F0F1F3;display:flex;flex-direction:column;gap:14px;">
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0 16px;"><div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">Full name</label><input type="text" defaultValue="Dillan Fernando" style="{{ rvFieldStyle }}"></div><div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">Email</label><input type="text" defaultValue="dillan@gmail.com" style="{{ rvFieldStyle }}"></div><div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">Phone</label><input type="text" defaultValue="+1 512 555 0142" style="{{ rvFieldStyle }}"></div><div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">Location</label><input type="text" defaultValue="Austin, TX" style="{{ rvFieldStyle }}"></div></div>
-              </div>
-            </sc-if>
-          </div>
-
-          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:14px;overflow:hidden;">
-            <button onClick="{{ rvExp.onToggle }}" aria-expanded="{{ rvExp.open }}" style="width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;padding:16px 20px;font-family:inherit;cursor:pointer;text-align:left;">
-              <i class="icon icon-briefcase" style="font-size:20px;color:#1D484F;"></i>
-              <span style="flex:1;font-size:17px;font-weight:700;color:#0D0D0F;">Experience</span>
-              <span style="{{ rvExp.flagStyle }}"><i class="{{ rvExp.flagIcon }}" style="font-size:14px;"></i>{{ rvExp.flagText }}</span>
-              <i class="{{ rvExp.chev }}" style="font-size:18px;color:#4A5464;"></i>
-            </button>
-            <sc-if value="{{ rvExp.open }}" hint-placeholder-val="{{ false }}">
-              <div style="padding:4px 20px 20px;border-top:1px solid #F0F1F3;display:flex;flex-direction:column;gap:14px;">
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0 16px;">
-                  <div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">Job title</label><input type="text" value="{{ rvTitle }}" onChange="{{ onRvTitle }}" style="{{ rvFieldStyle }}"></div>
-                  <div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">Company</label><input type="text" defaultValue="Acme Corp" style="{{ rvFieldStyle }}"></div><div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">Start date</label><input type="text" defaultValue="Jun 2022" style="{{ rvFieldStyle }}"></div>
-                  <div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">End date</label><input type="text" value="{{ rvEnd }}" onChange="{{ onRvEnd }}" placeholder="e.g. Present or Aug 2025" style="{{ rvEndStyle }}">
-                    <sc-if value="{{ rvEndMissing }}" hint-placeholder-val="{{ true }}"><div style="font-size:13px;color:#92400E;margin-top:6px;">We couldn’t find an end date. Type “Present” if you still work here.</div></sc-if>
-                  </div>
-                </div>
-              </div>
-            </sc-if>
-          </div>
-
-          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:14px;overflow:hidden;">
-            <button onClick="{{ rvEdu.onToggle }}" aria-expanded="{{ rvEdu.open }}" style="width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;padding:16px 20px;font-family:inherit;cursor:pointer;text-align:left;">
-              <i class="icon icon-graduation-cap" style="font-size:20px;color:#1D484F;"></i>
-              <span style="flex:1;font-size:17px;font-weight:700;color:#0D0D0F;">Education</span>
-              <span style="{{ rvEdu.flagStyle }}"><i class="{{ rvEdu.flagIcon }}" style="font-size:14px;"></i>{{ rvEdu.flagText }}</span>
-              <i class="{{ rvEdu.chev }}" style="font-size:18px;color:#4A5464;"></i>
-            </button>
-            <sc-if value="{{ rvEdu.open }}" hint-placeholder-val="{{ false }}">
-              <div style="padding:4px 20px 20px;border-top:1px solid #F0F1F3;display:flex;flex-direction:column;gap:14px;">
-                <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0 16px;">
-                  <div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">School</label><input type="text" defaultValue="University of Texas at Austin" style="{{ rvFieldStyle }}"></div><div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">Degree</label><input type="text" defaultValue="B.S. Computer Science" style="{{ rvFieldStyle }}"></div>
-                  <div><label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin:12px 0 6px;">CGPA / GPA</label><input type="text" value="{{ rvGpa }}" onChange="{{ onRvGpa }}" placeholder="e.g. 3.6 out of 4.0" style="{{ rvGpaStyle }}">
-                    <sc-if value="{{ rvGpaMissing }}" hint-placeholder-val="{{ true }}"><div style="font-size:13px;color:#92400E;margin-top:6px;">Not found in your resume. Many forms ask for it, so adding it avoids a pause later.</div></sc-if>
-                  </div>
-                </div>
-              </div>
-            </sc-if>
-          </div>
-
-          <div style="background:#fff;border:1px solid #E5E7EB;border-radius:14px;overflow:hidden;">
-            <button onClick="{{ rvSkills.onToggle }}" aria-expanded="{{ rvSkills.open }}" style="width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;padding:16px 20px;font-family:inherit;cursor:pointer;text-align:left;">
-              <i class="icon icon-sparkles" style="font-size:20px;color:#1D484F;"></i>
-              <span style="flex:1;font-size:17px;font-weight:700;color:#0D0D0F;">Skills</span>
-              <span style="{{ rvSkills.flagStyle }}"><i class="{{ rvSkills.flagIcon }}" style="font-size:14px;"></i>{{ rvSkills.flagText }}</span>
-              <i class="{{ rvSkills.chev }}" style="font-size:18px;color:#4A5464;"></i>
-            </button>
-            <sc-if value="{{ rvSkills.open }}" hint-placeholder-val="{{ false }}">
-              <div style="padding:4px 20px 20px;border-top:1px solid #F0F1F3;display:flex;flex-direction:column;gap:14px;">
-                <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;"><sc-for list="{{ rvSkillList }}" as="sk" hint-placeholder-count="8"><span style="background:#F0FCFF;border:1px solid #B8EAF5;color:#022F36;border-radius:9999px;padding:6px 14px;font-size:14px;font-weight:600;">{{ sk }}</span></sc-for></div>
-              </div>
-            </sc-if>
-          </div>
-        <div style="display:flex;align-items:center;justify-content:center;gap:22px;margin-top:18px;flex-wrap:wrap;">
-          <button onClick="{{ onRvDone }}" style="background:#022F36;border:none;border-radius:9999px;height:56px;padding:0 48px;font-family:inherit;font-size:18px;font-weight:600;color:#fff;cursor:pointer;" style-hover="background:#1D484F;">Looks good, continue</button>
-          <button onClick="{{ onRvDone }}" style="background:none;border:none;padding:0;font-family:inherit;font-size:15px;font-weight:600;color:#1D484F;cursor:pointer;text-decoration:underline;">Skip for now</button>
-        </div>
-        <div style="text-align:center;font-size:13px;color:#4A5464;">You can edit these any time in Profile.</div>
-      </div>
-    </sc-if>
     <sc-if value="{{ isImport }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Onboarding · Import" style="width:100%;max-width:820px;margin:auto;display:flex;flex-direction:column;align-items:center;">
         <div style="display:flex;align-items:center;justify-content:center;margin-bottom:56px;">
@@ -402,6 +323,35 @@
           <div role="alert" style="display:flex;align-items:center;gap:7px;margin-top:12px;font-size:14px;font-weight:600;color:#B23B3B;"><i class="icon icon-circle-alert" style="font-size:16px;"></i>{{ fileError }}</div>
         </sc-if>
 
+        <sc-if value="{{ hasFile }}" hint-placeholder-val="{{ false }}">
+          <div style="width:100%;margin-top:24px;text-align:left;">
+            <div style="background:#fff;border:1px solid #E5E7EB;border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;">
+              <div style="display:flex;align-items:flex-start;gap:14px;">
+                <span style="width:40px;height:40px;border-radius:10px;background:#E3F7EC;color:#00824D;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-message-circle" style="font-size:21px;"></i></span>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:17px;font-weight:700;color:#0D0D0F;">Get updates on WhatsApp?</div>
+                  <div style="font-size:14px;line-height:1.5;color:#4A5464;margin-top:3px;text-wrap:pretty;">Get updates about your applications on WhatsApp. You can turn this off anytime.</div>
+                </div>
+                <button role="switch" aria-checked="{{ waOn }}" aria-label="WhatsApp updates" onClick="{{ onWaToggle }}" style="{{ waTrack }}"><span style="{{ waKnob }}"></span></button>
+              </div>
+              <sc-if value="{{ waOn }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-direction:column;gap:14px;padding-top:14px;border-top:1px solid #F0F1F3;">
+                  <div>
+                    <label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin-bottom:6px;">WhatsApp number <span style="font-weight:500;">(from your resume)</span></label>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                      <input type="tel" value="{{ waPhone }}" onChange="{{ onWaPhone }}" aria-label="WhatsApp number" style="flex:1;min-width:200px;box-sizing:border-box;background:#F5F6F7;border:1px solid #E5E7EB;border-radius:8px;height:46px;padding:0 14px;font-family:inherit;font-size:15px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;background:#fff;">
+                      <button onClick="{{ onWaVerify }}" disabled="{{ waVerified }}" style="{{ waVerifyStyle }}"><i class="{{ waVerifyIcon }}" style="font-size:16px;"></i>{{ waVerifyLabel }}</button>
+                    </div>
+                    <sc-if value="{{ waSent }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:13px;color:#4A5464;margin-top:8px;">We sent a code to this number. Reply YES on WhatsApp to confirm.</div>
+                    </sc-if>
+                  </div>
+                                    <div style="font-size:12.5px;line-height:1.5;color:#4A5464;background:#F5F6F7;border-radius:8px;padding:10px 12px;">By turning this on, you agree to receive WhatsApp messages from Bloom about your applications. Message and data rates may apply. Reply STOP anytime, or turn it off in Profile → Notifications.</div>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
         <button onClick="{{ onContinue }}" disabled="{{ continueDisabled }}" style="{{ continueStyle }}">Continue</button>
       </div>
     </sc-if>
@@ -473,7 +423,7 @@ const TITLES = {
 };
 const JOBN = (k) => { let h = 0; for (const ch of k) h = (h * 31 + ch.charCodeAt(0)) >>> 0; const big = ['Austin','Dallas','Houston','San Francisco','New York','Seattle','Toronto','Los Angeles','Chicago','Boston','Vancouver','San Jose','Atlanta','Denver']; return big.includes(k) ? 60 + (h % 140) : 2 + (h % 14); };
 class Component extends DCLogic {
-  state = { stage: 'signin', file: null, fileErr: '', dragOver: false, obFunc: 'Software Engineering', obTitles: ['Software Engineer'], titlesOpen: false, obLoc: 'United States',
+  state = { stage: 'signin', waOn: false, waPhone: '+1 512 555 0142', waSent: false, waVerified: false, waTypes: { needs: true, submitted: false, digest: false }, file: null, fileErr: '', dragOver: false, obFunc: 'Software Engineering', obTitles: ['Software Engineer'], titlesOpen: false, obLoc: 'United States',
     obTypes: { full: true, part: false, intern: false },
     obModes: { remote: true, hybrid: true, onsite: false },
     obNear: { mode: 'specific', states: [], cities: ['Austin|Texas'], detected: true, q: '', ro: false, note: '' },
@@ -560,7 +510,7 @@ class Component extends DCLogic {
       onDrop: (e) => { e.preventDefault(); this.setState({ dragOver: false }); this.pickFile(e.dataTransfer.files && e.dataTransfer.files[0]); },
       continueDisabled: !has,
       continueStyle: `margin-top:40px;height:56px;padding:0 56px;border:none;border-radius:9999px;font-family:inherit;font-size:19px;font-weight:600;transition:background .15s;${has ? 'background:#022F36;color:#FFFFFF;cursor:pointer;' : 'background:#D9F2F2;color:#8FB5B8;cursor:not-allowed;'}`,
-      onContinue: (e) => { if (has) this.go(e, 'review'); },
+      onContinue: (e) => { if (has) this.signIn(e); },
     };
   }
 
@@ -754,6 +704,25 @@ v: (() => {
       onBackToPrefs: (e) => this.go(e, 'prefs'),
       isImport: st.stage === 'import',
       isReview: st.stage === 'review',
+      ...(() => {
+        const on = !!st.waOn;
+        const box = (v, locked) => `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${v ? (locked ? '#7A8694' : '#022F36') : '#fff'};border:1.5px solid ${v ? (locked ? '#7A8694' : '#022F36') : '#A9B3B9'};`;
+        return {
+          waOn: on,
+          onWaToggle: () => this.setState(s => ({ waOn: !s.waOn })),
+          waTrack: `position:relative;width:48px;height:28px;border-radius:9999px;border:none;flex-shrink:0;cursor:pointer;background:${on ? '#00B16B' : '#C9D0D4'};transition:background .2s;`,
+          waKnob: `position:absolute;top:3px;left:${on ? 23 : 3}px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:left .2s;`,
+          waPhone: st.waPhone, onWaPhone: (e) => this.setState({ waPhone: e.target.value, waSent: false, waVerified: false }),
+          waSent: st.waSent && !st.waVerified, waVerified: st.waVerified,
+          onWaVerify: () => { if (st.waSent) this.setState({ waVerified: true }); else { this.setState({ waSent: true }); clearTimeout(this._wa); this._wa = setTimeout(() => this.setState({ waVerified: true }), 2500); } },
+          waVerifyLabel: st.waVerified ? 'Verified' : st.waSent ? 'Waiting…' : 'Verify number',
+          waVerifyIcon: st.waVerified ? 'icon icon-circle-check' : 'icon icon-send',
+          waVerifyStyle: `display:flex;align-items:center;gap:7px;height:46px;padding:0 18px;border-radius:9999px;font-family:inherit;font-size:14px;font-weight:700;cursor:${st.waVerified ? 'default' : 'pointer'};white-space:nowrap;${st.waVerified ? 'background:#E3F7EC;color:#00824D;border:1px solid #CFEBD9;' : 'background:#fff;color:#022F36;border:1.5px solid #022F36;'}`,
+          waTypes: [['needs', 'Needs your input', 'when an application is waiting on you', true], ['submitted', 'Submitted', 'a confirmation each time an application goes out', false], ['digest', 'Weekly summary', 'your applications and new matches, once a week', false]]
+            .map(([k, label, sub, locked]) => ({ label, sub, locked, on: st.waTypes[k], box: box(st.waTypes[k], locked),
+              onClick: () => { if (!locked) this.setState(s => ({ waTypes: { ...s.waTypes, [k]: !s.waTypes[k] } })); } })),
+        };
+      })(),
       ...this.reviewVals(st),
       ...this.importVals(st),
       isWelcome: st.stage === 'welcome',
