@@ -342,11 +342,11 @@
                       <input type="tel" value="{{ waPhone }}" onChange="{{ onWaPhone }}" aria-label="WhatsApp number" style="flex:1;min-width:200px;box-sizing:border-box;background:#F5F6F7;border:1px solid #E5E7EB;border-radius:8px;height:46px;padding:0 14px;font-family:inherit;font-size:15px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;background:#fff;">
                       </div>
                   </div>
-                                    <div style="font-size:12.5px;line-height:1.5;color:#4A5464;background:#F5F6F7;border-radius:8px;padding:10px 12px;">You’ll get updates about your applications on WhatsApp. You can turn this off anytime in Settings.</div>
+                                    <div style="font-size:12.5px;line-height:1.5;color:#4A5464;background:#F5F6F7;border-radius:8px;padding:10px 12px;">You’ll get updates about your applications on WhatsApp. You can turn this off anytime in your Profile.</div>
                 </div>
               </sc-if>
             <sc-if value="{{ waOff }}" hint-placeholder-val="{{ true }}">
-              <div style="font-size:12.5px;line-height:1.5;color:#4A5464;background:#F5F6F7;border-radius:8px;padding:10px 12px;">WhatsApp updates are off. You can turn them on anytime in Settings.</div>
+              <div style="font-size:12.5px;line-height:1.5;color:#4A5464;background:#F5F6F7;border-radius:8px;padding:10px 12px;">WhatsApp updates are off. You can turn them on anytime in your Profile.</div>
             </sc-if>
             </div>
           </div>
@@ -422,7 +422,7 @@ const TITLES = {
 };
 const JOBN = (k) => { let h = 0; for (const ch of k) h = (h * 31 + ch.charCodeAt(0)) >>> 0; const big = ['Austin','Dallas','Houston','San Francisco','New York','Seattle','Toronto','Los Angeles','Chicago','Boston','Vancouver','San Jose','Atlanta','Denver']; return big.includes(k) ? 60 + (h % 140) : 2 + (h % 14); };
 class Component extends DCLogic {
-  state = { stage: 'signin', waOn: false, waPhone: '+1 512 555 0142', waSent: false, waVerified: false, waTypes: { needs: true, submitted: false, digest: false }, file: null, fileErr: '', dragOver: false, obFunc: 'Software Engineering', obTitles: ['Software Engineer'], titlesOpen: false, obLoc: 'United States',
+  state = { stage: 'prefs', waOn: false, waPhone: '+1 512 555 0142', waSent: false, waVerified: false, waTypes: { needs: true, submitted: false, digest: false }, file: null, fileErr: '', dragOver: false, obFunc: 'Software Engineering', obTitles: ['Software Engineer'], titlesOpen: false, obLoc: 'United States',
     obTypes: { full: true, part: false, intern: false },
     obModes: { remote: true, hybrid: true, onsite: false },
     obNear: { mode: 'specific', states: [], cities: ['Austin|Texas'], detected: true, q: '', ro: false, note: '' },
