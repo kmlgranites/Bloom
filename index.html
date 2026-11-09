@@ -722,12 +722,7 @@
               <button role="switch" aria-checked="{{ pnWaOn }}" aria-label="WhatsApp updates" onClick="{{ onPnWaToggle }}" style="{{ pnWaTrack }}"><span style="{{ pnWaKnob }}"></span></button>
             </div>
             <sc-if value="{{ pnWaOn }}" hint-placeholder-val="{{ false }}">
-              <div style="display:flex;flex-direction:column;gap:12px;padding-top:14px;border-top:1px solid #F0F1F3;">
-                <div>
-                  <label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin-bottom:6px;">WhatsApp number</label>
-                  <input type="tel" value="{{ pnWaPhone }}" onChange="{{ onPnWaPhone }}" aria-label="WhatsApp number" style="width:100%;box-sizing:border-box;background:#F5F6F7;border:1px solid #E5E7EB;border-radius:8px;height:44px;padding:0 14px;font-family:inherit;font-size:15px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;background:#fff;">
-                </div>
-              </div>
+              <div style="display:flex;align-items:center;gap:8px;padding-top:12px;border-top:1px solid #F0F1F3;font-size:14px;color:#4A5464;"><i class="icon icon-phone" style="font-size:15px;color:#1D484F;"></i>Sent to <b style="font-weight:600;color:#0D0D0F;">+91 72999 11652</b><span>· from Personal info</span></div>
             </sc-if>
             <div style="font-size:13px;line-height:1.5;color:#4A5464;background:#F5F6F7;border-radius:8px;padding:10px 12px;">{{ pnWaNote }}</div>
           </div>
