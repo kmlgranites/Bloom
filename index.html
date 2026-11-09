@@ -709,6 +709,28 @@
             <button style="width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;padding:18px 20px;font-family:inherit;font-size:16px;color:#23262E;cursor:pointer;border-bottom:1px solid #F0F1F3;"><i class="icon icon-file-text" style="font-size:18px;color:#4A5464;"></i>Manage My Resume<i class="icon icon-chevron-right" style="margin-left:auto;font-size:16px;color:#A5A5A5;"></i></button>
             <button onClick="{{ onOpenPrefs }}" style="width:100%;display:flex;align-items:center;gap:12px;background:none;border:none;padding:18px 20px;font-family:inherit;font-size:16px;color:#23262E;cursor:pointer;"><i class="icon icon-file-cog" style="font-size:18px;color:#4A5464;"></i>Update Job Preference<i class="icon icon-chevron-right" style="margin-left:auto;font-size:16px;color:#A5A5A5;"></i></button>
           </div>
+
+          <!-- Notifications -->
+          <div style="background:#fff;border:1px solid #EDEEF0;border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;">
+            <div style="font-size:18px;font-weight:700;color:#0D0D0F;">Notifications</div>
+            <div style="display:flex;align-items:flex-start;gap:12px;">
+              <span style="width:36px;height:36px;border-radius:10px;background:#E3F7EC;color:#00824D;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-message-circle" style="font-size:19px;"></i></span>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:16px;font-weight:600;color:#0D0D0F;">WhatsApp updates</div>
+                <div style="font-size:14px;line-height:1.45;color:#4A5464;margin-top:2px;">Get updates about your applications on WhatsApp.</div>
+              </div>
+              <button role="switch" aria-checked="{{ pnWaOn }}" aria-label="WhatsApp updates" onClick="{{ onPnWaToggle }}" style="{{ pnWaTrack }}"><span style="{{ pnWaKnob }}"></span></button>
+            </div>
+            <sc-if value="{{ pnWaOn }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:12px;padding-top:14px;border-top:1px solid #F0F1F3;">
+                <div>
+                  <label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin-bottom:6px;">WhatsApp number</label>
+                  <input type="tel" value="{{ pnWaPhone }}" onChange="{{ onPnWaPhone }}" aria-label="WhatsApp number" style="width:100%;box-sizing:border-box;background:#F5F6F7;border:1px solid #E5E7EB;border-radius:8px;height:44px;padding:0 14px;font-family:inherit;font-size:15px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;background:#fff;">
+                </div>
+              </div>
+            </sc-if>
+            <div style="font-size:13px;line-height:1.5;color:#4A5464;background:#F5F6F7;border-radius:8px;padding:10px 12px;">{{ pnWaNote }}</div>
+          </div>
           </div>
         </div>
 
@@ -3351,6 +3373,13 @@ v: (() => {
       prefsOpen: st.prefsOpen,
       onClosePrefs: () => this.closePrefs(),
       onUpdatePrefs: () => this.closePrefs(),
+      ...(() => { const on = !!st.pnWaOn; return {
+        pnWaOn: on, onPnWaToggle: () => this.setState(s => ({ pnWaOn: !s.pnWaOn })),
+        pnWaPhone: st.pnWaPhone ?? '+1 512 555 0142', onPnWaPhone: (e) => this.setState({ pnWaPhone: e.target.value }),
+        pnWaTrack: `position:relative;width:48px;height:28px;border-radius:9999px;border:none;flex-shrink:0;cursor:pointer;background:${on ? '#00B16B' : '#C9D0D4'};transition:background .2s;`,
+        pnWaKnob: `position:absolute;top:3px;left:${on ? 23 : 3}px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:left .2s;`,
+        pnWaNote: on ? 'You’ll get updates about your applications on WhatsApp. You can turn this off anytime here.' : 'WhatsApp updates are off. Turn them on anytime here.',
+      }; })(),
       ...(() => { const nm = this.matchCount(st); return { matchBadge: this.matchLabel(nm), updateLabel: 'Update · ' + (nm === 0 ? 'No matches' : nm + (nm === 1 ? ' match' : ' matches')) }; })(),
       prefFunc: st.prefs.func,
       subOptions: [['fe','Frontend'],['be','Backend'],['fs','Full Stack'],['mobile','Mobile'],['devops','DevOps / Cloud'],['qa','QA / Testing']].map(([k,label]) => { const on = st.prefs.subs[k]; return { label, onClick: () => this.toggleSub(k), chipStyle: this.chipStyle(on), chipHover: this.chipHoverStyle(on), chipFocus: this.chipFocusStyle(), checkIcon: this.chipCheckIcon(on), checkIconStyle: this.chipCheckColor(on) }; }),
