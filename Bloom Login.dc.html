@@ -330,7 +330,7 @@
                 <span style="width:40px;height:40px;border-radius:10px;background:#E3F7EC;color:#00824D;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-message-circle" style="font-size:21px;"></i></span>
                 <div style="flex:1;min-width:0;">
                   <div style="font-size:17px;font-weight:700;color:#0D0D0F;">Get updates on WhatsApp?</div>
-                  <div style="font-size:14px;line-height:1.5;color:#4A5464;margin-top:3px;text-wrap:pretty;">Get updates about your applications on WhatsApp. You can turn this off anytime.</div>
+                  <div style="font-size:14px;line-height:1.5;color:#4A5464;margin-top:3px;text-wrap:pretty;">Get updates about your applications on WhatsApp.</div>
                 </div>
                 <button role="switch" aria-checked="{{ waOn }}" aria-label="WhatsApp updates" onClick="{{ onWaToggle }}" style="{{ waTrack }}"><span style="{{ waKnob }}"></span></button>
               </div>
@@ -340,15 +340,14 @@
                     <label style="display:block;font-size:13px;font-weight:600;color:#4A5464;margin-bottom:6px;">WhatsApp number <span style="font-weight:500;">(from your resume)</span></label>
                     <div style="display:flex;gap:10px;flex-wrap:wrap;">
                       <input type="tel" value="{{ waPhone }}" onChange="{{ onWaPhone }}" aria-label="WhatsApp number" style="flex:1;min-width:200px;box-sizing:border-box;background:#F5F6F7;border:1px solid #E5E7EB;border-radius:8px;height:46px;padding:0 14px;font-family:inherit;font-size:15px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;background:#fff;">
-                      <button onClick="{{ onWaVerify }}" disabled="{{ waVerified }}" style="{{ waVerifyStyle }}"><i class="{{ waVerifyIcon }}" style="font-size:16px;"></i>{{ waVerifyLabel }}</button>
-                    </div>
-                    <sc-if value="{{ waSent }}" hint-placeholder-val="{{ false }}">
-                      <div style="font-size:13px;color:#4A5464;margin-top:8px;">We sent a code to this number. Reply YES on WhatsApp to confirm.</div>
-                    </sc-if>
+                      </div>
                   </div>
-                                    <div style="font-size:12.5px;line-height:1.5;color:#4A5464;background:#F5F6F7;border-radius:8px;padding:10px 12px;">By turning this on, you agree to receive WhatsApp messages from Bloom about your applications. Message and data rates may apply. Reply STOP anytime, or turn it off in Profile → Notifications.</div>
+                                    <div style="font-size:12.5px;line-height:1.5;color:#4A5464;background:#F5F6F7;border-radius:8px;padding:10px 12px;">You’ll get updates about your applications on WhatsApp. You can turn this off anytime in Settings.</div>
                 </div>
               </sc-if>
+            <sc-if value="{{ waOff }}" hint-placeholder-val="{{ true }}">
+              <div style="font-size:12.5px;line-height:1.5;color:#4A5464;background:#F5F6F7;border-radius:8px;padding:10px 12px;">WhatsApp updates are off. You can turn them on anytime in Settings.</div>
+            </sc-if>
             </div>
           </div>
         </sc-if>
@@ -708,7 +707,7 @@ v: (() => {
         const on = !!st.waOn;
         const box = (v, locked) => `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${v ? (locked ? '#7A8694' : '#022F36') : '#fff'};border:1.5px solid ${v ? (locked ? '#7A8694' : '#022F36') : '#A9B3B9'};`;
         return {
-          waOn: on,
+          waOn: on, waOff: !on,
           onWaToggle: () => this.setState(s => ({ waOn: !s.waOn })),
           waTrack: `position:relative;width:48px;height:28px;border-radius:9999px;border:none;flex-shrink:0;cursor:pointer;background:${on ? '#00B16B' : '#C9D0D4'};transition:background .2s;`,
           waKnob: `position:absolute;top:3px;left:${on ? 23 : 3}px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:left .2s;`,
