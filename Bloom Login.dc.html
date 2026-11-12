@@ -31,6 +31,7 @@
   @keyframes ringIn{from{opacity:0;transform:scale(.8);}to{opacity:1;transform:scale(1);}}
   @keyframes riseIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
   @media (max-width:920px){ .brand-panel{display:none !important;} }
+  @keyframes pbar{0%{transform:translateX(-100%);}100%{transform:translateX(170%);}}
 </style>
 </helmet>
 
@@ -403,9 +404,307 @@
     </div>
     </sc-if>
   </div>
+
+  <!-- ===== COMPLETE PROFILE MODAL ===== -->
+  <sc-if value="{{ isComplete }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:95;background:rgba(8,20,22,0.55);display:flex;align-items:center;justify-content:center;padding:28px;">
+      <div role="dialog" aria-label="Complete your profile" data-cp-scroll="1" style="position:relative;width:100%;max-width:880px;height:min(860px,calc(100vh - 56px));background:#fff;border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,0.35);overflow-y:auto;overscroll-behavior:contain;display:flex;flex-direction:column;">
+      <button onClick="{{ onCpClose }}" aria-label="Close" style="position:absolute;top:18px;right:18px;z-index:8;width:40px;height:40px;border-radius:10px;border:none;background:#fff;color:#4A5464;cursor:pointer;display:flex;align-items:center;justify-content:center;" style-hover="background:#F2F5F8;"><i class="icon icon-x" style="font-size:20px;"></i></button>
+      <div data-screen-label="Onboarding · Complete Profile" style="width:100%;padding:0 40px;box-sizing:border-box;flex:1;display:flex;flex-direction:column;">
+        <!-- stepper -->
+        <div style="position:sticky;top:0;z-index:6;background:#FFFFFF;display:flex;align-items:center;justify-content:center;flex-wrap:nowrap;gap:0;margin:0 -40px 28px;padding:22px 64px 16px 32px;border-bottom:1px solid #EDEEF0;">
+          <sc-for list="{{ cpSteps }}" as="p" hint-placeholder-count="5">
+            <div style="display:flex;align-items:center;">
+              <sc-if value="{{ p.line }}" hint-placeholder-val="{{ true }}"><span style="{{ p.lineStyle }}"></span></sc-if>
+              <button onClick="{{ p.onClick }}" aria-current="{{ p.current }}" style="{{ p.pill }}">
+                <span style="{{ p.num }}"><sc-if value="{{ p.done }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:14px;"></i></sc-if><sc-if value="{{ p.notDone }}" hint-placeholder-val="{{ true }}">{{ p.n }}</sc-if></span>{{ p.label }}
+              </button>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ cpIsStep0 }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <div style="display:flex;gap:12px;align-items:flex-start;background:#F0FCFF;border:1px solid #CDEFF5;border-radius:12px;padding:14px 16px;margin-bottom:24px;font-size:14.5px;line-height:1.5;color:#23262E;"><i class="icon icon-info" style="font-size:17px;color:#1D484F;margin-top:2px;flex-shrink:0;"></i><span>We couldn’t read your resume, so let’s fill in your details together. It takes about 3 minutes, and Bloom uses them to auto-fill your applications.</span></div>
+            <h1 style="font-size:30px;font-weight:700;color:#0D0D0F;letter-spacing:-0.02em;margin-bottom:24px;">Let’s start with the basics</h1>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 24px;">
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;"><span style="color:#E5484D;">*</span> First Name</label>
+              <input type="text" defaultValue="" placeholder="e.g. Joel" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;"><span style="color:#E5484D;">*</span> Last Name</label>
+              <input type="text" defaultValue="" placeholder="e.g. Dehlin" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;"><span style="color:#E5484D;">*</span> Email</label>
+              <input type="email" defaultValue="joeldehlin@gmail.com" placeholder="you@example.com" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;"><span style="color:#E5484D;">*</span> Phone</label>
+              <input type="tel" defaultValue="" placeholder="+1 555 000 0000" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;">City</label>
+              <input type="text" defaultValue="" placeholder="e.g. Austin" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;">Postal Code</label>
+              <input type="text" defaultValue="" placeholder="e.g. 78701" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;">Country</label>
+              <input type="text" defaultValue="" placeholder="e.g. United States" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;">Address Line</label>
+              <input type="text" defaultValue="" placeholder="Street and number" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="grid-column:span 2;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;"><span style="color:#E5484D;">*</span> LinkedIn URL</label>
+              <input type="text" defaultValue="" placeholder="linkedin.com/in/yourname" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;">GitHub URL</label>
+              <input type="text" defaultValue="" placeholder="github.com/yourname" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;">Portfolio URL</label>
+              <input type="text" defaultValue="" placeholder="yourwebsite.com" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+          </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ cpIsStep1 }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <h1 style="font-size:30px;font-weight:700;color:#0D0D0F;letter-spacing:-0.02em;margin-bottom:6px;">Add your education</h1>
+            <p style="font-size:16px;color:#4A5464;margin-bottom:24px;">Start with your highest degree. You can add more below.</p>
+            <div style="border:1px solid #E5E7EB;border-radius:14px;padding:20px 22px;">
+              <div style="font-size:17px;font-weight:700;color:#0D0D0F;margin-bottom:18px;">Education 1</div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 24px;">
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;"><span style="color:#E5484D;">*</span> School Name</label>
+              <input type="text" defaultValue="" placeholder="e.g. Pomona College" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;"><span style="color:#E5484D;">*</span> Major</label>
+              <input type="text" defaultValue="" placeholder="e.g. Computer Science" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;"><span style="color:#E5484D;">*</span> Degree Type</label>
+              <div style="position:relative;">
+                <select defaultValue="" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;appearance:none;-webkit-appearance:none;padding-right:44px;cursor:pointer;color:#23262E;" style-focus="outline:none;border-color:#1D484F;">
+                  <option value="" disabled="{{ true }}">Select</option>
+                  <option value="High School">High School</option>
+                  <option value="Associate">Associate</option>
+                  <option value="B.Sc / B.E.">B.Sc / B.E.</option>
+                  <option value="B.A.">B.A.</option>
+                  <option value="M.Sc / M.S.">M.Sc / M.S.</option>
+                  <option value="MBA">MBA</option>
+                  <option value="Ph.D.">Ph.D.</option>
+                  <option value="Other">Other</option>
+                </select>
+                <i class="icon icon-chevron-down" style="position:absolute;right:16px;top:15px;font-size:18px;color:#4A5464;pointer-events:none;"></i>
+              </div>
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;">GPA</label>
+              <input type="text" defaultValue="" placeholder="e.g. 3.6 / 4.0" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;">Start Date</label>
+              <input type="month" defaultValue="" placeholder="" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;">End Date</label>
+              <input type="month" defaultValue="" placeholder="" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+          </div>
+              <div style="margin-top:16px;">
+            <label style="display:flex;align-items:center;gap:10px;font-size:15px;color:#23262E;cursor:pointer;"><input type="checkbox" style="width:18px;height:18px;accent-color:#1D484F;">I currently study here</label>
+              </div>
+            </div>
+          <button style="display:flex;align-items:center;gap:8px;margin-top:20px;background:none;border:1px dashed #A9B3B9;border-radius:10px;height:48px;width:100%;justify-content:center;font-family:inherit;font-size:15px;font-weight:600;color:#1D484F;cursor:pointer;" style-hover="background:#F0FCFF;border-color:#1D484F;"><i class="icon icon-plus" style="font-size:17px;"></i>Add another education</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ cpIsStep2 }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <h1 style="font-size:30px;font-weight:700;color:#0D0D0F;letter-spacing:-0.02em;margin-bottom:6px;">Halfway there! Add your work experience</h1>
+            <p style="font-size:16px;color:#4A5464;margin-bottom:24px;">Start with your most recent role.</p>
+            <div style="border:1px solid #E5E7EB;border-radius:14px;padding:20px 22px;">
+              <div style="font-size:17px;font-weight:700;color:#0D0D0F;margin-bottom:18px;">Work Experience 1</div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 24px;">
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;"><span style="color:#E5484D;">*</span> Job Title</label>
+              <input type="text" defaultValue="" placeholder="e.g. Software Engineer" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;"><span style="color:#E5484D;">*</span> Company</label>
+              <input type="text" defaultValue="" placeholder="e.g. Nurturebox" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;"><span style="color:#E5484D;">*</span> Job Type</label>
+              <div style="position:relative;">
+                <select defaultValue="" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;appearance:none;-webkit-appearance:none;padding-right:44px;cursor:pointer;color:#23262E;" style-focus="outline:none;border-color:#1D484F;">
+                  <option value="" disabled="{{ true }}">Select</option>
+                  <option value="Full-time">Full-time</option>
+                  <option value="Part-time">Part-time</option>
+                  <option value="Contract">Contract</option>
+                  <option value="Internship">Internship</option>
+                </select>
+                <i class="icon icon-chevron-down" style="position:absolute;right:16px;top:15px;font-size:18px;color:#4A5464;pointer-events:none;"></i>
+              </div>
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;">Location</label>
+              <input type="text" defaultValue="" placeholder="e.g. Chennai, India" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;">Start Date</label>
+              <input type="month" defaultValue="" placeholder="" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+            <div style="grid-column:span 1;min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;">End Date</label>
+              <input type="month" defaultValue="" placeholder="" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
+            </div>
+          </div>
+              <div style="margin:16px 0 20px;">
+            <label style="display:flex;align-items:center;gap:10px;font-size:15px;color:#23262E;cursor:pointer;"><input type="checkbox" style="width:18px;height:18px;accent-color:#1D484F;">I currently work here</label>
+              </div>
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;">Experience Summary</label>
+              <textarea rows="4" placeholder="What you worked on, the tools you used and the results" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;padding:12px 16px;font-family:inherit;font-size:16px;line-height:1.5;color:#0D0D0F;resize:vertical;" style-focus="outline:none;border-color:#1D484F;"></textarea>
+            </div>
+          <button style="display:flex;align-items:center;gap:8px;margin-top:20px;background:none;border:1px dashed #A9B3B9;border-radius:10px;height:48px;width:100%;justify-content:center;font-family:inherit;font-size:15px;font-weight:600;color:#1D484F;cursor:pointer;" style-hover="background:#F0FCFF;border-color:#1D484F;"><i class="icon icon-plus" style="font-size:17px;"></i>Add another role</button>
+            <label style="display:flex;align-items:center;gap:10px;margin-top:18px;font-size:15px;color:#23262E;cursor:pointer;"><input type="checkbox" style="width:18px;height:18px;accent-color:#1D484F;">I don’t have work experience yet</label>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ cpIsStep3 }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <h1 style="font-size:30px;font-weight:700;color:#0D0D0F;letter-spacing:-0.02em;margin-bottom:6px;">Now let’s add your skills</h1>
+            <p style="font-size:16px;color:#4A5464;margin-bottom:24px;text-wrap:pretty;">The more complete your skills, the better we can match you with the right jobs.</p>
+            <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;"><span style="color:#E5484D;">*</span> Skills <span style="font-weight:500;color:#4A5464;">(add at least 3)</span></label>
+            <div style="border:1px solid #D5DBDF;border-radius:10px;padding:10px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;min-height:56px;">
+              <sc-for list="{{ cpSkills }}" as="k" hint-placeholder-count="0">
+                <span style="display:inline-flex;align-items:center;gap:6px;background:#E0FAFA;color:#022F36;border-radius:9999px;padding:6px 6px 6px 14px;font-size:15px;font-weight:600;">{{ k.name }}<button onClick="{{ k.onRemove }}" aria-label="Remove" style="width:22px;height:22px;border-radius:50%;border:none;background:#fff;color:#4A5464;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="icon icon-x" style="font-size:13px;"></i></button></span>
+              </sc-for>
+              <input type="text" value="{{ cpSkillQ }}" onChange="{{ onCpSkillQ }}" onKeyDown="{{ onCpSkillKey }}" placeholder="Type a skill and press Enter" aria-label="Add a skill" style="flex:1;min-width:200px;border:none;outline:none;height:36px;font-family:inherit;font-size:16px;color:#0D0D0F;background:transparent;">
+            </div>
+            <div style="font-size:14px;font-weight:600;color:#4A5464;margin:20px 0 10px;">Suggested for {{ cpRole }}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px;">
+              <sc-for list="{{ cpSuggest }}" as="k" hint-placeholder-count="8">
+                <button onClick="{{ k.onAdd }}" style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #D5DBDF;border-radius:9999px;padding:8px 14px;font-family:inherit;font-size:15px;font-weight:600;color:#23262E;cursor:pointer;" style-hover="border-color:#1D484F;background:#F0FCFF;"><i class="icon icon-plus" style="font-size:14px;color:#1D484F;"></i>{{ k.name }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ cpIsStep4 }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <h1 style="font-size:30px;font-weight:700;color:#0D0D0F;letter-spacing:-0.02em;margin-bottom:6px;">Last step! Your employment info</h1>
+            <p style="font-size:16px;color:#4A5464;margin-bottom:24px;text-wrap:pretty;">Employers ask these on most applications. Answering once lets Bloom fill them for you. You can always choose “Decline to state”.</p>
+            <div style="display:flex;flex-direction:column;gap:22px;">
+              <sc-for list="{{ cpQs }}" as="q" hint-placeholder-count="6">
+                <div role="radiogroup" aria-label="{{ q.label }}">
+                  <div style="font-size:15px;font-weight:600;color:#0D0D0F;margin-bottom:10px;"><span style="color:#E5484D;">*</span> {{ q.label }}</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:10px;">
+                    <sc-for list="{{ q.opts }}" as="o" hint-placeholder-count="3">
+                      <button role="radio" aria-checked="{{ o.on }}" onClick="{{ o.onClick }}" style="{{ o.style }}"><span style="{{ o.dot }}"></span>{{ o.label }}</button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 24px;margin-top:24px;">
+            <div style="min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;"><span style="color:#E5484D;">*</span> How would you identify your race?</label>
+              <div style="position:relative;">
+                <select defaultValue="" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;appearance:none;-webkit-appearance:none;padding-right:44px;cursor:pointer;color:#23262E;" style-focus="outline:none;border-color:#1D484F;">
+                  <option value="" disabled="{{ true }}">Select</option>
+                  <option value="American Indian or Alaska Native">American Indian or Alaska Native</option>
+                  <option value="Asian">Asian</option>
+                  <option value="Black or African American">Black or African American</option>
+                  <option value="Native Hawaiian or Pacific Islander">Native Hawaiian or Pacific Islander</option>
+                  <option value="White">White</option>
+                  <option value="Two or more races">Two or more races</option>
+                  <option value="Decline to state">Decline to state</option>
+                </select>
+                <i class="icon icon-chevron-down" style="position:absolute;right:16px;top:15px;font-size:18px;color:#4A5464;pointer-events:none;"></i>
+              </div>
+            </div>
+            <div style="min-width:0;">
+              <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:8px;"><span style="color:#E5484D;">*</span> How would you describe your sexual orientation?</label>
+              <div style="position:relative;">
+                <select defaultValue="" style="width:100%;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:8px;height:48px;padding:0 16px;font-family:inherit;font-size:16px;color:#0D0D0F;appearance:none;-webkit-appearance:none;padding-right:44px;cursor:pointer;color:#23262E;" style-focus="outline:none;border-color:#1D484F;">
+                  <option value="" disabled="{{ true }}">Select</option>
+                  <option value="Heterosexual">Heterosexual</option>
+                  <option value="Gay or Lesbian">Gay or Lesbian</option>
+                  <option value="Bisexual">Bisexual</option>
+                  <option value="Prefer to self-describe">Prefer to self-describe</option>
+                  <option value="Decline to state">Decline to state</option>
+                </select>
+                <i class="icon icon-chevron-down" style="position:absolute;right:16px;top:15px;font-size:18px;color:#4A5464;pointer-events:none;"></i>
+              </div>
+            </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ cpIsDone }}" hint-placeholder-val="{{ false }}">
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 0;">
+            <div style="position:relative;width:96px;height:96px;margin-bottom:22px;">
+              <img src="assets/favicon.png" alt="" style="width:96px;height:96px;object-fit:contain;">
+              <span style="position:absolute;right:-4px;bottom:0;width:32px;height:32px;border-radius:50%;background:#00B16B;border:3px solid #fff;display:flex;align-items:center;justify-content:center;"><i class="icon icon-check" style="font-size:17px;color:#fff;"></i></span>
+            </div>
+            <h1 style="font-size:34px;font-weight:700;color:#022F36;letter-spacing:-0.02em;margin-bottom:10px;">Congrats! You’re all set.</h1>
+            <p style="font-size:17px;line-height:1.55;color:#23262E;margin-bottom:30px;">Thanks for completing your profile. Let’s find the best jobs for you.</p>
+            <button onClick="{{ onCpFinish }}" style="background:#022F36;border:none;border-radius:9999px;height:56px;padding:0 44px;font-family:inherit;font-size:18px;font-weight:600;color:#FFFFFF;cursor:pointer;" style-hover="background:#1D484F;">View your job matches</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ cpShowFooter }}" hint-placeholder-val="{{ true }}">
+          <div style="position:sticky;bottom:0;z-index:6;background:#FFFFFF;border-top:1px solid #EDEEF0;display:flex;align-items:center;justify-content:center;gap:16px;margin:32px -40px 0;padding:16px 0 20px;">
+            <sc-if value="{{ cpHasBack }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ onCpBack }}" style="background:#fff;border:1px solid rgba(0,0,0,0.25);border-radius:9999px;height:56px;padding:0 40px;font-family:inherit;font-size:18px;font-weight:600;color:#0D0D0F;cursor:pointer;" style-hover="background:#F5F6F7;">Back</button>
+            </sc-if>
+            <button onClick="{{ onCpNext }}" style="background:#022F36;border:none;border-radius:9999px;height:56px;padding:0 64px;font-family:inherit;font-size:18px;font-weight:600;color:#FFFFFF;cursor:pointer;" style-hover="background:#1D484F;">{{ cpNextLabel }}</button>
+          </div>
+        </sc-if>
+      </div>
+      </div>
+    </div>
+  </sc-if>
+  <!-- ===== RESUME PARSING / PARSE ERROR ===== -->
+  <sc-if value="{{ parsing }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position:fixed;inset:0;z-index:90;background:rgba(8,20,22,0.55);display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div style="width:100%;max-width:420px;background:#fff;border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,0.3);padding:36px 32px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;">
+        <img src="assets/favicon.png" alt="" style="width:64px;height:64px;object-fit:contain;">
+        <div style="font-size:20px;font-weight:700;color:#022F36;">Reading your resume…</div>
+        <div style="width:100%;height:6px;border-radius:9999px;background:#E0FAFA;overflow:hidden;"><div style="width:60%;height:100%;border-radius:9999px;background:#1D484F;animation:pbar 1.2s ease-in-out infinite;"></div></div>
+      </div>
+    </div>
+  </sc-if>
+  <sc-if value="{{ parseErr }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;z-index:90;background:rgba(8,20,22,0.55);display:flex;align-items:center;justify-content:center;padding:24px;">
+      <div role="dialog" aria-label="We couldn’t read that resume" style="width:100%;max-width:520px;background:#fff;border-radius:24px;box-shadow:0 30px 80px rgba(0,0,0,0.3);padding:36px 36px 30px;display:flex;flex-direction:column;align-items:center;text-align:center;">
+        <div style="position:relative;width:76px;height:76px;margin-bottom:18px;">
+          <img src="assets/favicon.png" alt="" style="width:76px;height:76px;object-fit:contain;">
+          <span style="position:absolute;right:-2px;bottom:2px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.2);display:flex;align-items:center;justify-content:center;"><i class="icon icon-circle-help" style="font-size:17px;color:#E5484D;"></i></span>
+        </div>
+        <h2 style="font-size:28px;font-weight:700;color:#022F36;letter-spacing:-0.01em;margin-bottom:10px;">We couldn’t read that resume</h2>
+        <p style="font-size:16px;line-height:1.55;color:#23262E;max-width:420px;margin-bottom:24px;text-wrap:pretty;">It may be scanned, image-based or password-protected. You can still finish setting up by adding your details to your profile.</p>
+        <button onClick="{{ onCompleteProfile }}" style="width:100%;display:flex;align-items:center;justify-content:center;gap:9px;height:52px;border:none;border-radius:9999px;background:#1D484F;color:#fff;font-family:inherit;font-size:17px;font-weight:700;cursor:pointer;" style-hover="background:#022F36;"><i class="icon icon-user-pen" style="font-size:18px;"></i>Complete my profile</button>
+        <div style="font-size:13.5px;color:#4A5464;margin-top:8px;">Takes about 3 minutes</div>
+        <button onClick="{{ onRetryFile }}" style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;height:48px;border:1px solid rgba(0,0,0,0.25);border-radius:9999px;background:#fff;color:#0D0D0F;font-family:inherit;font-size:16px;font-weight:600;cursor:pointer;" style-hover="background:#F5F6F7;"><i class="icon icon-upload" style="font-size:17px;"></i>Try a different file</button>
+        <div style="margin-top:20px;width:100%;display:flex;gap:10px;align-items:flex-start;text-align:left;background:#F0FCFF;border:1px solid #CDEFF5;border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.5;color:#23262E;"><i class="icon icon-info" style="font-size:16px;color:#1D484F;margin-top:1px;flex-shrink:0;"></i><span><b style="font-weight:700;">What works best:</b> a text-based PDF or DOCX under 5MB. You can upload a new resume anytime from your Profile.</span></div>
+      </div>
+    </div>
+  </sc-if>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;rotateSeconds&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:5.5,&quot;min&quot;:3,&quot;max&quot;:10,&quot;step&quot;:0.5,&quot;unit&quot;:&quot;s&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Live feed&quot;},&quot;ctaColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#18D1D1&quot;,&quot;options&quot;:[&quot;#18D1D1&quot;,&quot;#1D484F&quot;,&quot;#022F36&quot;,&quot;#F76638&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Branding&quot;},&quot;showLinkedIn&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sign in&quot;}}">
+<script type="text/x-dc" data-dc-script data-props="{&quot;rotateSeconds&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:5.5,&quot;min&quot;:3,&quot;max&quot;:10,&quot;step&quot;:0.5,&quot;unit&quot;:&quot;s&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Live feed&quot;},&quot;ctaColor&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;default&quot;:&quot;#18D1D1&quot;,&quot;options&quot;:[&quot;#18D1D1&quot;,&quot;#1D484F&quot;,&quot;#022F36&quot;,&quot;#F76638&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Branding&quot;},&quot;showLinkedIn&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sign in&quot;},&quot;parseResult&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Success&quot;,&quot;Parse error&quot;],&quot;default&quot;:&quot;Success&quot;,&quot;tsType&quot;:&quot;'Success' | 'Parse error'&quot;,&quot;section&quot;:&quot;Demo&quot;}}">
 const US_STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
 const CITIES = {"Alabama":["Birmingham","Huntsville","Montgomery","Mobile"],"Alaska":["Anchorage","Fairbanks","Juneau"],"Arizona":["Phoenix","Tucson","Scottsdale","Tempe","Mesa"],"Arkansas":["Little Rock","Fayetteville","Bentonville"],"California":["San Francisco","Los Angeles","San Jose","San Diego","Palo Alto","Mountain View","Sunnyvale","Oakland","Irvine","Sacramento"],"Colorado":["Denver","Boulder","Colorado Springs","Fort Collins"],"Connecticut":["Hartford","Stamford","New Haven"],"Delaware":["Wilmington","Dover"],"Florida":["Miami","Tampa","Orlando","Jacksonville","Fort Lauderdale"],"Georgia":["Atlanta","Alpharetta","Savannah","Augusta"],"Hawaii":["Honolulu"],"Idaho":["Boise","Idaho Falls"],"Illinois":["Chicago","Naperville","Evanston","Champaign"],"Indiana":["Indianapolis","Fort Wayne","Bloomington"],"Iowa":["Des Moines","Cedar Rapids","Iowa City"],"Kansas":["Wichita","Overland Park","Kansas City"],"Kentucky":["Louisville","Lexington"],"Louisiana":["New Orleans","Baton Rouge"],"Maine":["Portland","Bangor"],"Maryland":["Baltimore","Bethesda","Rockville","Columbia"],"Massachusetts":["Boston","Cambridge","Somerville","Waltham","Worcester"],"Michigan":["Detroit","Ann Arbor","Grand Rapids"],"Minnesota":["Minneapolis","St. Paul","Rochester"],"Mississippi":["Jackson","Gulfport"],"Missouri":["St. Louis","Kansas City","Springfield"],"Montana":["Bozeman","Missoula","Billings"],"Nebraska":["Omaha","Lincoln"],"Nevada":["Las Vegas","Reno","Henderson"],"New Hampshire":["Manchester","Nashua","Portsmouth"],"New Jersey":["Jersey City","Newark","Princeton","Hoboken"],"New Mexico":["Albuquerque","Santa Fe"],"New York":["New York City","Brooklyn","Buffalo","Rochester","Albany"],"North Carolina":["Raleigh","Charlotte","Durham","Chapel Hill"],"North Dakota":["Fargo","Bismarck"],"Ohio":["Columbus","Cleveland","Cincinnati","Dayton"],"Oklahoma":["Oklahoma City","Tulsa"],"Oregon":["Portland","Beaverton","Eugene","Bend"],"Pennsylvania":["Philadelphia","Pittsburgh","Harrisburg"],"Rhode Island":["Providence"],"South Carolina":["Charleston","Greenville","Columbia"],"South Dakota":["Sioux Falls","Rapid City"],"Tennessee":["Nashville","Memphis","Knoxville","Chattanooga"],"Texas":["Austin","Dallas","Houston","San Antonio","Plano","Fort Worth"],"Utah":["Salt Lake City","Lehi","Provo"],"Vermont":["Burlington"],"Virginia":["Arlington","Richmond","Reston","McLean","Virginia Beach"],"Washington":["Seattle","Bellevue","Redmond","Tacoma","Spokane"],"West Virginia":["Charleston","Morgantown"],"Wisconsin":["Milwaukee","Madison","Green Bay"],"Wyoming":["Cheyenne","Jackson"],"Alberta":["Calgary","Edmonton"],"British Columbia":["Vancouver","Victoria","Burnaby","Surrey"],"Manitoba":["Winnipeg"],"New Brunswick":["Moncton","Fredericton","Saint John"],"Newfoundland and Labrador":["St. John's"],"Nova Scotia":["Halifax"],"Ontario":["Toronto","Ottawa","Waterloo","Mississauga","Hamilton","London"],"Prince Edward Island":["Charlottetown"],"Quebec":["Montreal","Quebec City","Laval"],"Saskatchewan":["Saskatoon","Regina"],"Northwest Territories":["Yellowknife"],"Nunavut":["Iqaluit"],"Yukon":["Whitehorse"]};
 const CA_PROVINCES = ["Alberta","British Columbia","Manitoba","New Brunswick","Newfoundland and Labrador","Nova Scotia","Ontario","Prince Edward Island","Quebec","Saskatchewan","Northwest Territories","Nunavut","Yukon"];
@@ -422,7 +721,7 @@ const TITLES = {
 };
 const JOBN = (k) => { let h = 0; for (const ch of k) h = (h * 31 + ch.charCodeAt(0)) >>> 0; const big = ['Austin','Dallas','Houston','San Francisco','New York','Seattle','Toronto','Los Angeles','Chicago','Boston','Vancouver','San Jose','Atlanta','Denver']; return big.includes(k) ? 60 + (h % 140) : 2 + (h % 14); };
 class Component extends DCLogic {
-  state = { stage: 'prefs', waOn: false, waPhone: '+1 512 555 0142', waSent: false, waVerified: false, waTypes: { needs: true, submitted: false, digest: false }, file: null, fileErr: '', dragOver: false, obFunc: 'Software Engineering', obTitles: ['Software Engineer'], titlesOpen: false, obLoc: 'United States',
+  state = { cpStep: 0, cpOpen: typeof location !== 'undefined' && location.hash === '#complete-profile', stage: (typeof location !== 'undefined' && location.hash === '#complete-profile') ? 'import' : (typeof location !== 'undefined' && location.hash === '#import') ? 'import' : (typeof location !== 'undefined' && location.hash === '#parse-error') ? 'import' : 'prefs', parseErr: typeof location !== 'undefined' && location.hash === '#parse-error', file: (typeof location !== 'undefined' && location.hash === '#parse-error') ? { name: 'Dillan_Resume_scan.pdf', size: 1843200 } : null, waOn: false, waPhone: '+1 512 555 0142', waSent: false, waVerified: false, waTypes: { needs: true, submitted: false, digest: false }, fileErr: '', dragOver: false, obFunc: 'Software Engineering', obTitles: ['Software Engineer'], titlesOpen: false, obLoc: 'United States',
     obTypes: { full: true, part: false, intern: false },
     obModes: { remote: true, hybrid: true, onsite: false },
     obNear: { mode: 'specific', states: [], cities: ['Austin|Texas'], detected: true, q: '', ro: false, note: '' },
@@ -509,7 +808,12 @@ class Component extends DCLogic {
       onDrop: (e) => { e.preventDefault(); this.setState({ dragOver: false }); this.pickFile(e.dataTransfer.files && e.dataTransfer.files[0]); },
       continueDisabled: !has,
       continueStyle: `margin-top:40px;height:56px;padding:0 56px;border:none;border-radius:9999px;font-family:inherit;font-size:19px;font-weight:600;transition:background .15s;${has ? 'background:#022F36;color:#FFFFFF;cursor:pointer;' : 'background:#D9F2F2;color:#8FB5B8;cursor:not-allowed;'}`,
-      onContinue: (e) => { if (has) this.signIn(e); },
+      onContinue: (e) => { if (!has) return; if (e && e.preventDefault) e.preventDefault();
+        this.setState({ parsing: true }); clearTimeout(this._parse);
+        this._parse = setTimeout(() => { if ((this.props.parseResult ?? 'Success') === 'Parse error') this.setState({ parsing: false, parseErr: true }); else { this.setState({ parsing: false }); this.signIn(); } }, 1400); },
+      parsing: !!st.parsing, parseErr: !!st.parseErr,
+      onCompleteProfile: () => this.setState({ parseErr: false, cpOpen: true, cpStep: 0 }),
+      onRetryFile: () => this.setState({ parseErr: false, file: null, fileErr: '' }),
     };
   }
 
@@ -670,6 +974,48 @@ v: (() => {
     };
   }
 
+  cpVals(st) {
+    const step = st.cpStep || 0, LABELS = ['Personal','Education','Work Experience','Skills','Employment'];
+    const go = (n) => { this.setState({ cpStep: n }); const sc = document.querySelector('[data-cp-scroll]'); if (sc) sc.scrollTop = 0; };
+    const skills = st.cpSkills || [];
+    const role = (this.state.obFunc || 'Software Engineering');
+    const POOL = ['Python','JavaScript','TypeScript','React','Node.js','SQL','AWS','Docker','Git','REST APIs','Java','Go'];
+    const add = (n) => { const v = n.trim(); if (v && !skills.some(x => x.toLowerCase() === v.toLowerCase())) this.setState({ cpSkills: [...skills, v], cpSkillQ: '' }); else this.setState({ cpSkillQ: '' }); };
+    const ans = st.cpAns || {};
+    const pill = (on) => `display:flex;align-items:center;gap:10px;height:46px;padding:0 20px;border-radius:9999px;font-family:inherit;font-size:16px;font-weight:600;color:#0D0D0F;cursor:pointer;white-space:nowrap;background:${on ? '#E9FCFC' : '#FFFFFF'};border:1.5px solid ${on ? '#5AEBEB' : '#D5DBDF'};`;
+    const dot = (on) => `width:20px;height:20px;border-radius:50%;flex-shrink:0;background:#FFFFFF;border:${on ? '6px solid #00824D' : '1.5px solid #A9B3B9'};box-sizing:border-box;`;
+    const Q = [
+      ['auth','Are you authorized to work in the US?',['Yes','No']],
+      ['spon','Will you now or in the future require sponsorship for employment visa status?',['Yes','No']],
+      ['vet','Are you a veteran?',['Yes','No','Decline to state']],
+      ['gender','What is your gender?',['Male','Female','Non-binary','Decline to state']],
+      ['dis','Do you have a disability?',['Yes','No','Decline to state']],
+      ['lgbt','Do you identify as LGBTQ+?',['Yes','No','Decline to state']],
+      ['hisp','Are you Hispanic or Latino?',['Yes','No','Decline to state']],
+    ];
+    return {
+      cpSteps: LABELS.map((label, i) => { const done = i < step || step === 5, cur = i === step;
+        return { n: i + 1, label, done, notDone: !done, current: cur ? 'step' : 'false', line: i > 0,
+          lineStyle: `width:20px;height:2px;flex-shrink:0;background:${i <= step ? '#1D484F' : '#C9D0D4'};`,
+          onClick: () => { if (i <= step) go(i); },
+          pill: `display:flex;align-items:center;gap:8px;border:none;border-radius:9999px;padding:5px 12px 5px 5px;font-family:inherit;font-size:14px;flex-shrink:0;font-weight:600;white-space:nowrap;cursor:${i <= step ? 'pointer' : 'default'};background:${cur ? '#1D484F' : done ? '#E0FAFA' : '#ECEEF0'};color:${cur ? '#FFFFFF' : done ? '#022F36' : '#4A5464'};`,
+          num: `width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:${done ? '#1D484F' : '#FFFFFF'};color:${done ? '#FFFFFF' : cur ? '#1D484F' : '#4A5464'};` }; }),
+      cpIsStep0: step === 0, cpIsStep1: step === 1, cpIsStep2: step === 2, cpIsStep3: step === 3, cpIsStep4: step === 4, cpIsDone: step === 5,
+      cpShowFooter: step < 5, cpHasBack: step > 0,
+      cpNextLabel: step === 4 ? 'Finish' : 'Next',
+      onCpNext: () => go(step + 1), onCpBack: () => go(Math.max(0, step - 1)),
+      onCpFinish: (e) => this.signIn(e),
+      cpRole: role,
+      cpSkills: skills.map(n => ({ name: n, onRemove: () => this.setState({ cpSkills: skills.filter(x => x !== n) }) })),
+      cpSkillQ: st.cpSkillQ || '',
+      onCpSkillQ: (e) => this.setState({ cpSkillQ: e.target.value }),
+      onCpSkillKey: (e) => { if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); add(st.cpSkillQ || ''); } },
+      cpSuggest: POOL.filter(n => !skills.includes(n)).slice(0, 10).map(n => ({ name: n, onAdd: () => add(n) })),
+      cpQs: Q.map(([k, label, opts]) => ({ label, opts: opts.map(o => ({ label: o, on: ans[k] === o, style: pill(ans[k] === o), dot: dot(ans[k] === o),
+        onClick: () => this.setState(s => ({ cpAns: { ...(s.cpAns || {}), [k]: o } })) })) })),
+    };
+  }
+
   signIn(e) {
     if (e && e.preventDefault) e.preventDefault();
     if (typeof this.props.onSignIn === 'function') this.props.onSignIn();
@@ -727,6 +1073,9 @@ v: (() => {
       isWelcome: st.stage === 'welcome',
       isSignin: st.stage === 'signin',
       isPrefs: st.stage === 'prefs',
+      isComplete: !!st.cpOpen,
+      onCpClose: () => this.setState({ cpOpen: false }),
+      ...this.cpVals(st),
       ...this.obVals(st),
       liveCount: st.liveCount.toLocaleString(),
       showLinkedIn: this.props.showLinkedIn ?? true,
