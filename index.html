@@ -39,8 +39,10 @@
   @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.45;transform:scale(0.8);}}
   @keyframes sbIn{from{opacity:0;transform:translate(-50%,16px);}to{opacity:1;transform:translate(-50%,0);}}
   /* ---- responsive: phones/tablets ---- */
+  .head-upgrade-compact{display:none !important;}
   @media (max-width:1260px){
     .promo-pill{display:none !important;}
+    .head-upgrade-compact{display:flex !important;}
   }
   @media (max-width:1050px){
     .credits-label{display:none !important;}
@@ -88,6 +90,7 @@
     .info-strip{align-items:flex-start !important;}
   }
 </style>
+<script src="./image-slot.js"></script>
 </helmet>
 <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
   <div data-screen-label="Login" style="position:fixed;inset:0;z-index:500;overflow:auto;background:#FFFFFF;">
@@ -118,6 +121,9 @@
           <span style="font-size:14px;color:#23262E;white-space:nowrap;"><i class="icon icon-sparkles" style="font-size:12px;color:#F76638;margin-right:5px;"></i>Get <b>100+</b> Job Auto Applies at <b>Just $19</b></span>
           <button onClick="{{ onUpgrade }}" style="border:double 2px transparent;border-radius:9999px;background-image:linear-gradient(#fff,#fff),linear-gradient(95deg,#5AEBEB,#7C8BFF,#F76638);background-origin:border-box;background-clip:padding-box,border-box;padding:6px 15px;font-family:inherit;font-size:14px;font-weight:700;color:#022F36;cursor:pointer;white-space:nowrap;">Upgrade Now</button>
         </div>
+      </sc-if>
+      <sc-if value="{{ showHeadUpgrade }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ onUpgrade }}" class="{{ headUpgradeClass }}" style="display:flex;align-items:center;gap:7px;border:double 2px transparent;border-radius:9999px;background-image:linear-gradient(#fff,#fff),linear-gradient(95deg,#5AEBEB,#7C8BFF,#F76638);background-origin:border-box;background-clip:padding-box,border-box;height:40px;padding:0 18px;font-family:inherit;font-size:14px;font-weight:700;color:#022F36;cursor:pointer;white-space:nowrap;"><i class="icon icon-crown" style="font-size:15px;color:#F76638;"></i>Upgrade</button>
       </sc-if>
 
       <sc-if value="{{ showPlanBadge }}" hint-placeholder-val="{{ true }}">
@@ -426,10 +432,17 @@
         <sc-if value="{{ noJobs }}" hint-placeholder-val="{{ false }}">
           <div data-screen-label="Jobs · No matches" style="background:#fff;border:1px solid #EDEEF0;border-radius:22px;box-shadow:0 4px 16px rgba(0,0,0,0.05);padding:48px 40px 40px;max-width:760px;margin:0 auto;display:flex;flex-direction:column;align-items:center;text-align:center;">
             <img src="assets/favicon.png" alt="" style="width:72px;height:72px;object-fit:contain;margin-bottom:20px;">
-            <h2 style="font-size:26px;font-weight:700;color:#0D0D0F;letter-spacing:-0.02em;margin-bottom:10px;">No matches for these filters yet</h2>
-            <p style="font-size:16px;line-height:1.6;color:#4A5464;max-width:470px;margin-bottom:18px;text-wrap:pretty;">Your search is quite specific right now. Broaden it a little and Bloom can find you more roles.</p>
+            <h2 style="font-size:26px;font-weight:700;color:#0D0D0F;letter-spacing:-0.02em;margin-bottom:10px;">{{ emptyTitle }}</h2>
+            <p style="font-size:16px;line-height:1.6;color:#4A5464;max-width:480px;margin-bottom:18px;text-wrap:pretty;">{{ emptyBody }}</p>
+            <sc-if value="{{ emptyFirstRun }}" hint-placeholder-val="{{ false }}">
+              <div style="width:100%;max-width:520px;background:#F5F8FA;border:1px solid #EDEEF0;border-radius:14px;padding:6px 18px;margin-bottom:22px;text-align:left;">
+                <sc-for list="{{ emptyPrefRows }}" as="r" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-top:{{ r.border }};font-size:15px;"><i class="{{ r.icon }}" style="font-size:16px;color:#1D484F;flex-shrink:0;"></i><span style="color:#4A5464;width:110px;flex-shrink:0;">{{ r.k }}</span><span style="font-weight:600;color:#0D0D0F;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.v }}</span></div>
+                </sc-for>
+              </div>
+            </sc-if>
             <div style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:6px;">
-              <button onClick="{{ onOpenPrefs }}" style="display:flex;align-items:center;gap:8px;background:#1D484F;border:none;border-radius:9999px;height:48px;padding:0 26px;font-family:inherit;font-size:15px;font-weight:700;color:#fff;cursor:pointer;" style-hover="background:#022F36;"><i class="icon icon-sliders-horizontal" style="font-size:16px;"></i>Edit match preferences</button>
+              <button onClick="{{ onOpenPrefs }}" style="display:flex;align-items:center;gap:8px;background:#1D484F;border:none;border-radius:9999px;height:48px;padding:0 26px;font-family:inherit;font-size:15px;font-weight:700;color:#fff;cursor:pointer;" style-hover="background:#022F36;"><i class="icon icon-sliders-horizontal" style="font-size:16px;"></i>{{ emptyCta }}</button>
             </div>
             <div style="font-size:13px;color:#4A5464;margin-top:18px;">New roles are added every day. We’ll show them here as they arrive.</div>
           </div>
@@ -485,6 +498,17 @@
     <!-- ============ PROFILE ============ -->
     <sc-if value="{{ isProfile }}" hint-placeholder-val="{{ false }}">
       <div data-screen-label="Profile" style="max-width:1340px;margin:0 auto;padding:24px 32px 90px;">
+        <sc-if value="{{ noResume }}" hint-placeholder-val="{{ false }}">
+          <div role="status" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;background:#F0FCFF;border:1px solid #CDEFF5;border-radius:16px;padding:16px 20px;margin-bottom:20px;">
+            <span style="width:40px;height:40px;border-radius:10px;background:#fff;color:#1D484F;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-user-pen" style="font-size:20px;"></i></span>
+            <div style="flex:1;min-width:240px;">
+              <div style="font-size:16px;font-weight:700;color:#0D0D0F;">Add your details to start matching</div>
+              <div style="font-size:14px;line-height:1.5;color:#4A5464;margin-top:2px;">We couldn’t read your resume, so Experience, Education and Skills are empty. Fill them in and Bloom will start finding jobs for you.</div>
+            </div>
+            <button onClick="{{ onNoResumeUpload }}" style="display:flex;align-items:center;gap:7px;background:#fff;border:1px solid rgba(0,0,0,0.25);border-radius:9999px;height:42px;padding:0 18px;font-family:inherit;font-size:14px;font-weight:600;color:#0D0D0F;cursor:pointer;white-space:nowrap;"><i class="icon icon-upload" style="font-size:15px;"></i>Upload a resume instead</button>
+            <button onClick="{{ onNoResumeDismiss }}" aria-label="Dismiss" style="width:34px;height:34px;border-radius:8px;border:none;background:none;color:#4A5464;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="icon icon-x" style="font-size:17px;"></i></button>
+          </div>
+        </sc-if>
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
           <span style="font-size:18px;font-weight:600;color:#23262E;">Your profile data is kept private and secure.</span>
           <i class="icon icon-badge-help" style="font-size:19px;color:#4A5464;"></i>
@@ -1322,67 +1346,102 @@
       <button onClick="{{ onPrClose }}" aria-label="Close" style="position:fixed;top:18px;right:22px;width:44px;height:44px;border-radius:10px;border:none;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#4A5464;z-index:2;"><i class="icon icon-x" style="font-size:20px;"></i></button>
       <div style="max-width:1080px;margin:0 auto;padding:44px 24px 56px;">
         <div style="text-align:center;margin-bottom:36px;">
-          <h1 style="font-size:32px;font-weight:700;color:#23262E;letter-spacing:-0.01em;">Get Access</h1>
-          <p style="font-size:20px;color:#23262E;margin-top:12px;">Upgrade to get the full auto-apply feature</p>
+          <h1 style="font-size:32px;font-weight:700;color:#23262E;letter-spacing:-0.01em;">Apply to more jobs, faster</h1>
+          <p style="font-size:20px;color:#23262E;margin-top:12px;">Bloom fills and submits applications for you, up to 300 a month.</p>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:28px;align-items:start;">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:28px;align-items:stretch;padding-top:16px;">
 
           <!-- Starter -->
-          <div style="background:#fff;border:1px solid #DCEBF1;border-radius:14px;overflow:hidden;">
-            <div style="background:#B8E8F5;padding:14px 20px;text-align:center;font-size:16px;font-weight:700;color:#0C2A2C;">Flexible · Cancel anytime</div>
-            <div style="padding:30px 28px 26px;border-bottom:1px solid #EDEEF0;">
-              <div style="text-align:center;font-size:24px;font-weight:700;color:#23262E;margin-bottom:26px;">Job Starter</div>
-              <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
-                <div style="display:flex;align-items:baseline;gap:8px;"><span style="font-size:52px;font-weight:800;color:#0D0D0F;line-height:1;letter-spacing:-0.02em;">$19</span><span style="font-size:15px;color:#4A5464;">/ Billed monthly</span></div>
-                <div style="text-align:right;"><div style="font-size:14px;color:#4A5464;">You’ll pay</div><div style="font-size:18px;font-weight:700;color:#23262E;">Just $0.63/day</div></div>
+          <div style="position:relative;background:#FEFEFE;border:1px solid #E5E7EB;border-radius:24px;padding:36px 28px 28px;display:flex;flex-direction:column;align-items:center;text-align:center;box-shadow:0px 2px 4px -2px rgba(0,0,0,0.10),0px 4px 6px -1px rgba(0,0,0,0.10);">
+            <h2 style="font-size:30px;font-weight:700;color:#23262E;letter-spacing:-0.01em;">Job Starter</h2>
+            <div style="font-size:15px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#4A5464;margin-top:8px;">Steady pace, cancel anytime</div>
+            <div style="height:22px;margin-top:22px;"></div>
+            <div style="font-size:60px;font-weight:800;color:#1D484F;line-height:1;letter-spacing:-0.02em;margin-top:6px;">$19</div>
+            <div style="font-size:18px;font-weight:600;color:#1D484F;margin-top:10px;">per month</div>
+            <div style="font-size:16px;color:#4A5464;margin-top:14px;">Billed monthly · about $0.63/day</div>
+            <button onClick="{{ onPrStarter }}" disabled="{{ prStarterCurrent }}" style="{{ prStarterBtn }}margin:24px 0 22px;">{{ prStarterLabel }}</button>
+              <div style="width:100%;box-sizing:border-box;background:#F0FCFF;border-radius:18px;padding:20px 22px;text-align:left;display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;align-items:flex-start;gap:12px;font-size:16px;line-height:1.45;color:#23262E;"><span style="width:6px;height:6px;border-radius:50%;background:#1D484F;flex-shrink:0;margin-top:9px;"></span><span>Apply to <b style="font-weight:700;">300 jobs a month</b> with apply credits</span></div>
+                <sc-for list="{{ prStarterFeatures }}" as="f" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:flex-start;gap:12px;font-size:16px;line-height:1.45;color:#23262E;"><span style="width:6px;height:6px;border-radius:50%;background:#1D484F;flex-shrink:0;margin-top:9px;"></span><span>{{ f }}</span></div>
+                </sc-for>
               </div>
-              <button onClick="{{ onPrStarter }}" style="width:100%;height:50px;border-radius:9999px;background:#fff;border:1.5px solid #5AC8E8;font-family:inherit;font-size:16px;font-weight:600;color:#0E7490;cursor:pointer;" style-hover="background:#F0FCFF;">Upgrade to Starter Monthly</button>
-            </div>
-            <div style="padding:22px 28px;border-bottom:1px solid #EDEEF0;">
-              <div style="font-size:15px;font-weight:600;color:#23262E;margin-bottom:10px;">Swipes</div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:18px;color:#23262E;"><i class="icon icon-file-plus" style="font-size:20px;color:#4A5464;"></i>300 swipes a month</div>
-            </div>
-            <div style="padding:22px 28px 28px;display:flex;flex-direction:column;gap:16px;">
-              <div style="font-size:15px;font-weight:600;color:#23262E;">Everything in Free, plus</div>
-              <div style="display:flex;align-items:center;gap:12px;font-size:16px;color:#23262E;"><span style="width:24px;height:24px;border-radius:50%;background:#5FCB93;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-check" style="font-size:14px;color:#fff;"></i></span>Auto-form submission</div>
-              <div style="display:flex;align-items:center;gap:12px;font-size:16px;color:#23262E;"><span style="width:24px;height:24px;border-radius:50%;background:#5FCB93;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-check" style="font-size:14px;color:#fff;"></i></span>Live application tracking</div>
-              <div style="display:flex;align-items:center;gap:12px;font-size:16px;color:#23262E;"><span style="width:24px;height:24px;border-radius:50%;background:#5FCB93;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-check" style="font-size:14px;color:#fff;"></i></span>Match Preference filters</div>
-              <div style="display:flex;align-items:center;gap:12px;font-size:16px;color:#23262E;"><span style="width:24px;height:24px;border-radius:50%;background:#5FCB93;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-check" style="font-size:14px;color:#fff;"></i></span>Instant job alerts</div>
-              <div style="display:flex;align-items:center;gap:14px;margin-top:10px;">
-                <div style="display:flex;">
-                  <span style="width:42px;height:42px;border-radius:50%;background:#1D484F;border:2px solid #fff;"></span>
-                  <span style="width:42px;height:42px;border-radius:50%;background:#F76638;border:2px solid #fff;margin-left:-12px;"></span>
-                  <span style="width:42px;height:42px;border-radius:50%;background:#5AEBEB;border:2px solid #fff;margin-left:-12px;"></span>
-                </div>
-                <span style="font-size:18px;color:#23262E;">Trusted by over <b style="font-weight:700;">500K</b> job seekers</span>
-              </div>
-            </div>
           </div>
 
           <!-- Accelerator -->
-          <div style="background:#fff;border:3px solid #FBE38A;border-radius:14px;overflow:hidden;">
-            <div style="background:#FBE38A;padding:13px 20px;text-align:center;font-size:16px;font-weight:700;color:#8A3B0E;">Most popular · Save 14% vs monthly</div>
-            <div style="padding:30px 28px 26px;border-bottom:1px solid #EDEEF0;">
-              <div style="text-align:center;font-size:24px;font-weight:700;color:#23262E;margin-bottom:26px;">Job Accelerator</div>
-              <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:24px;">
-                <div style="display:flex;align-items:baseline;gap:8px;"><span style="font-size:52px;font-weight:800;color:#0D0D0F;line-height:1;letter-spacing:-0.02em;">$49</span><span style="font-size:15px;color:#4A5464;">/ Billed quarterly</span></div>
-                <div style="text-align:right;"><div style="font-size:14px;color:#4A5464;">You’ll pay</div><div style="font-size:18px;font-weight:700;color:#23262E;">Just $0.54/day</div></div>
+          <div style="position:relative;background:#FEFEFE;border:2px solid #1D484F;border-radius:24px;padding:36px 28px 28px;display:flex;flex-direction:column;align-items:center;text-align:center;box-shadow:0px 2px 4px -2px rgba(0,0,0,0.10),0px 4px 6px -1px rgba(0,0,0,0.10);">
+            <span style="position:absolute;top:-17px;left:50%;transform:translateX(-50%);background:#F76638;color:#fff;box-shadow:0 4px 12px rgba(247,102,56,0.3);border-radius:9999px;padding:7px 18px;font-size:15px;font-weight:700;white-space:nowrap;">Most popular · Save 14%</span>
+            <h2 style="font-size:30px;font-weight:700;color:#23262E;letter-spacing:-0.01em;">Job Accelerator</h2>
+            <div style="font-size:15px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:#4A5464;margin-top:8px;">Best value for an active search</div>
+            <div style="font-size:18px;font-weight:600;color:#A5A5A5;text-decoration:line-through;text-decoration-color:#F76638;text-decoration-thickness:2px;margin-top:22px;height:22px;">$57</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-top:6px;flex-wrap:wrap;">
+              <div style="font-size:60px;font-weight:800;color:#1D484F;line-height:1;letter-spacing:-0.02em;">$49</div>
+              <span style="background:#DCF5E8;color:#00824D;border-radius:9999px;padding:6px 14px;font-size:15px;font-weight:800;letter-spacing:0.04em;white-space:nowrap;">SAVE $8</span>
+            </div>
+            <div style="font-size:18px;font-weight:600;color:#1D484F;margin-top:10px;">per quarter</div>
+            <div style="font-size:16px;color:#4A5464;margin-top:14px;">$16.33/month · about $0.54/day</div>
+            <button onClick="{{ onPrAccel }}" style="width:100%;height:50px;border-radius:9999px;background:#1D484F;border:none;font-family:inherit;font-size:16px;font-weight:700;color:#fff;cursor:pointer;margin:24px 0 22px;" style-hover="background:#022F36;">Upgrade to Accelerator Quarterly</button>
+              <div style="width:100%;box-sizing:border-box;background:#F0FCFF;border-radius:18px;padding:20px 22px;text-align:left;display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;align-items:flex-start;gap:12px;font-size:16px;line-height:1.45;color:#23262E;"><span style="width:6px;height:6px;border-radius:50%;background:#1D484F;flex-shrink:0;margin-top:9px;"></span><span>Apply to <b style="font-weight:700;">900 jobs a quarter</b> with apply credits</span></div>
+                <sc-for list="{{ prAccelFeatures }}" as="f" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:flex-start;gap:12px;font-size:16px;line-height:1.45;color:#23262E;"><span style="width:6px;height:6px;border-radius:50%;background:#1D484F;flex-shrink:0;margin-top:9px;"></span><span>{{ f }}</span></div>
+                </sc-for>
               </div>
-              <button onClick="{{ onPrAccel }}" style="width:100%;height:50px;border-radius:9999px;background:linear-gradient(90deg,#1D7F8F,#14B866);border:none;font-family:inherit;font-size:16px;font-weight:700;color:#fff;cursor:pointer;">Upgrade to Accelerator Quarterly</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:18px;margin-top:30px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;">
+            <div style="font-size:16px;color:#4A5464;">Cancel anytime. No lock-in. No questions asked.</div>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;font-size:15px;color:#4A5464;"><i class="icon icon-lock" style="font-size:17px;"></i>Guaranteed safe and secure checkout<span aria-hidden="true">·</span>Powered by <b style="font-weight:700;color:#1D484F;">Dodo Payments</b></div>
+          </div>
+          <button onClick="{{ onPrDemo }}" style="display:flex;align-items:center;gap:9px;background:none;border:none;padding:6px 10px;font-family:inherit;font-size:16px;font-weight:600;color:#1D484F;cursor:pointer;" style-hover="text-decoration:underline;"><i class="icon icon-circle-play" style="font-size:20px;"></i>See how it works (1 min demo)</button>
+
+        <!-- testimonial -->
+        <div style="width:720px;max-width:100%;box-sizing:border-box;margin:44px auto 0;background:#FEFEFE;border:1px solid #E5E7EB;border-radius:24px;box-shadow:0px 2px 4px -2px rgba(0,0,0,0.10),0px 4px 6px -1px rgba(0,0,0,0.10);padding:28px 32px;">
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:18px;">
+            <div style="display:flex;">
+              <span style="width:40px;height:40px;border-radius:50%;border:2.5px solid #fff;box-sizing:content-box;background:#fff;"><image-slot id="ts-face-1" shape="circle" placeholder="Photo" style="width:40px;height:40px;"></image-slot></span>
+              <span style="width:40px;height:40px;border-radius:50%;border:2.5px solid #fff;box-sizing:content-box;background:#fff;margin-left:-10px;"><image-slot id="ts-face-2" shape="circle" placeholder="Photo" style="width:40px;height:40px;"></image-slot></span>
+              <span style="width:40px;height:40px;border-radius:50%;border:2.5px solid #fff;box-sizing:content-box;background:#fff;margin-left:-10px;"><image-slot id="ts-face-3" shape="circle" placeholder="Photo" style="width:40px;height:40px;"></image-slot></span>
+              <span style="width:40px;height:40px;border-radius:50%;border:2.5px solid #fff;box-sizing:content-box;background:#fff;margin-left:-10px;"><image-slot id="ts-face-4" shape="circle" placeholder="Photo" style="width:40px;height:40px;"></image-slot></span>
             </div>
-            <div style="padding:22px 28px;border-bottom:1px solid #EDEEF0;">
-              <div style="font-size:15px;font-weight:600;color:#23262E;margin-bottom:10px;">Swipes</div>
-              <div style="display:flex;align-items:center;gap:10px;font-size:18px;color:#23262E;"><i class="icon icon-file-plus" style="font-size:20px;color:#4A5464;"></i>900 swipes a quarter</div>
+            <span style="display:inline-flex;align-items:center;gap:3px;background:#DCF5E8;border-radius:9999px;padding:6px 12px;" aria-label="5 out of 5 stars">
+              <sc-for list="{{ tsStars }}" as="x" hint-placeholder-count="5"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="#00B16B" d="M12 2.5l2.94 6.06 6.66.94-4.83 4.67 1.15 6.63L12 17.67 6.08 20.8l1.15-6.63L2.4 9.5l6.66-.94L12 2.5z"/></svg></sc-for>
+            </span>
+            <span style="font-size:15px;color:#4A5464;">Trusted by 500K+ job seekers</span>
+          </div>
+          <p style="font-size:18px;line-height:1.6;color:#23262E;height:86px;overflow:hidden;text-wrap:pretty;">“{{ ts.quote }}”</p>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:18px;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <sc-for list="{{ tsAuthors }}" as="a" hint-placeholder-count="1">
+                <span style="width:44px;height:44px;flex-shrink:0;"><image-slot id="{{ a.id }}" shape="circle" placeholder="Photo" style="width:44px;height:44px;"></image-slot></span>
+              </sc-for>
+              <div>
+                <div style="font-size:16px;font-weight:700;color:#0D0D0F;">{{ ts.name }}</div>
+                <div style="font-size:13.5px;color:#4A5464;">{{ ts.role }}</div>
+              </div>
             </div>
-            <div style="padding:22px 28px 28px;display:flex;flex-direction:column;gap:16px;">
-              <div style="font-size:15px;font-weight:600;color:#23262E;">Everything in Starter, plus</div>
-              <sc-for list="{{ prAccelFeatures }}" as="f" hint-placeholder-count="5">
-                <div style="display:flex;align-items:center;gap:12px;font-size:16px;color:#23262E;"><span style="width:24px;height:24px;border-radius:50%;background:#5FCB93;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="icon icon-check" style="font-size:14px;color:#fff;"></i></span><span style="flex:1;">{{ f }}</span><span style="background:#FFF4D6;color:#92400E;border-radius:6px;padding:3px 10px;font-size:13px;font-weight:600;">Unlimited</span></div>
+            <div role="tablist" aria-label="Testimonials" style="display:flex;gap:6px;">
+              <sc-for list="{{ tsDots }}" as="d" hint-placeholder-count="4">
+                <button role="tab" aria-selected="{{ d.on }}" aria-label="{{ d.label }}" onClick="{{ d.onClick }}" style="{{ d.style }}"></button>
               </sc-for>
             </div>
           </div>
         </div>
-        <p style="text-align:center;font-size:13.5px;color:#4A5464;margin-top:26px;">Credits are only used when an application is submitted. Cancel anytime from Plan &amp; Billing.</p>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ prDemoOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ onPrDemoClose }}" style="position:fixed;inset:0;z-index:97;background:rgba(8,20,22,0.7);display:flex;align-items:center;justify-content:center;padding:28px;">
+      <div role="dialog" aria-label="How Bloom works" onClick="{{ onPrDemoStop }}" style="position:relative;width:100%;max-width:880px;background:#0C262A;border-radius:20px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.4);">
+        <button onClick="{{ onPrDemoClose }}" aria-label="Close" style="position:absolute;top:12px;right:12px;z-index:2;width:40px;height:40px;border-radius:10px;border:none;background:rgba(255,255,255,0.12);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="icon icon-x" style="font-size:20px;"></i></button>
+        <div style="aspect-ratio:16/9;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#fff;">
+          <span style="width:76px;height:76px;border-radius:50%;background:#5AEBEB;color:#022F36;display:flex;align-items:center;justify-content:center;"><i class="icon icon-play" style="font-size:34px;margin-left:4px;"></i></span>
+          <div style="font-size:18px;font-weight:700;">How Bloom applies for you</div>
+          <div style="font-size:14px;color:#A9C4C7;">1 min demo video goes here</div>
+        </div>
       </div>
     </div>
   </sc-if>
@@ -1898,6 +1957,12 @@
         </sc-for>
       </div>
       <div style="height:1px;background:rgba(255,255,255,0.12);margin:12px 0 10px;"></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:0.04em;color:#5AEBEB;margin-bottom:8px;"><i class="icon icon-user-plus" style="font-size:15px;"></i>ONBOARDING</div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <a href="Bloom Login.dc.html#parse-error" style="display:flex;align-items:center;gap:10px;border-radius:10px;padding:9px 12px;font-size:15px;color:#E6F2F3;text-decoration:none;" style-hover="background:rgba(255,255,255,0.08);"><span style="width:8px;height:8px;border-radius:50%;background:#E5484D;flex-shrink:0;"></span>Resume parse error<i class="icon icon-arrow-up-right" style="font-size:14px;margin-left:auto;opacity:.7;"></i></a>
+        <a href="Bloom Login.dc.html#complete-profile" style="display:flex;align-items:center;gap:10px;border-radius:10px;padding:9px 12px;font-size:15px;color:#E6F2F3;text-decoration:none;" style-hover="background:rgba(255,255,255,0.08);"><span style="width:8px;height:8px;border-radius:50%;background:#F0B429;flex-shrink:0;"></span>Complete profile (no resume)<i class="icon icon-arrow-up-right" style="font-size:14px;margin-left:auto;opacity:.7;"></i></a>
+      </div>
+      <div style="height:1px;background:rgba(255,255,255,0.12);margin:12px 0 10px;"></div>
       <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:0.04em;color:#5AEBEB;margin-bottom:8px;"><i class="icon icon-briefcase" style="font-size:15px;"></i>JOBS PAGE</div>
       <div style="display:flex;flex-direction:column;gap:4px;">
         <sc-for list="{{ jobsDemos }}" as="jd" hint-placeholder-count="2">
@@ -1926,7 +1991,9 @@ const CA_PROVINCES = ["Alberta","British Columbia","Manitoba","New Brunswick","N
 const JOBN = (k) => { let h = 0; for (const ch of k) h = (h * 31 + ch.charCodeAt(0)) >>> 0; const big = ['Austin','Dallas','Houston','San Francisco','New York','Seattle','Toronto','Los Angeles','Chicago','Boston','Vancouver','San Jose','Atlanta','Denver']; return big.includes(k) ? 60 + (h % 140) : 2 + (h % 14); };
 class Component extends DCLogic {
   state = {
-    screen: 'jobs',
+    screen: (typeof location !== 'undefined' && /^#profile/.test(location.hash)) ? 'profile' : 'jobs',
+    noResume: typeof location !== 'undefined' && location.hash === '#profile-incomplete',
+    jobsDemo: (typeof location !== 'undefined' && location.hash === '#no-matches') ? 'firstrun' : 'normal',
     scenario: 'free',
     acctTab: 'billing',
     jobsTab: 'matches',
@@ -1940,7 +2007,7 @@ class Component extends DCLogic {
     appsFilter: 'all',
     appsTab: 'active',
     appsVersion: 'b',
-    jobsDemo: 'normal', skillOv: {}, skillDemo: 'partial', skPop: '', skPopN: 0, skillToast: false,
+    skillOv: {}, skillDemo: 'partial', skPop: '', skPopN: 0, skillToast: false,
     fSearch: '',
     fDate: 'All time',
     fType: 'All',
@@ -2712,8 +2779,9 @@ v: (() => {
 
   componentDidMount() {
     this._tickT = setInterval(() => this.setState(s => ({ tickIdx: s.tickIdx + 1 })), 2400);
+    this._ts = setInterval(() => { if (this.state.prOpen) this.setState(s => ({ tsIdx: ((s.tsIdx || 0) + 1) % 4 })); }, 6000);
   }
-  componentWillUnmount() { clearInterval(this._tickT); clearTimeout(this._pendT); }
+  componentWillUnmount() { clearInterval(this._tickT); clearInterval(this._ts); clearTimeout(this._pendT); }
 
   buildApps(st) {
     const live = st.applied.slice().reverse().map(id => {
@@ -3004,8 +3072,8 @@ v: (() => {
         showSwitchUp: kind === 'starter' && !['past_due','cancelling'].includes(st.scenario),
         showBilling: kind !== 'free',
         cards: [
-          planCard('starter', 'Starter', '$19', '/month', 'Billed monthly', ['300 auto-applies every month', 'Live application tracking', 'Match Preference filters']),
-          planCard('accel', 'Accelerator', '$49', '/quarter', '$16.33/month · Save 14% vs monthly', ['900 auto-applies per quarter', 'Everything in Starter', 'Priority matching (80%+)'], 'Most popular · Save 14%'),
+          planCard('starter', 'Starter', '$19', '/month', 'Billed monthly · Cancel anytime', ['300 apply credits a month', 'Credits reset every month']),
+          planCard('accel', 'Accelerator', '$49', '/quarter', '$16.33/month · Save 14% vs monthly', ['900 apply credits a quarter', 'Priority matching (80%+ fit)', 'Be first to apply on new roles'], 'Most popular · Save 14%'),
         ],
         billRows: [
           { icon: 'icon icon-credit-card', label: 'Payment methods, invoices & cancellation', value: 'Managed securely in the billing portal', action: 'Manage subscription', actionIcon: 'icon icon-external-link', onClick: portal('subscription') },
@@ -3209,9 +3277,38 @@ v: (() => {
       onUpgrade: () => this.setState({ prOpen: true, creditsHover: false, avatarMenu: false }),
       prOpen: !!st.prOpen,
       onPrClose: () => this.setState({ prOpen: false }),
-      onPrStarter: () => this.setState({ prOpen: false, scenario: 'upgraded', screen: 'plan' }),
+      ...(() => {
+        const T = [
+          ['Bloom cut my job search time in half. More applications, more callbacks. Simple.', 'Emily R.', 'Backend Engineer · Austin, TX', 'E', '#1D484F'],
+          ['Bloom gave me momentum after a layoff. Within two weeks, I had multiple interviews lined up.', 'Jason M.', 'Frontend Engineer · Seattle, WA', 'J', '#F76638'],
+          ['Applied to 120 jobs, got 4 interviews and received an offer in 21 days.', 'Ashley T.', 'Full Stack Engineer · Chicago, IL', 'A', '#00824D'],
+          ['I stopped retyping the same answers on every portal. Bloom handles the forms, I focus on prep.', 'Ryan C.', 'Platform Engineer · Denver, CO', 'R', '#5E6AD2'],
+        ];
+        const idx = (st.tsIdx || 0) % T.length, t = T[idx];
+        const face = (bg, i) => `width:40px;height:40px;border-radius:50%;background:${bg};color:#fff;font-size:16px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2.5px solid #fff;margin-left:${i ? -10 : 0}px;`;
+        return {
+          ts: { quote: t[0], name: t[1], role: t[2], initial: t[3],
+            avatar: `width:44px;height:44px;border-radius:50%;background:${t[4]};color:#fff;font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;` },
+          tsFaces: T.map((x, i) => ({ ch: x[3], style: face(x[4], i) })),
+          tsStars: [1,2,3,4,5],
+          tsAuthors: [{ id: 'ts-face-' + (idx + 1) }],
+          tsDots: T.map((x, i) => ({ on: i === idx, label: 'Testimonial ' + (i + 1), onClick: () => this.setState({ tsIdx: i }),
+            style: `width:${i === idx ? 22 : 8}px;height:8px;border-radius:9999px;border:none;padding:0;cursor:pointer;background:${i === idx ? '#1D484F' : '#C9D0D4'};transition:width .2s;` })),
+        };
+      })(),
+      prDemoOpen: !!st.prDemo, onPrDemo: () => this.setState({ prDemo: true }), onPrDemoClose: () => this.setState({ prDemo: false }), onPrDemoStop: (e) => e.stopPropagation(),
+      onPrStarter: () => { if (this.planKind(st.scenario) !== 'starter') this.setState({ prOpen: false, scenario: 'upgraded', screen: 'plan' }); },
       onPrAccel: () => this.setState({ prOpen: false, scenario: 'accel_new', screen: 'plan' }),
-      prAccelFeatures: ['AI résumé review', 'Recruiter outreach drafts', 'Cold outreach & referral emails', 'Priority matching (80%+ fit)', 'Be first to apply on new roles'],
+      prStarterFeatures: ['Credits reset every month', 'Everything in the Free plan'],
+      prAccelFeatures: ['14% less than paying monthly', 'Priority matching (80%+ fit)', 'Be first to apply on new roles'],
+      ...(() => { const cur = this.planKind(st.scenario) === 'starter'; return {
+        showHeadUpgrade: (cur && !sc.promo) || !!sc.promo,
+        headUpgradeClass: sc.promo ? 'head-upgrade-compact' : '',
+        prStarterCurrent: cur,
+        prStarterLabel: cur ? 'Your current plan' : 'Upgrade to Starter Monthly',
+        prStarterBtn: cur ? 'width:100%;height:50px;border-radius:9999px;background:#F2F5F8;border:none;font-family:inherit;font-size:16px;font-weight:600;color:#4A5464;cursor:default;'
+                          : 'width:100%;height:50px;border-radius:9999px;background:#fff;border:1px solid rgba(0,0,0,0.25);font-family:inherit;font-size:16px;font-weight:700;color:#0D0D0F;cursor:pointer;',
+      }; })(),
       goBilling: () => this.goBillingTab(),
       goAccount: () => this.setState({ amOpen: true, amTab: 'profile', avatarMenu: false }),
       amOpen: !!st.amOpen, amIsProfile: (st.amTab || 'profile') === 'profile', amIsSecurity: st.amTab === 'security',
@@ -3332,10 +3429,20 @@ v: (() => {
       // jobs
       jobsHeading: isMatches ? 'Your top role matches' : 'Saved jobs',
       isMatches, isSavedDetail, isSavedList,
-      showCard: (isMatches && !caughtUp && st.jobsDemo !== 'empty') || isSavedDetail,
-      caughtUp: caughtUp && st.jobsDemo !== 'empty',
-      noJobs: isMatches && st.jobsDemo === 'empty',
-      showCountBadge: isMatches && st.jobsDemo !== 'empty',
+      showCard: (isMatches && !caughtUp && st.jobsDemo !== 'empty' && st.jobsDemo !== 'firstrun') || isSavedDetail,
+      caughtUp: caughtUp && st.jobsDemo !== 'empty' && st.jobsDemo !== 'firstrun',
+      noJobs: isMatches && (st.jobsDemo === 'empty' || st.jobsDemo === 'firstrun'),
+      emptyFirstRun: st.jobsDemo === 'firstrun',
+      emptyTitle: st.jobsDemo === 'firstrun' ? 'No matches for your preferences yet' : 'No matches for these filters yet',
+      emptyBody: st.jobsDemo === 'firstrun' ? 'We searched using the preferences you set during onboarding but didn’t find any open roles. Widen one of them and Bloom will start matching right away.' : 'Your search is quite specific right now. Broaden it a little and Bloom can find you more roles.',
+      emptyCta: st.jobsDemo === 'firstrun' ? 'Edit preferences' : 'Edit match preferences',
+      emptyPrefRows: [
+        ['icon icon-briefcase','Role','Senior Backend Engineer'],
+        ['icon icon-map-pin','Location','On-site · Austin, Texas'],
+        ['icon icon-user-round','Experience','Executive Level'],
+        ['icon icon-clock','Job type','Internship'],
+      ].map(([icon, k, v], i) => ({ icon, k, v, border: i ? '1px solid #E5E7EB' : 'none' })),
+      showCountBadge: isMatches && st.jobsDemo !== 'empty' && st.jobsDemo !== 'firstrun',
       emptyFilters: [
         { icon: 'icon icon-map-pin', label: 'On-site · Austin, TX' },
         { icon: 'icon icon-briefcase', label: 'Senior Backend Engineer' },
@@ -3347,7 +3454,7 @@ v: (() => {
         { icon: 'icon icon-layers', title: 'Add Mid Level roles', sub: 'Alongside Senior', gain: '+30 jobs', onClick: () => this.broaden('Added Mid Level roles') },
       ],
       onBroadenAll: () => this.broaden('Search broadened · added remote roles'),
-      jobsDemos: [['normal','Matches available','#00B16B'],['empty','No jobs found','#F76638']].map(([k, label, dot]) => ({ label, dot,
+      jobsDemos: [['normal','Matches available','#00B16B'],['empty','No jobs found','#F76638'],['firstrun','No matches after onboarding','#F76638']].map(([k, label, dot]) => ({ label, dot,
         onClick: () => this.setState({ jobsDemo: k, screen: 'jobs', jobsTab: 'matches', dockOpen: true }),
         style: `display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:${(st.jobsDemo || 'normal') === k ? 'rgba(90,235,235,0.16)' : 'transparent'};border:none;border-radius:9px;padding:8px 10px;font-family:inherit;font-size:14px;font-weight:600;color:#fff;cursor:pointer;` })),
       skippedCount: remaining.length,
@@ -3368,6 +3475,10 @@ v: (() => {
       prefsOpen: st.prefsOpen,
       onClosePrefs: () => this.closePrefs(),
       onUpdatePrefs: () => this.closePrefs(),
+      noResume: !!st.noResume && st.screen === 'profile',
+      onNoResumeDismiss: () => this.setState({ noResume: false }),
+      onDemoNoResume: (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ screen: 'profile', noResume: true }); },
+      onNoResumeUpload: () => { window.location.href = 'Bloom Login.dc.html#import'; },
       ...(() => { const on = !!st.pnWaOn; return {
         pnWaOn: on, onPnWaToggle: () => this.setState(s => ({ pnWaOn: !s.pnWaOn })),
         pnWaPhone: st.pnWaPhone ?? '+1 512 555 0142', onPnWaPhone: (e) => this.setState({ pnWaPhone: e.target.value }),
