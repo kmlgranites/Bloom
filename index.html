@@ -1831,6 +1831,13 @@
                   </div>
                 </sc-if>
               </div>
+              <sc-if value="{{ pfNHasStateChips }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                  <sc-for list="{{ pfNStateChips }}" as="c" hint-placeholder-count="2">
+                    <span style="{{ c.style }}">{{ c.name }}<span style="{{ c.countStyle }}">{{ c.count }}</span><button onClick="{{ c.onRemove }}" aria-label="Remove {{ c.name }}" style="width:22px;height:22px;border-radius:50%;border:none;background:#fff;color:#4A5464;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="icon icon-x" style="font-size:13px;"></i></button></span>
+                  </sc-for>
+                </div>
+              </sc-if>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:8px;">
@@ -1991,6 +1998,14 @@
           <button onClick="{{ sd.onClick }}" style="{{ sd.style }}"><span style="width:8px;height:8px;border-radius:50%;background:{{ sd.dot }};flex-shrink:0;"></span>{{ sd.label }}</button>
         </sc-for>
       </div>
+      <div style="height:1px;background:rgba(255,255,255,0.12);margin:12px 0 10px;"></div>
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:0.04em;color:#5AEBEB;margin-bottom:4px;"><i class="icon icon-map-pin" style="font-size:15px;"></i>LOCATION EDGE CASES</div>
+      <div style="font-size:12.5px;line-height:1.45;color:rgba(255,255,255,0.78);margin-bottom:8px;">Opens Match Preference. Demo rules: Ohio has no Executive-only jobs, Texas has no Internship-only jobs. Change Experience or Job Type to test.</div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <sc-for list="{{ locDemos }}" as="ld" hint-placeholder-count="6">
+          <button onClick="{{ ld.onClick }}" style="{{ ld.style }}"><span style="width:8px;height:8px;border-radius:50%;background:{{ ld.dot }};flex-shrink:0;"></span>{{ ld.label }}</button>
+        </sc-for>
+      </div>
     </div>
   </sc-if>
   <sc-if value="{{ dockClosed }}" hint-placeholder-val="{{ false }}">
@@ -2006,6 +2021,7 @@ const CA_PROVINCES = ["Alberta","British Columbia","Manitoba","New Brunswick","N
 const JOBN = (k) => { let h = 0; for (const ch of k) h = (h * 31 + ch.charCodeAt(0)) >>> 0; const big = ['Austin','Dallas','Houston','San Francisco','New York','Seattle','Toronto','Los Angeles','Chicago','Boston','Vancouver','San Jose','Atlanta','Denver']; return big.includes(k) ? 60 + (h % 140) : 2 + (h % 14); };
 const ZERO_CITIES = ['Fort Worth','Hamilton','Juneau','Fairbanks','Mobile','Tempe','London','Plano'];
 const CITYN = (c) => ZERO_CITIES.includes(c) ? 0 : JOBN(c);
+const CITY_ST = {}; Object.keys(CITIES).forEach(x => CITIES[x].forEach(c => { if (!CITY_ST[c]) CITY_ST[c] = x; }));
 const STATEN = (st) => (CITIES[st] || []).reduce((m, c) => m + CITYN(c), 0);
 class Component extends DCLogic {
   state = {
@@ -2137,8 +2153,9 @@ class Component extends DCLogic {
     const set = (patch) => this.setState(s => ({ prefs: { ...s.prefs, near: { ...s.prefs.near, ...patch } } }));
     const allowed = { us: !!st.prefs.locations.us || !st.prefs.locations.ca, ca: !!st.prefs.locations.ca };
     const f = this.prefFactor(st);
-    const cityN = (c) => Math.round(CITYN(c) * f);
-    const stateN = (x) => (CITIES[x] || []).reduce((m, c) => m + cityN(c), 0);
+    const zs = this.zeroStates(st);
+    const cityN = (c, x) => zs.includes(x || CITY_ST[c]) ? 0 : Math.round(CITYN(c) * f);
+    const stateN = (x) => zs.includes(x) ? 0 : (CITIES[x] || []).reduce((m, c) => m + cityN(c, x), 0);
     const cname = { us: 'United States', ca: 'Canada' };
     const ctry = 'any';
     const groups = [];
@@ -2147,7 +2164,8 @@ class Component extends DCLogic {
     const okStates = groups.flatMap(g => g.list);
     const sts = (loc.states || []).filter(x => okStates.includes(x));
     const cts = (loc.cities || []).filter(k => sts.includes(k.split('|')[1]));
-    const live = cts.filter(k => cityN(k.split('|')[0]) > 0), dead = cts.filter(k => cityN(k.split('|')[0]) === 0);
+    const live = cts.filter(k => cityN(...k.split('|')) > 0), dead = cts.filter(k => cityN(...k.split('|')) === 0);
+    const liveSts = sts.filter(x => stateN(x) > 0), deadSts = sts.filter(x => stateN(x) === 0);
     const box = (on, off) => `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on ? '#1D484F' : '#fff'};border:1.5px solid ${on ? '#1D484F' : off ? '#D5DBDF' : '#A9B3B9'};`;
     const rowStyle = (off) => 'width:100%;display:flex;align-items:center;gap:10px;background:none;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;' + (off ? 'opacity:0.5;cursor:not-allowed;' : '');
     const cStyle = (n) => `font-size:13px;font-weight:600;white-space:nowrap;color:${n === 0 ? '#4A5464' : '#1D484F'};`;
@@ -2157,20 +2175,28 @@ class Component extends DCLogic {
     const sq = (loc.sq || '').trim().toLowerCase(), cq = (loc.cq || '').trim().toLowerCase();
     const sort = (arr, n) => [...arr].sort((x, y) => (n(y) > 0) - (n(x) > 0) || n(y) - n(x) || x.localeCompare(y));
     const togState = (x) => { const on = sts.includes(x); set(on ? { states: sts.filter(y => y !== x), cities: cts.filter(k => k.split('|')[1] !== x) } : { states: [...sts, x] }); };
-    const togCity = (k) => { const c = k.split('|')[0]; if (!cts.includes(k) && cityN(c) === 0) return; set({ cities: cts.includes(k) ? cts.filter(y => y !== k) : [...cts, k] }); };
+    const togCity = (k) => { if (!cts.includes(k) && cityN(...k.split('|')) === 0) return; set({ cities: cts.includes(k) ? cts.filter(y => y !== k) : [...cts, k] }); };
     const stateGroups = groups.map(g => ({ name: g.name, hasName: groups.length > 1,
       items: sort(g.list.filter(x => !sq || x.toLowerCase().includes(sq)), stateN).map(x => { const n = stateN(x), on = sts.includes(x), off = n === 0 && !on;
         return { name: x, on, off, count: fmt(n), countStyle: cStyle(n), box: box(on, off), rowStyle: rowStyle(off), onClick: () => { if (!off) togState(x); } }; }) })).filter(g => g.items.length);
     const cityGroups = sts.map(x => ({ name: x, hasName: sts.length > 1,
-      items: sort((CITIES[x] || []).filter(c => !cq || c.toLowerCase().includes(cq)), cityN).map(c => { const k = c + '|' + x, n = cityN(c), on = cts.includes(k), off = n === 0 && !on;
+      items: sort((CITIES[x] || []).filter(c => !cq || c.toLowerCase().includes(cq)), (c) => cityN(c, x)).map(c => { const k = c + '|' + x, n = cityN(c, x), on = cts.includes(k), off = n === 0 && !on;
         return { name: c, on, off, count: fmt(n), countStyle: cStyle(n), box: box(on, off), rowStyle: rowStyle(off), onClick: () => togCity(k) }; }) })).filter(g => g.items.length);
     const summary = (arr, any) => arr.length === 0 ? any : arr.length <= 2 ? arr.join(', ') : (arr.slice(0, 2).join(', ') + ' +' + (arr.length - 2));
     const cityNames = cts.map(k => k.split('|')[0]);
     const deadNames = dead.map(k => k.split('|')[0]), liveNames = live.map(k => k.split('|')[0]);
-    const widenStates = [...new Set(dead.map(k => k.split('|')[1]))];
-    const note = cts.length && !live.length
-      ? ('No jobs in ' + deadNames.join(' and ') + ' with these filters, so we’re showing all of ' + widenStates.join(' and ') + '.')
-      : dead.length ? (deadNames.join(' and ') + (dead.length === 1 ? ' has' : ' have') + ' no jobs with these filters. Showing ' + liveNames.join(', ') + '.') : '';
+    const jn = (a, w) => a.length <= 1 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' ' + (w || 'and') + ' ' + a[a.length - 1];
+    const ctryName = allowed.us && allowed.ca ? 'the US and Canada' : allowed.ca ? 'Canada' : 'the United States';
+    const msgs = [];
+    if (sts.length && !liveSts.length) msgs.push('No jobs in ' + jn(sts, 'or') + ' with these filters, so we’re showing all of ' + ctryName + '.');
+    else {
+      if (deadSts.length) msgs.push(jn(deadSts) + (deadSts.length === 1 ? ' has' : ' have') + ' no jobs with these filters. Showing ' + jn(liveSts) + '.');
+      liveSts.forEach(x => { const picked = cts.filter(k => k.endsWith('|' + x));
+        const dn = picked.filter(k => dead.includes(k)).map(k => k.split('|')[0]), ln = picked.filter(k => live.includes(k)).map(k => k.split('|')[0]);
+        if (picked.length && !ln.length) msgs.push('No jobs in ' + jn(dn, 'or') + ' with these filters, so we’re showing all of ' + x + '.');
+        else if (dn.length) msgs.push(jn(dn) + (dn.length === 1 ? ' has' : ' have') + ' no jobs with these filters. Showing ' + jn(ln) + '.'); });
+    }
+    const note = msgs.join(' ');
     return {
       Countries: [['any', allowed.us && allowed.ca ? 'Any' : allowed.ca ? 'Any in Canada' : 'Any in US'], ...['us', 'ca'].filter(k => allowed[k] && allowed.us && allowed.ca).map(k => [k, cname[k]])]
         .map(([k, label]) => ({ label, on: ctry === k, style: pill(ctry === k), onClick: () => set({ country: k, states: [], cities: [], open: null }),
@@ -2192,13 +2218,17 @@ class Component extends DCLogic {
       CityLabel: summary(cityNames, 'Any'), CityInk: cts.length ? 'color:#0D0D0F;' : 'color:#4A5464;',
       HasCityClear: cts.length > 0, OnCityClear: () => set({ cities: [], open: null }),
       HasCityChips: cts.length > 0,
-      CityChips: cts.map(k => { const c = k.split('|')[0], n = cityN(c);
+      CityChips: cts.map(k => { const c = k.split('|')[0], n = cityN(...k.split('|'));
         return { name: c, count: fmt(n), style: `display:inline-flex;align-items:center;gap:6px;border-radius:9999px;padding:5px 6px 5px 12px;font-size:14px;font-weight:600;${n === 0 ? 'background:#F5F6F7;border:1px dashed #A9B3B9;color:#4A5464;' : 'background:#F0FCFF;border:1px solid #B8EAF5;color:#022F36;'}`,
           countStyle: cStyle(n), onRemove: () => set({ cities: cts.filter(y => y !== k) }) }; }),
       CityHelp: sts.length === 0 ? 'Pick a state to choose cities.' : 'Ordered by job count. Counts update with your other filters.',
       HasNote: !!note, Note: note,
+      HasStateChips: sts.length > 0,
+      StateChips: sts.map(x => { const n = stateN(x);
+        return { name: x, count: fmt(n), countStyle: cStyle(n), onRemove: () => togState(x),
+          style: `display:inline-flex;align-items:center;gap:6px;border-radius:9999px;padding:5px 6px 5px 12px;font-size:14px;font-weight:600;${n === 0 ? 'background:#F5F6F7;border:1px dashed #A9B3B9;color:#4A5464;' : 'background:#F0FCFF;border:1px solid #B8EAF5;color:#022F36;'}` }; }),
       Close: () => set({ open: null }),
-      _scope: { ctry, sts, live, widen: cts.length && !live.length, widenStates, cityN, stateN, ctryN, allowed },
+      _scope: { ctry, sts, cts, live, liveSts, cityN, stateN, ctryN, allowed },
     };
   }
   __pfN(st) {
@@ -2310,14 +2340,20 @@ v: (() => {
     const a = st.prefs.arrangement || {};
     let n = 0;
     if (a.hybrid || a.onsite) {
-      const { ctry, sts, live, widen, widenStates, cityN, stateN, ctryN, allowed } = this.__loc(st)._scope;
-      n += live.length ? live.reduce((m, k) => m + cityN(k.split('|')[0]), 0)
-         : widen ? widenStates.reduce((m, x) => m + stateN(x), 0)
-         : sts.length ? sts.reduce((m, x) => m + stateN(x), 0)
-         : (ctry === 'any' ? ['us', 'ca'].filter(x => allowed[x]) : [ctry]).reduce((m, x) => m + ctryN(x), 0);
+      const { ctry, sts, cts, live, liveSts, cityN, stateN, ctryN, allowed } = this.__loc(st)._scope;
+      const whole = () => (ctry === 'any' ? ['us', 'ca'].filter(x => allowed[x]) : [ctry]).reduce((m, x) => m + ctryN(x), 0);
+      n += !liveSts.length ? whole()
+         : liveSts.reduce((m, x) => { const lv = live.filter(k => k.endsWith('|' + x));
+             return m + (lv.length ? lv.reduce((q, k) => q + cityN(...k.split('|')), 0) : stateN(x)); }, 0);
     }
     if (a.remote) n += Math.round(140 * this.prefFactor(st));
     return n;
+  }
+  zeroStates(st) {
+    const lv = st.prefs.levels || {}, ty = st.prefs.types || {}, z = [];
+    if (lv.exec && !lv.entry && !lv.mid && !lv.senior) z.push('Ohio');
+    if (ty.intern && !ty.full && !ty.part) z.push('Texas');
+    return z;
   }
   matchLabel(nm) {
     const capSetting = this.props.matchCap ?? '30+';
@@ -3638,6 +3674,22 @@ v: (() => {
       skillToast: st.skillToast,
       skillsAll: !!st.skillsAll,
       onToggleSkillsAll: () => this.setState(s => ({ skillsAll: !s.skillsAll })),
+      locDemos: (() => {
+        const L = (o) => ({ entry: false, mid: false, senior: false, exec: false, ...o });
+        const T = (o) => ({ full: false, part: false, intern: false, ...o });
+        return [
+          ['ok', '2 states, both have jobs', '#00B16B', ['Texas','Ohio'], [], L({ entry: true, mid: true }), T({ full: true })],
+          ['one', '2 states, Ohio drops to 0', '#F0B429', ['Texas','Ohio'], [], L({ exec: true }), T({ full: true })],
+          ['both', '2 states, both drop to 0', '#F76638', ['Texas','Ohio'], [], L({ exec: true }), T({ intern: true })],
+          ['stcity', 'State + city drop together', '#F0B429', ['Texas','Ohio'], ['Austin|Texas','Columbus|Ohio'], L({ exec: true }), T({ full: true })],
+          ['city', '3 cities, Fort Worth is 0', '#F0B429', ['Texas'], ['Austin|Texas','Dallas|Texas','Fort Worth|Texas'], L({ entry: true, mid: true }), T({ full: true })],
+          ['allcity', 'All picked cities 0, widen to state', '#F76638', ['Texas'], ['Fort Worth|Texas','Plano|Texas'], L({ entry: true, mid: true }), T({ full: true })],
+        ].map(([k, label, dot, states, cities, levels, types]) => ({ label, dot,
+          onClick: () => this.setState(s => ({ locDemo: k, screen: 'jobs', prefsOpen: true, avatarMenu: false,
+            prefs: { ...s.prefs, levels, types, locations: { us: true, ca: false }, arrangement: { remote: false, hybrid: true, onsite: true },
+              near: { ...s.prefs.near, country: 'any', states, cities, open: null, sq: '', cq: '' } } })),
+          style: `display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:${st.locDemo === k ? 'rgba(90,235,235,0.16)' : 'transparent'};border:none;border-radius:9px;padding:8px 10px;font-family:inherit;font-size:14px;font-weight:600;color:#fff;cursor:pointer;` }));
+      })(),
       skillDemos: [['full','100% skill match','#00B16B'],['partial','Partial match','#5AEBEB'],['low','Low match (3 of 8)','#F76638']].map(([k, label, dot]) => ({ label, dot,
         onClick: () => this.setState({ skillDemo: k, skillOv: {}, skPop: '' }),
         style: `display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:${st.skillDemo === k ? 'rgba(90,235,235,0.16)' : 'transparent'};border:none;border-radius:9px;padding:8px 10px;font-family:inherit;font-size:13px;font-weight:${st.skillDemo === k ? 700 : 500};color:#fff;cursor:pointer;` })),
