@@ -192,65 +192,87 @@
 
         <sc-if value="{{ obShowNear }}" hint-placeholder-val="{{ true }}">
           <div style="margin-bottom:26px;">
-          <div style="border:1px solid #E5E7EB;border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;">
+          <div style="border:1px solid #E5E7EB;border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:16px;">
             <div style="font-size:16px;font-weight:700;color:#022F36;">On-site / hybrid jobs</div>
-            <div style="display:flex;gap:8px;flex-wrap:nowrap;">
-              <sc-for list="{{ obNNearModes }}" as="nm" hint-placeholder-count="2">
-                <button onClick="{{ nm.onClick }}" title="{{ nm.label }}" aria-pressed="{{ nm.on }}" style="{{ nm.style }}"><i class="icon icon-circle-check" style="{{ nm.iconStyle }}"></i><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;">{{ nm.label }}</span></button>
-              </sc-for>
-            </div>
-            <sc-if value="{{ obNSpecific }}" hint-placeholder-val="{{ true }}">
-              <sc-if value="{{ obNHasChips }}" hint-placeholder-val="{{ true }}">
-                <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                  <sc-for list="{{ obNChips }}" as="c" hint-placeholder-count="1">
-                    <span style="display:inline-flex;align-items:center;gap:6px;background:#F0FCFF;border:1px solid #B8EAF5;color:#022F36;border-radius:9999px;padding:5px 6px 5px 12px;font-size:14px;font-weight:600;">{{ c.name }}<button onClick="{{ c.onRemove }}" aria-label="Remove" style="width:22px;height:22px;border-radius:50%;border:none;background:#fff;color:#4A5464;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="icon icon-x" style="font-size:13px;"></i></button></span>
-                  </sc-for>
-                </div>
-              </sc-if>
+
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#0D0D0F;"><i class="icon icon-map" style="font-size:16px;color:#1D484F;"></i>States<sc-if value="{{ obNHasStateClear }}" hint-placeholder-val="{{ false }}"><button onClick="{{ obNOnStateClear }}" style="margin-left:auto;background:none;border:none;padding:0;font-family:inherit;font-size:13px;font-weight:600;color:#1D484F;cursor:pointer;">Clear</button></sc-if></div>
               <div style="position:relative;">
-                <i class="icon icon-search" style="position:absolute;left:15px;top:15px;font-size:18px;color:#4A5464;pointer-events:none;"></i>
-                <input type="text" value="{{ obNQ }}" onChange="{{ obNOnQ }}" onFocus="{{ obNOnFocus }}" onBlur="{{ obNOnBlur }}" onKeyDown="{{ obNOnKey }}" placeholder="Search a city or state" aria-label="Search a city or state" style="width:100%;box-sizing:border-box;background:#fff;border:1px solid #E5E7EB;border-radius:10px;height:48px;padding:0 16px 0 44px;font-family:inherit;font-size:15px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
-                <sc-if value="{{ obNResultsOpen }}" hint-placeholder-val="{{ false }}">
-                  <div role="listbox" aria-multiselectable="true" style="position:absolute;left:0;right:0;top:54px;z-index:30;background:#fff;border:1px solid #CBD3E4;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,0.14);max-height:300px;overflow-y:auto;padding:6px 6px 0;">
-                    <sc-if value="{{ obNHasStateResults }}" hint-placeholder-val="{{ true }}">
-                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">States / provinces</div>
-                      <sc-for list="{{ obNStateResults }}" as="it" hint-placeholder-count="2">
-                        <button onMouseDown="{{ it.onPick }}" role="option" aria-selected="{{ it.on }}" style="width:100%;display:flex;align-items:center;gap:10px;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;font-weight:600;color:#23262E;cursor:pointer;text-align:left;{{ it.rowBg }}" style-hover="background:#F0FCFF;"><span style="{{ it.box }}"><sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:13px;color:#fff;"></i></sc-if></span><span>All of {{ it.name }}</span></button>
-                        <sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><div style="padding:0 10px 8px 40px;font-size:13px;color:#4A5464;">{{ it.incNote }}</div></sc-if>
+                <button onClick="{{ obNOnStateOpen }}" aria-haspopup="listbox" aria-expanded="{{ obNStateOpen }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:10px;height:48px;padding:0 14px 0 16px;font-family:inherit;font-size:15px;color:#0D0D0F;cursor:pointer;text-align:left;"><span style="{{ obNStateInk }}">{{ obNStateLabel }}</span><i class="icon icon-chevron-down" style="font-size:18px;color:#4A5464;flex-shrink:0;"></i></button>
+                <sc-if value="{{ obNStateOpen }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ obNClose }}" style="position:fixed;inset:0;z-index:39;"></div>
+                  <div role="listbox" aria-multiselectable="true" style="position:absolute;left:0;right:0;top:54px;z-index:40;background:#fff;border:1px solid #CBD3E4;border-radius:16px;box-shadow:0 14px 34px rgba(0,0,0,0.14);overflow:hidden;">
+                    <sc-if value="{{ obNStateSearchable }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:relative;padding:10px 10px 6px;border-bottom:1px solid #EDEEF0;">
+                        <i class="icon icon-search" style="position:absolute;left:24px;top:22px;font-size:16px;color:#4A5464;pointer-events:none;"></i>
+                        <input type="text" value="{{ obNStateQ }}" onChange="{{ obNOnStateQ }}" placeholder="Search states" aria-label="Search states" style="width:100%;box-sizing:border-box;background:#F5F6F7;border:1px solid #E5E7EB;border-radius:8px;height:40px;padding:0 12px 0 38px;font-family:inherit;font-size:15px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;background:#fff;">
+                      </div>
+                    </sc-if>
+                    <div style="max-height:260px;overflow-y:auto;padding:6px;">
+                      <sc-for list="{{ obNStateGroups }}" as="g" hint-placeholder-count="1">
+                        <sc-if value="{{ g.hasName }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">{{ g.name }}</div></sc-if>
+                        <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="5">
+                          <button role="option" aria-selected="{{ it.on }}" aria-disabled="{{ it.off }}" onClick="{{ it.onClick }}" style="{{ it.rowStyle }}" style-hover="background:#F0FCFF;"><span style="{{ it.box }}"><sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:13px;color:#fff;"></i></sc-if></span><span style="flex:1;min-width:0;">{{ it.name }}</span><span style="{{ it.countStyle }}">{{ it.count }}</span></button>
+                        </sc-for>
                       </sc-for>
-                    </sc-if>
-                    <sc-if value="{{ obNHasCityResults }}" hint-placeholder-val="{{ true }}">
-                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">{{ obNCityHead }}</div>
-                      <sc-for list="{{ obNCityResults }}" as="it" hint-placeholder-count="4">
-                        <button onMouseDown="{{ it.onPick }}" role="option" aria-selected="{{ it.on }}" style="width:100%;display:flex;align-items:center;gap:10px;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;{{ it.rowBg }}" style-hover="background:#F0FCFF;"><span style="{{ it.box }}"><sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:13px;color:#fff;"></i></sc-if></span><span>{{ it.name }}</span><span style="color:#4A5464;">{{ it.sub }}</span></button>
-                      </sc-for>
-                    </sc-if>
-                    
-                    <sc-if value="{{ obNNoResults }}" hint-placeholder-val="{{ false }}">
-                      <div style="padding:12px 10px;font-size:14px;color:#4A5464;">No matching city or state</div>
-                    </sc-if>
-                    <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #EDEEF0;margin:6px -6px 0;padding:8px 12px;display:flex;justify-content:flex-end;">
-                      <button onMouseDown="{{ obNOnDone }}" style="background:#1D484F;border:none;border-radius:9999px;padding:7px 18px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;" style-hover="background:#022F36;">{{ obNDoneLabel }}</button>
+                      <sc-if value="{{ obNStateEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:14px 10px;font-size:14px;color:#4A5464;">No matches for that search.</div></sc-if>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-top:1px solid #EDEEF0;">
+                      <span style="font-size:13px;color:#4A5464;">{{ obNStateFoot }}</span>
+                      <button onClick="{{ obNClose }}" style="background:#1D484F;border:none;border-radius:9999px;height:36px;padding:0 18px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;">Done</button>
                     </div>
                   </div>
                 </sc-if>
               </div>
-              
-              <sc-if value="{{ obNLow }}" hint-placeholder-val="{{ false }}">
-                <div role="status" style="display:flex;gap:9px;align-items:flex-start;font-size:13.5px;line-height:1.45;color:#4A5464;"><i class="icon icon-info" style="font-size:15px;color:#1D484F;margin-top:1px;flex-shrink:0;"></i>Smaller cities have fewer openings. You can add more locations any time.</div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#0D0D0F;"><i class="icon icon-building-2" style="font-size:16px;color:#1D484F;"></i>Cities<sc-if value="{{ obNHasCityClear }}" hint-placeholder-val="{{ false }}"><button onClick="{{ obNOnCityClear }}" style="margin-left:auto;background:none;border:none;padding:0;font-family:inherit;font-size:13px;font-weight:600;color:#1D484F;cursor:pointer;">Clear</button></sc-if></div>
+              <div style="position:relative;">
+                <button onClick="{{ obNOnCityOpen }}" disabled="{{ obNCityDisabled }}" aria-haspopup="listbox" aria-expanded="{{ obNCityOpen }}" style="{{ obNCityFieldStyle }}"><span style="{{ obNCityInk }}">{{ obNCityLabel }}</span><i class="icon icon-chevron-down" style="font-size:18px;color:#4A5464;flex-shrink:0;"></i></button>
+                <sc-if value="{{ obNCityOpen }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ obNClose }}" style="position:fixed;inset:0;z-index:39;"></div>
+                  <div role="listbox" aria-multiselectable="true" style="position:absolute;left:0;right:0;top:54px;z-index:40;background:#fff;border:1px solid #CBD3E4;border-radius:16px;box-shadow:0 14px 34px rgba(0,0,0,0.14);overflow:hidden;">
+                    <sc-if value="{{ obNCitySearchable }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:relative;padding:10px 10px 6px;border-bottom:1px solid #EDEEF0;">
+                        <i class="icon icon-search" style="position:absolute;left:24px;top:22px;font-size:16px;color:#4A5464;pointer-events:none;"></i>
+                        <input type="text" value="{{ obNCityQ }}" onChange="{{ obNOnCityQ }}" placeholder="Search cities" aria-label="Search cities" style="width:100%;box-sizing:border-box;background:#F5F6F7;border:1px solid #E5E7EB;border-radius:8px;height:40px;padding:0 12px 0 38px;font-family:inherit;font-size:15px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;background:#fff;">
+                      </div>
+                    </sc-if>
+                    <div style="max-height:260px;overflow-y:auto;padding:6px;">
+                      <sc-for list="{{ obNCityGroups }}" as="g" hint-placeholder-count="1">
+                        <sc-if value="{{ g.hasName }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">{{ g.name }}</div></sc-if>
+                        <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="5">
+                          <button role="option" aria-selected="{{ it.on }}" aria-disabled="{{ it.off }}" onClick="{{ it.onClick }}" style="{{ it.rowStyle }}" style-hover="background:#F0FCFF;"><span style="{{ it.box }}"><sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:13px;color:#fff;"></i></sc-if></span><span style="flex:1;min-width:0;">{{ it.name }}</span><span style="{{ it.countStyle }}">{{ it.count }}</span></button>
+                        </sc-for>
+                      </sc-for>
+                      <sc-if value="{{ obNCityEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:14px 10px;font-size:14px;color:#4A5464;">No matches for that search.</div></sc-if>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-top:1px solid #EDEEF0;">
+                      <span style="font-size:13px;color:#4A5464;">{{ obNCityFoot }}</span>
+                      <button onClick="{{ obNClose }}" style="background:#1D484F;border:none;border-radius:9999px;height:36px;padding:0 18px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;">Done</button>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+              <sc-if value="{{ obNHasCityChips }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                  <sc-for list="{{ obNCityChips }}" as="c" hint-placeholder-count="1">
+                    <span style="{{ c.style }}">{{ c.name }}<span style="{{ c.countStyle }}">{{ c.count }}</span><button onClick="{{ c.onRemove }}" aria-label="Remove" style="width:22px;height:22px;border-radius:50%;border:none;background:#fff;color:#4A5464;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="icon icon-x" style="font-size:13px;"></i></button></span>
+                  </sc-for>
+                </div>
               </sc-if>
-              <sc-if value="{{ obNHasNote }}" hint-placeholder-val="{{ false }}">
-                <div style="font-size:13px;color:#4A5464;">{{ obNNote }}</div>
-              </sc-if>
-              <sc-if value="{{ obNDetected2 }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#4A5464;"><i class="icon icon-locate-fixed" style="font-size:14px;color:#1D484F;"></i>{{ obNDetectedText2 }}</div>
-              </sc-if>
+              <div style="font-size:13px;line-height:1.45;color:#4A5464;">{{ obNCityHelp }}</div>
+            </div>
+
+            <sc-if value="{{ obNHasNote }}" hint-placeholder-val="{{ false }}">
+              <div role="status" style="display:flex;align-items:flex-start;gap:8px;font-size:13.5px;line-height:1.45;color:#92400E;"><i class="icon icon-info" style="font-size:15px;flex-shrink:0;margin-top:1px;"></i>{{ obNNote }}</div>
             </sc-if>
           </div>
           </div>
         </sc-if>
         <sc-if value="{{ obRemoteOnly }}" hint-placeholder-val="{{ false }}">
-          <div style="font-size:13px;color:#4A5464;margin:-14px 0 26px;">Remote only, so location doesn’t apply. Select Hybrid or On-site to pick states.</div>
+          <div style="font-size:13px;color:#4A5464;margin:-14px 0 26px;">Remote only, so location doesn’t apply. Select Hybrid or On-site to pick a location.</div>
         </sc-if>
 
         <label style="display:block;font-size:14px;font-weight:600;color:#0D0D0F;margin-bottom:10px;">Experience Level (select all that apply)</label>
@@ -720,11 +742,14 @@ const TITLES = {
   'QA / Testing': [{ name: 'Titles', items: ['QA Engineer','Test Automation Engineer','SDET','Manual QA Tester'] }],
 };
 const JOBN = (k) => { let h = 0; for (const ch of k) h = (h * 31 + ch.charCodeAt(0)) >>> 0; const big = ['Austin','Dallas','Houston','San Francisco','New York','Seattle','Toronto','Los Angeles','Chicago','Boston','Vancouver','San Jose','Atlanta','Denver']; return big.includes(k) ? 60 + (h % 140) : 2 + (h % 14); };
+const ZERO_CITIES = ['Fort Worth','Hamilton','Juneau','Fairbanks','Mobile','Tempe','London','Plano'];
+const CITYN = (c) => ZERO_CITIES.includes(c) ? 0 : JOBN(c);
+const STATEN = (st) => (CITIES[st] || []).reduce((m, c) => m + CITYN(c), 0);
 class Component extends DCLogic {
   state = { cpStep: 0, cpOpen: typeof location !== 'undefined' && location.hash === '#complete-profile', stage: (typeof location !== 'undefined' && location.hash === '#complete-profile') ? 'import' : (typeof location !== 'undefined' && location.hash === '#import') ? 'import' : (typeof location !== 'undefined' && location.hash === '#parse-error') ? 'import' : 'prefs', parseErr: typeof location !== 'undefined' && location.hash === '#parse-error', file: (typeof location !== 'undefined' && location.hash === '#parse-error') ? { name: 'Dillan_Resume_scan.pdf', size: 1843200 } : null, waOn: false, waPhone: '+1 512 555 0142', waSent: false, waVerified: false, waTypes: { needs: true, submitted: false, digest: false }, fileErr: '', dragOver: false, obFunc: 'Software Engineering', obTitles: ['Software Engineer'], titlesOpen: false, obLoc: 'United States',
     obTypes: { full: true, part: false, intern: false },
     obModes: { remote: true, hybrid: true, onsite: false },
-    obNear: { mode: 'specific', states: [], cities: ['Austin|Texas'], detected: true, q: '', ro: false, note: '' },
+    obNear: { country: 'any', states: [], cities: [], open: null, sq: '', cq: '' },
     obLevels: { entry: true, mid: false, senior: false, exec: false },
     obAuth: { us: { auth: 'no', spon: 'yes' }, ca: { auth: null, spon: null } },
     feedIdx: 0, step: 0, showPw: false, email: '', password: '', liveCount: 1284 };
@@ -817,6 +842,82 @@ class Component extends DCLogic {
     };
   }
 
+  obFactor(st) {
+    const on = (o) => Object.values(o || {}).filter(Boolean).length;
+    const t = st.obTypes || {}, l = st.obLevels || {};
+    const lv = on(l) ? Math.min(1, 0.35 + on(l) * 0.25) : 1;
+    const ty = on(t) ? Math.min(1, (t.full ? 0.85 : 0) + (on(t) - (t.full ? 1 : 0)) * 0.15) : 1;
+    return lv * ty;
+  }
+  __loc(st) {
+    const loc = st.obNear || {};
+    const set = (patch) => this.setState(s => ({ obNear: { ...s.obNear, ...patch } }));
+    const allowed = ({ us: st.obLoc !== 'Canada', ca: st.obLoc !== 'United States' });
+    const f = this.obFactor(st);
+    const cityN = (c) => Math.round(CITYN(c) * f);
+    const stateN = (x) => (CITIES[x] || []).reduce((m, c) => m + cityN(c), 0);
+    const cname = { us: 'United States', ca: 'Canada' };
+    const ctry = 'any';
+    const groups = [];
+    if (allowed.us && (ctry === 'any' || ctry === 'us')) groups.push({ name: 'United States', list: US_STATES });
+    if (allowed.ca && (ctry === 'any' || ctry === 'ca')) groups.push({ name: 'Canada', list: CA_PROVINCES });
+    const okStates = groups.flatMap(g => g.list);
+    const sts = (loc.states || []).filter(x => okStates.includes(x));
+    const cts = (loc.cities || []).filter(k => sts.includes(k.split('|')[1]));
+    const live = cts.filter(k => cityN(k.split('|')[0]) > 0), dead = cts.filter(k => cityN(k.split('|')[0]) === 0);
+    const box = (on, off) => `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on ? '#1D484F' : '#fff'};border:1.5px solid ${on ? '#1D484F' : off ? '#D5DBDF' : '#A9B3B9'};`;
+    const rowStyle = (off) => 'width:100%;display:flex;align-items:center;gap:10px;background:none;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;' + (off ? 'opacity:0.5;cursor:not-allowed;' : '');
+    const cStyle = (n) => `font-size:13px;font-weight:600;white-space:nowrap;color:${n === 0 ? '#4A5464' : '#1D484F'};`;
+    const fmt = (n) => n.toLocaleString();
+    const ctryN = (k) => (k === 'us' ? US_STATES : CA_PROVINCES).reduce((m, x) => m + stateN(x), 0);
+    const pill = (on) => `display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:9999px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap;background:${on ? '#022F36' : '#fff'};color:${on ? '#fff' : '#022F36'};border:1.5px solid ${on ? '#022F36' : '#E5E7EB'};`;
+    const sq = (loc.sq || '').trim().toLowerCase(), cq = (loc.cq || '').trim().toLowerCase();
+    const sort = (arr, n) => [...arr].sort((x, y) => (n(y) > 0) - (n(x) > 0) || n(y) - n(x) || x.localeCompare(y));
+    const togState = (x) => { const on = sts.includes(x); set(on ? { states: sts.filter(y => y !== x), cities: cts.filter(k => k.split('|')[1] !== x) } : { states: [...sts, x] }); };
+    const togCity = (k) => { const c = k.split('|')[0]; if (!cts.includes(k) && cityN(c) === 0) return; set({ cities: cts.includes(k) ? cts.filter(y => y !== k) : [...cts, k] }); };
+    const stateGroups = groups.map(g => ({ name: g.name, hasName: groups.length > 1,
+      items: sort(g.list.filter(x => !sq || x.toLowerCase().includes(sq)), stateN).map(x => { const n = stateN(x), on = sts.includes(x), off = n === 0 && !on;
+        return { name: x, on, off, count: fmt(n), countStyle: cStyle(n), box: box(on, off), rowStyle: rowStyle(off), onClick: () => { if (!off) togState(x); } }; }) })).filter(g => g.items.length);
+    const cityGroups = sts.map(x => ({ name: x, hasName: sts.length > 1,
+      items: sort((CITIES[x] || []).filter(c => !cq || c.toLowerCase().includes(cq)), cityN).map(c => { const k = c + '|' + x, n = cityN(c), on = cts.includes(k), off = n === 0 && !on;
+        return { name: c, on, off, count: fmt(n), countStyle: cStyle(n), box: box(on, off), rowStyle: rowStyle(off), onClick: () => togCity(k) }; }) })).filter(g => g.items.length);
+    const summary = (arr, any) => arr.length === 0 ? any : arr.length <= 2 ? arr.join(', ') : (arr.slice(0, 2).join(', ') + ' +' + (arr.length - 2));
+    const cityNames = cts.map(k => k.split('|')[0]);
+    const deadNames = dead.map(k => k.split('|')[0]), liveNames = live.map(k => k.split('|')[0]);
+    const widenStates = [...new Set(dead.map(k => k.split('|')[1]))];
+    const note = cts.length && !live.length
+      ? ('No jobs in ' + deadNames.join(' and ') + ' with these filters, so we’re showing all of ' + widenStates.join(' and ') + '.')
+      : dead.length ? (deadNames.join(' and ') + (dead.length === 1 ? ' has' : ' have') + ' no jobs with these filters. Showing ' + liveNames.join(', ') + '.') : '';
+    return {
+      Countries: [['any', allowed.us && allowed.ca ? 'Any' : allowed.ca ? 'Any in Canada' : 'Any in US'], ...['us', 'ca'].filter(k => allowed[k] && allowed.us && allowed.ca).map(k => [k, cname[k]])]
+        .map(([k, label]) => ({ label, on: ctry === k, style: pill(ctry === k), onClick: () => set({ country: k, states: [], cities: [], open: null }),
+          count: fmt(k === 'any' ? ['us', 'ca'].filter(x => allowed[x]).reduce((m, x) => m + ctryN(x), 0) : ctryN(k)),
+          countStyle: `font-size:13px;font-weight:600;color:${ctry === k ? '#5AEBEB' : '#4A5464'};` })),
+      HasCountryClear: ctry !== 'any', OnCountryClear: () => set({ country: 'any', states: [], cities: [], open: null }),
+      StateOpen: loc.open === 'state', OnStateOpen: () => set({ open: loc.open === 'state' ? null : 'state', sq: '' }),
+      StateSearchable: true, StateQ: loc.sq || '', OnStateQ: (e) => set({ sq: e.target.value }),
+      StateGroups: stateGroups, StateEmpty: stateGroups.length === 0,
+      StateFoot: sts.length ? (sts.length + ' selected') : 'Ordered by job count',
+      StateLabel: summary(sts, 'Any'), StateInk: sts.length ? 'color:#0D0D0F;' : 'color:#4A5464;',
+      HasStateClear: sts.length > 0, OnStateClear: () => set({ states: [], cities: [], open: null }),
+      CityOpen: loc.open === 'city', OnCityOpen: () => set({ open: loc.open === 'city' ? null : 'city', cq: '' }),
+      CitySearchable: cityGroups.reduce((m, g) => m + g.items.length, 0) > 8, CityQ: loc.cq || '', OnCityQ: (e) => set({ cq: e.target.value }),
+      CityGroups: cityGroups, CityEmpty: cityGroups.length === 0,
+      CityFoot: cts.length ? (cts.length + ' selected') : 'Ordered by job count',
+      CityDisabled: sts.length === 0,
+      CityFieldStyle: 'width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:10px;height:48px;padding:0 14px 0 16px;font-family:inherit;font-size:15px;color:#0D0D0F;cursor:pointer;text-align:left;' + (sts.length === 0 ? 'background:#F5F6F7;cursor:not-allowed;' : ''),
+      CityLabel: summary(cityNames, 'Any'), CityInk: cts.length ? 'color:#0D0D0F;' : 'color:#4A5464;',
+      HasCityClear: cts.length > 0, OnCityClear: () => set({ cities: [], open: null }),
+      HasCityChips: cts.length > 0,
+      CityChips: cts.map(k => { const c = k.split('|')[0], n = cityN(c);
+        return { name: c, count: fmt(n), style: `display:inline-flex;align-items:center;gap:6px;border-radius:9999px;padding:5px 6px 5px 12px;font-size:14px;font-weight:600;${n === 0 ? 'background:#F5F6F7;border:1px dashed #A9B3B9;color:#4A5464;' : 'background:#F0FCFF;border:1px solid #B8EAF5;color:#022F36;'}`,
+          countStyle: cStyle(n), onRemove: () => set({ cities: cts.filter(y => y !== k) }) }; }),
+      CityHelp: sts.length === 0 ? 'Pick a state to choose cities.' : 'Ordered by job count. Counts update with your other filters.',
+      HasNote: !!note, Note: note,
+      Close: () => set({ open: null }),
+      _scope: { ctry, sts, live, widen: cts.length && !live.length, widenStates, cityN, stateN, ctryN, allowed },
+    };
+  }
   __obN(st) {
     return ({
 v: (() => {
@@ -968,7 +1069,7 @@ v: (() => {
       obLevels: group('obLevels', [['entry','Entry Level'],['mid','Mid Level'],['senior','Senior Level'],['exec','Executive Level']]),
       obAuthCountries: countries,
       obShowNear: st.obModes.hybrid || st.obModes.onsite,
-      ...(() => { const v = this.__obN(st); const o = {}; Object.keys(v).forEach(k => o['obN' + k] = v[k]); return o; })(),
+      ...(() => { const v = this.__loc(st); const o = {}; Object.keys(v).forEach(k => o['obN' + k] = v[k]); return o; })(),
       obRemoteOnly: st.obModes.remote && !st.obModes.hybrid && !st.obModes.onsite,
 
     };
