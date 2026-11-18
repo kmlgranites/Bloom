@@ -1773,6 +1773,14 @@
         <!-- Location + Work Style (paired) -->
         <div class="pref-pair" style="display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-bottom:16px;">
           <div class="pref-row" style="display:block;margin-bottom:16px;">
+            <div style="font-size:13px;font-weight:700;color:#0D0D0F;margin-bottom:6px;">How do you want to work?</div>
+            <div class="pref-chips" style="display:flex;flex-wrap:wrap;gap:8px;">
+              <sc-for list="{{ arrangeOptions }}" as="ar" hint-placeholder-count="3">
+                <button onClick="{{ ar.onClick }}" style="{{ ar.chipStyle }}" style-hover="{{ ar.chipHover }}" style-focus="{{ ar.chipFocus }}"><i class="{{ ar.checkIcon }}" style="{{ ar.checkIconStyle }}"></i>{{ ar.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div class="pref-row" style="display:block;margin-bottom:16px;">
             <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px;">
               <span style="font-size:13px;font-weight:700;color:#0D0D0F;">Where can you work? <span style="color:#E5484D;">*</span></span>
               <span class="tip" style="position:relative;display:inline-flex;cursor:help;">
@@ -1786,85 +1794,92 @@
               </sc-for>
             </div>
           </div>
-          <div class="pref-row" style="display:block;margin-bottom:16px;">
-            <div style="font-size:13px;font-weight:700;color:#0D0D0F;margin-bottom:6px;">How do you want to work?</div>
-            <div class="pref-chips" style="display:flex;flex-wrap:wrap;gap:8px;">
-              <sc-for list="{{ arrangeOptions }}" as="ar" hint-placeholder-count="3">
-                <button onClick="{{ ar.onClick }}" style="{{ ar.chipStyle }}" style-hover="{{ ar.chipHover }}" style-focus="{{ ar.chipFocus }}"><i class="{{ ar.checkIcon }}" style="{{ ar.checkIconStyle }}"></i>{{ ar.label }}</button>
-              </sc-for>
-            </div>
-          </div>
         </div>
 
         <!-- On-site / hybrid states (hidden when Remote only) -->
         <sc-if value="{{ pfShowNear }}" hint-placeholder-val="{{ true }}">
           <div style="margin-bottom:16px;">
-          <div style="border:1px solid #E5E7EB;border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:14px;">
+          <div style="border:1px solid #E5E7EB;border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:16px;">
             <div style="font-size:16px;font-weight:700;color:#022F36;">On-site / hybrid jobs</div>
-            <div style="display:flex;gap:8px;flex-wrap:nowrap;">
-              <sc-for list="{{ pfNNearModes }}" as="nm" hint-placeholder-count="2">
-                <button onClick="{{ nm.onClick }}" title="{{ nm.label }}" aria-pressed="{{ nm.on }}" style="{{ nm.style }}"><i class="icon icon-circle-check" style="{{ nm.iconStyle }}"></i><span style="min-width:0;overflow:hidden;text-overflow:ellipsis;">{{ nm.label }}</span></button>
-              </sc-for>
-            </div>
-            <sc-if value="{{ pfNSpecific }}" hint-placeholder-val="{{ true }}">
-              <sc-if value="{{ pfNHasChips }}" hint-placeholder-val="{{ true }}">
-                <div style="display:flex;flex-wrap:wrap;gap:8px;">
-                  <sc-for list="{{ pfNChips }}" as="c" hint-placeholder-count="1">
-                    <span style="display:inline-flex;align-items:center;gap:6px;background:#F0FCFF;border:1px solid #B8EAF5;color:#022F36;border-radius:9999px;padding:5px 6px 5px 12px;font-size:14px;font-weight:600;">{{ c.name }}<button onClick="{{ c.onRemove }}" aria-label="Remove" style="width:22px;height:22px;border-radius:50%;border:none;background:#fff;color:#4A5464;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="icon icon-x" style="font-size:13px;"></i></button></span>
-                  </sc-for>
-                </div>
-              </sc-if>
+
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#0D0D0F;"><i class="icon icon-map" style="font-size:16px;color:#1D484F;"></i>States<sc-if value="{{ pfNHasStateClear }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pfNOnStateClear }}" style="margin-left:auto;background:none;border:none;padding:0;font-family:inherit;font-size:13px;font-weight:600;color:#1D484F;cursor:pointer;">Clear</button></sc-if></div>
               <div style="position:relative;">
-                <i class="icon icon-search" style="position:absolute;left:15px;top:15px;font-size:18px;color:#4A5464;pointer-events:none;"></i>
-                <input type="text" value="{{ pfNQ }}" onChange="{{ pfNOnQ }}" onFocus="{{ pfNOnFocus }}" onBlur="{{ pfNOnBlur }}" onKeyDown="{{ pfNOnKey }}" placeholder="Search a city or state" aria-label="Search a city or state" style="width:100%;box-sizing:border-box;background:#fff;border:1px solid #E5E7EB;border-radius:10px;height:48px;padding:0 16px 0 44px;font-family:inherit;font-size:15px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;">
-                <sc-if value="{{ pfNResultsOpen }}" hint-placeholder-val="{{ false }}">
-                  <div role="listbox" aria-multiselectable="true" style="position:absolute;left:0;right:0;top:54px;z-index:30;background:#fff;border:1px solid #CBD3E4;border-radius:12px;box-shadow:0 14px 34px rgba(0,0,0,0.14);max-height:300px;overflow-y:auto;padding:6px 6px 0;">
-                    <sc-if value="{{ pfNHasStateResults }}" hint-placeholder-val="{{ true }}">
-                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">States / provinces</div>
-                      <sc-for list="{{ pfNStateResults }}" as="it" hint-placeholder-count="2">
-                        <button onMouseDown="{{ it.onPick }}" role="option" aria-selected="{{ it.on }}" style="width:100%;display:flex;align-items:center;gap:10px;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;font-weight:600;color:#23262E;cursor:pointer;text-align:left;{{ it.rowBg }}" style-hover="background:#F0FCFF;"><span style="{{ it.box }}"><sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:13px;color:#fff;"></i></sc-if></span><span>All of {{ it.name }}</span></button>
-                        <sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><div style="padding:0 10px 8px 40px;font-size:13px;color:#4A5464;">{{ it.incNote }}</div></sc-if>
+                <button onClick="{{ pfNOnStateOpen }}" aria-haspopup="listbox" aria-expanded="{{ pfNStateOpen }}" style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:10px;height:48px;padding:0 14px 0 16px;font-family:inherit;font-size:15px;color:#0D0D0F;cursor:pointer;text-align:left;"><span style="{{ pfNStateInk }}">{{ pfNStateLabel }}</span><i class="icon icon-chevron-down" style="font-size:18px;color:#4A5464;flex-shrink:0;"></i></button>
+                <sc-if value="{{ pfNStateOpen }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ pfNClose }}" style="position:fixed;inset:0;z-index:39;"></div>
+                  <div role="listbox" aria-multiselectable="true" style="position:absolute;left:0;right:0;top:54px;z-index:40;background:#fff;border:1px solid #CBD3E4;border-radius:16px;box-shadow:0 14px 34px rgba(0,0,0,0.14);overflow:hidden;">
+                    <sc-if value="{{ pfNStateSearchable }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:relative;padding:10px 10px 6px;border-bottom:1px solid #EDEEF0;">
+                        <i class="icon icon-search" style="position:absolute;left:24px;top:22px;font-size:16px;color:#4A5464;pointer-events:none;"></i>
+                        <input type="text" value="{{ pfNStateQ }}" onChange="{{ pfNOnStateQ }}" placeholder="Search states" aria-label="Search states" style="width:100%;box-sizing:border-box;background:#F5F6F7;border:1px solid #E5E7EB;border-radius:8px;height:40px;padding:0 12px 0 38px;font-family:inherit;font-size:15px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;background:#fff;">
+                      </div>
+                    </sc-if>
+                    <div style="max-height:260px;overflow-y:auto;padding:6px;">
+                      <sc-for list="{{ pfNStateGroups }}" as="g" hint-placeholder-count="1">
+                        <sc-if value="{{ g.hasName }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">{{ g.name }}</div></sc-if>
+                        <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="5">
+                          <button role="option" aria-selected="{{ it.on }}" aria-disabled="{{ it.off }}" onClick="{{ it.onClick }}" style="{{ it.rowStyle }}" style-hover="background:#F0FCFF;"><span style="{{ it.box }}"><sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:13px;color:#fff;"></i></sc-if></span><span style="flex:1;min-width:0;">{{ it.name }}</span><span style="{{ it.countStyle }}">{{ it.count }}</span></button>
+                        </sc-for>
                       </sc-for>
-                    </sc-if>
-                    <sc-if value="{{ pfNHasCityResults }}" hint-placeholder-val="{{ true }}">
-                      <div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">{{ pfNCityHead }}</div>
-                      <sc-for list="{{ pfNCityResults }}" as="it" hint-placeholder-count="4">
-                        <button onMouseDown="{{ it.onPick }}" role="option" aria-selected="{{ it.on }}" style="width:100%;display:flex;align-items:center;gap:10px;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;{{ it.rowBg }}" style-hover="background:#F0FCFF;"><span style="{{ it.box }}"><sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:13px;color:#fff;"></i></sc-if></span><span>{{ it.name }}</span><span style="color:#4A5464;">{{ it.sub }}</span></button>
-                      </sc-for>
-                    </sc-if>
-                    
-                    <sc-if value="{{ pfNNoResults }}" hint-placeholder-val="{{ false }}">
-                      <div style="padding:12px 10px;font-size:14px;color:#4A5464;">No matching city or state</div>
-                    </sc-if>
-                    <div style="position:sticky;bottom:0;background:#fff;border-top:1px solid #EDEEF0;margin:6px -6px 0;padding:8px 12px;display:flex;justify-content:flex-end;">
-                      <button onMouseDown="{{ pfNOnDone }}" style="background:#1D484F;border:none;border-radius:9999px;padding:7px 18px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;" style-hover="background:#022F36;">{{ pfNDoneLabel }}</button>
+                      <sc-if value="{{ pfNStateEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:14px 10px;font-size:14px;color:#4A5464;">No matches for that search.</div></sc-if>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-top:1px solid #EDEEF0;">
+                      <span style="font-size:13px;color:#4A5464;">{{ pfNStateFoot }}</span>
+                      <button onClick="{{ pfNClose }}" style="background:#1D484F;border:none;border-radius:9999px;height:36px;padding:0 18px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;">Done</button>
                     </div>
                   </div>
                 </sc-if>
               </div>
-              
-              <sc-if value="{{ pfNLow }}" hint-placeholder-val="{{ false }}">
-                <div role="status" style="display:flex;flex-direction:column;gap:10px;background:#FFF7E8;border:1px solid #F3E3C2;border-radius:12px;padding:12px 14px;">
-                  <div style="display:flex;gap:9px;align-items:flex-start;font-size:14px;line-height:1.45;color:#23262E;"><i class="icon icon-info" style="font-size:16px;color:#92400E;margin-top:1px;flex-shrink:0;"></i><span><b style="font-weight:700;">{{ pfNLowTitle }}</b> {{ pfNLowSub }}</span></div>
-                  <div style="display:flex;flex-wrap:wrap;gap:8px;padding-left:25px;">
-                    <sc-for list="{{ pfNLowFixes }}" as="lf" hint-placeholder-count="1">
-                      <button onClick="{{ lf.onClick }}" style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid #E5E7EB;border-radius:9999px;height:36px;padding:0 14px;font-family:inherit;font-size:13.5px;font-weight:600;color:#022F36;cursor:pointer;" style-hover="background:#F0FCFF;border-color:#B8EAF5;"><i class="icon icon-plus" style="font-size:14px;"></i>{{ lf.label }}<span style="color:#00824D;font-weight:700;">{{ lf.gain }}</span></button>
-                    </sc-for>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#0D0D0F;"><i class="icon icon-building-2" style="font-size:16px;color:#1D484F;"></i>Cities<sc-if value="{{ pfNHasCityClear }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pfNOnCityClear }}" style="margin-left:auto;background:none;border:none;padding:0;font-family:inherit;font-size:13px;font-weight:600;color:#1D484F;cursor:pointer;">Clear</button></sc-if></div>
+              <div style="position:relative;">
+                <button onClick="{{ pfNOnCityOpen }}" disabled="{{ pfNCityDisabled }}" aria-haspopup="listbox" aria-expanded="{{ pfNCityOpen }}" style="{{ pfNCityFieldStyle }}"><span style="{{ pfNCityInk }}">{{ pfNCityLabel }}</span><i class="icon icon-chevron-down" style="font-size:18px;color:#4A5464;flex-shrink:0;"></i></button>
+                <sc-if value="{{ pfNCityOpen }}" hint-placeholder-val="{{ false }}">
+                  <div onClick="{{ pfNClose }}" style="position:fixed;inset:0;z-index:39;"></div>
+                  <div role="listbox" aria-multiselectable="true" style="position:absolute;left:0;right:0;top:54px;z-index:40;background:#fff;border:1px solid #CBD3E4;border-radius:16px;box-shadow:0 14px 34px rgba(0,0,0,0.14);overflow:hidden;">
+                    <sc-if value="{{ pfNCitySearchable }}" hint-placeholder-val="{{ false }}">
+                      <div style="position:relative;padding:10px 10px 6px;border-bottom:1px solid #EDEEF0;">
+                        <i class="icon icon-search" style="position:absolute;left:24px;top:22px;font-size:16px;color:#4A5464;pointer-events:none;"></i>
+                        <input type="text" value="{{ pfNCityQ }}" onChange="{{ pfNOnCityQ }}" placeholder="Search cities" aria-label="Search cities" style="width:100%;box-sizing:border-box;background:#F5F6F7;border:1px solid #E5E7EB;border-radius:8px;height:40px;padding:0 12px 0 38px;font-family:inherit;font-size:15px;color:#0D0D0F;" style-focus="outline:none;border-color:#1D484F;background:#fff;">
+                      </div>
+                    </sc-if>
+                    <div style="max-height:260px;overflow-y:auto;padding:6px;">
+                      <sc-for list="{{ pfNCityGroups }}" as="g" hint-placeholder-count="1">
+                        <sc-if value="{{ g.hasName }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;font-weight:700;color:#4A5464;text-transform:uppercase;letter-spacing:0.04em;padding:10px 10px 6px;">{{ g.name }}</div></sc-if>
+                        <sc-for list="{{ g.items }}" as="it" hint-placeholder-count="5">
+                          <button role="option" aria-selected="{{ it.on }}" aria-disabled="{{ it.off }}" onClick="{{ it.onClick }}" style="{{ it.rowStyle }}" style-hover="background:#F0FCFF;"><span style="{{ it.box }}"><sc-if value="{{ it.on }}" hint-placeholder-val="{{ false }}"><i class="icon icon-check" style="font-size:13px;color:#fff;"></i></sc-if></span><span style="flex:1;min-width:0;">{{ it.name }}</span><span style="{{ it.countStyle }}">{{ it.count }}</span></button>
+                        </sc-for>
+                      </sc-for>
+                      <sc-if value="{{ pfNCityEmpty }}" hint-placeholder-val="{{ false }}"><div style="padding:14px 10px;font-size:14px;color:#4A5464;">No matches for that search.</div></sc-if>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-top:1px solid #EDEEF0;">
+                      <span style="font-size:13px;color:#4A5464;">{{ pfNCityFoot }}</span>
+                      <button onClick="{{ pfNClose }}" style="background:#1D484F;border:none;border-radius:9999px;height:36px;padding:0 18px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;cursor:pointer;">Done</button>
+                    </div>
                   </div>
+                </sc-if>
+              </div>
+              <sc-if value="{{ pfNHasCityChips }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                  <sc-for list="{{ pfNCityChips }}" as="c" hint-placeholder-count="1">
+                    <span style="{{ c.style }}">{{ c.name }}<span style="{{ c.countStyle }}">{{ c.count }}</span><button onClick="{{ c.onRemove }}" aria-label="Remove" style="width:22px;height:22px;border-radius:50%;border:none;background:#fff;color:#4A5464;cursor:pointer;display:flex;align-items:center;justify-content:center;"><i class="icon icon-x" style="font-size:13px;"></i></button></span>
+                  </sc-for>
                 </div>
               </sc-if>
-              <sc-if value="{{ pfNHasNote }}" hint-placeholder-val="{{ false }}">
-                <div style="font-size:13px;color:#4A5464;">{{ pfNNote }}</div>
-              </sc-if>
-              <sc-if value="{{ pfNDetected2 }}" hint-placeholder-val="{{ false }}">
-                <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:#4A5464;"><i class="icon icon-locate-fixed" style="font-size:14px;color:#1D484F;"></i>{{ pfNDetectedText2 }}</div>
-              </sc-if>
+              <div style="font-size:13px;line-height:1.45;color:#4A5464;">{{ pfNCityHelp }}</div>
+            </div>
+
+            <sc-if value="{{ pfNHasNote }}" hint-placeholder-val="{{ false }}">
+              <div role="status" style="display:flex;align-items:flex-start;gap:8px;font-size:13.5px;line-height:1.45;color:#92400E;"><i class="icon icon-info" style="font-size:15px;flex-shrink:0;margin-top:1px;"></i>{{ pfNNote }}</div>
             </sc-if>
           </div>
           </div>
         </sc-if>
         <sc-if value="{{ pfRemoteOnly }}" hint-placeholder-val="{{ false }}">
-          <div style="font-size:12px;color:#4A5464;margin:-6px 0 16px;">Remote only, so location doesn’t apply. Select Hybrid or On-site to pick states.</div>
+          <div style="font-size:12px;color:#4A5464;margin:-6px 0 16px;">Remote only, so location doesn’t apply. Select Hybrid or On-site to pick a location.</div>
         </sc-if>
 
         <!-- Work Authorization (driven only by Location) -->
@@ -1915,7 +1930,7 @@
 
         <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;padding:14px 24px;border-top:1px solid #F0F1F3;flex-shrink:0;">
           <button onClick="{{ onClosePrefs }}" style="background:#fff;border:none;font-family:inherit;font-size:14px;font-weight:700;color:#23262E;padding:11px 18px;border-radius:9999px;cursor:pointer;">Close</button>
-          <button onClick="{{ onUpdatePrefs }}" style="background:#0C2A2C;border:none;font-family:inherit;font-size:14px;font-weight:700;color:#fff;padding:11px 24px;border-radius:9999px;cursor:pointer;" style-hover="background:#022F36;">{{ updateLabel }}</button>
+          <button onClick="{{ onUpdatePrefs }}" style="white-space:nowrap;flex-shrink:0;background:#0C2A2C;border:none;font-family:inherit;font-size:14px;font-weight:700;color:#fff;padding:11px 24px;border-radius:9999px;cursor:pointer;" style-hover="background:#022F36;">{{ updateLabel }}</button>
         </div>
       </div>
     </div>
@@ -1989,6 +2004,9 @@ const US_STATES = ["Alabama","Alaska","Arizona","Arkansas","California","Colorad
 const CITIES = {"Alabama":["Birmingham","Huntsville","Montgomery","Mobile"],"Alaska":["Anchorage","Fairbanks","Juneau"],"Arizona":["Phoenix","Tucson","Scottsdale","Tempe","Mesa"],"Arkansas":["Little Rock","Fayetteville","Bentonville"],"California":["San Francisco","Los Angeles","San Jose","San Diego","Palo Alto","Mountain View","Sunnyvale","Oakland","Irvine","Sacramento"],"Colorado":["Denver","Boulder","Colorado Springs","Fort Collins"],"Connecticut":["Hartford","Stamford","New Haven"],"Delaware":["Wilmington","Dover"],"Florida":["Miami","Tampa","Orlando","Jacksonville","Fort Lauderdale"],"Georgia":["Atlanta","Alpharetta","Savannah","Augusta"],"Hawaii":["Honolulu"],"Idaho":["Boise","Idaho Falls"],"Illinois":["Chicago","Naperville","Evanston","Champaign"],"Indiana":["Indianapolis","Fort Wayne","Bloomington"],"Iowa":["Des Moines","Cedar Rapids","Iowa City"],"Kansas":["Wichita","Overland Park","Kansas City"],"Kentucky":["Louisville","Lexington"],"Louisiana":["New Orleans","Baton Rouge"],"Maine":["Portland","Bangor"],"Maryland":["Baltimore","Bethesda","Rockville","Columbia"],"Massachusetts":["Boston","Cambridge","Somerville","Waltham","Worcester"],"Michigan":["Detroit","Ann Arbor","Grand Rapids"],"Minnesota":["Minneapolis","St. Paul","Rochester"],"Mississippi":["Jackson","Gulfport"],"Missouri":["St. Louis","Kansas City","Springfield"],"Montana":["Bozeman","Missoula","Billings"],"Nebraska":["Omaha","Lincoln"],"Nevada":["Las Vegas","Reno","Henderson"],"New Hampshire":["Manchester","Nashua","Portsmouth"],"New Jersey":["Jersey City","Newark","Princeton","Hoboken"],"New Mexico":["Albuquerque","Santa Fe"],"New York":["New York City","Brooklyn","Buffalo","Rochester","Albany"],"North Carolina":["Raleigh","Charlotte","Durham","Chapel Hill"],"North Dakota":["Fargo","Bismarck"],"Ohio":["Columbus","Cleveland","Cincinnati","Dayton"],"Oklahoma":["Oklahoma City","Tulsa"],"Oregon":["Portland","Beaverton","Eugene","Bend"],"Pennsylvania":["Philadelphia","Pittsburgh","Harrisburg"],"Rhode Island":["Providence"],"South Carolina":["Charleston","Greenville","Columbia"],"South Dakota":["Sioux Falls","Rapid City"],"Tennessee":["Nashville","Memphis","Knoxville","Chattanooga"],"Texas":["Austin","Dallas","Houston","San Antonio","Plano","Fort Worth"],"Utah":["Salt Lake City","Lehi","Provo"],"Vermont":["Burlington"],"Virginia":["Arlington","Richmond","Reston","McLean","Virginia Beach"],"Washington":["Seattle","Bellevue","Redmond","Tacoma","Spokane"],"West Virginia":["Charleston","Morgantown"],"Wisconsin":["Milwaukee","Madison","Green Bay"],"Wyoming":["Cheyenne","Jackson"],"Alberta":["Calgary","Edmonton"],"British Columbia":["Vancouver","Victoria","Burnaby","Surrey"],"Manitoba":["Winnipeg"],"New Brunswick":["Moncton","Fredericton","Saint John"],"Newfoundland and Labrador":["St. John's"],"Nova Scotia":["Halifax"],"Ontario":["Toronto","Ottawa","Waterloo","Mississauga","Hamilton","London"],"Prince Edward Island":["Charlottetown"],"Quebec":["Montreal","Quebec City","Laval"],"Saskatchewan":["Saskatoon","Regina"],"Northwest Territories":["Yellowknife"],"Nunavut":["Iqaluit"],"Yukon":["Whitehorse"]};
 const CA_PROVINCES = ["Alberta","British Columbia","Manitoba","New Brunswick","Newfoundland and Labrador","Nova Scotia","Ontario","Prince Edward Island","Quebec","Saskatchewan","Northwest Territories","Nunavut","Yukon"];
 const JOBN = (k) => { let h = 0; for (const ch of k) h = (h * 31 + ch.charCodeAt(0)) >>> 0; const big = ['Austin','Dallas','Houston','San Francisco','New York','Seattle','Toronto','Los Angeles','Chicago','Boston','Vancouver','San Jose','Atlanta','Denver']; return big.includes(k) ? 60 + (h % 140) : 2 + (h % 14); };
+const ZERO_CITIES = ['Fort Worth','Hamilton','Juneau','Fairbanks','Mobile','Tempe','London','Plano'];
+const CITYN = (c) => ZERO_CITIES.includes(c) ? 0 : JOBN(c);
+const STATEN = (st) => (CITIES[st] || []).reduce((m, c) => m + CITYN(c), 0);
 class Component extends DCLogic {
   state = {
     screen: (typeof location !== 'undefined' && /^#profile/.test(location.hash)) ? 'profile' : 'jobs',
@@ -2021,7 +2039,7 @@ class Component extends DCLogic {
     prefs: {
       func: 'Software Engineering',
       subs: { fe: false, be: true, fs: true, mobile: false, devops: false, qa: false },
-      near: { mode: 'specific', states: [], cities: ['Austin|Texas'], detected: true, q: '', ro: false, note: '' },
+      near: { country: 'any', states: [], cities: [], open: null, sq: '', cq: '' },
       types: { full: true, part: false, intern: false },
       locations: { us: true, ca: false },
       globalRemote: false,
@@ -2113,6 +2131,75 @@ class Component extends DCLogic {
   undoPending() {
     clearTimeout(this._pendT); this._pendT = null;
     this.setState({ pending: null });
+  }
+  __loc(st) {
+    const loc = st.prefs.near || {};
+    const set = (patch) => this.setState(s => ({ prefs: { ...s.prefs, near: { ...s.prefs.near, ...patch } } }));
+    const allowed = { us: !!st.prefs.locations.us || !st.prefs.locations.ca, ca: !!st.prefs.locations.ca };
+    const f = this.prefFactor(st);
+    const cityN = (c) => Math.round(CITYN(c) * f);
+    const stateN = (x) => (CITIES[x] || []).reduce((m, c) => m + cityN(c), 0);
+    const cname = { us: 'United States', ca: 'Canada' };
+    const ctry = 'any';
+    const groups = [];
+    if (allowed.us && (ctry === 'any' || ctry === 'us')) groups.push({ name: 'United States', list: US_STATES });
+    if (allowed.ca && (ctry === 'any' || ctry === 'ca')) groups.push({ name: 'Canada', list: CA_PROVINCES });
+    const okStates = groups.flatMap(g => g.list);
+    const sts = (loc.states || []).filter(x => okStates.includes(x));
+    const cts = (loc.cities || []).filter(k => sts.includes(k.split('|')[1]));
+    const live = cts.filter(k => cityN(k.split('|')[0]) > 0), dead = cts.filter(k => cityN(k.split('|')[0]) === 0);
+    const box = (on, off) => `width:20px;height:20px;border-radius:5px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:${on ? '#1D484F' : '#fff'};border:1.5px solid ${on ? '#1D484F' : off ? '#D5DBDF' : '#A9B3B9'};`;
+    const rowStyle = (off) => 'width:100%;display:flex;align-items:center;gap:10px;background:none;border:none;border-radius:8px;padding:9px 10px;font-family:inherit;font-size:15px;color:#23262E;cursor:pointer;text-align:left;' + (off ? 'opacity:0.5;cursor:not-allowed;' : '');
+    const cStyle = (n) => `font-size:13px;font-weight:600;white-space:nowrap;color:${n === 0 ? '#4A5464' : '#1D484F'};`;
+    const fmt = (n) => n.toLocaleString();
+    const ctryN = (k) => (k === 'us' ? US_STATES : CA_PROVINCES).reduce((m, x) => m + stateN(x), 0);
+    const pill = (on) => `display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:9999px;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap;background:${on ? '#022F36' : '#fff'};color:${on ? '#fff' : '#022F36'};border:1.5px solid ${on ? '#022F36' : '#E5E7EB'};`;
+    const sq = (loc.sq || '').trim().toLowerCase(), cq = (loc.cq || '').trim().toLowerCase();
+    const sort = (arr, n) => [...arr].sort((x, y) => (n(y) > 0) - (n(x) > 0) || n(y) - n(x) || x.localeCompare(y));
+    const togState = (x) => { const on = sts.includes(x); set(on ? { states: sts.filter(y => y !== x), cities: cts.filter(k => k.split('|')[1] !== x) } : { states: [...sts, x] }); };
+    const togCity = (k) => { const c = k.split('|')[0]; if (!cts.includes(k) && cityN(c) === 0) return; set({ cities: cts.includes(k) ? cts.filter(y => y !== k) : [...cts, k] }); };
+    const stateGroups = groups.map(g => ({ name: g.name, hasName: groups.length > 1,
+      items: sort(g.list.filter(x => !sq || x.toLowerCase().includes(sq)), stateN).map(x => { const n = stateN(x), on = sts.includes(x), off = n === 0 && !on;
+        return { name: x, on, off, count: fmt(n), countStyle: cStyle(n), box: box(on, off), rowStyle: rowStyle(off), onClick: () => { if (!off) togState(x); } }; }) })).filter(g => g.items.length);
+    const cityGroups = sts.map(x => ({ name: x, hasName: sts.length > 1,
+      items: sort((CITIES[x] || []).filter(c => !cq || c.toLowerCase().includes(cq)), cityN).map(c => { const k = c + '|' + x, n = cityN(c), on = cts.includes(k), off = n === 0 && !on;
+        return { name: c, on, off, count: fmt(n), countStyle: cStyle(n), box: box(on, off), rowStyle: rowStyle(off), onClick: () => togCity(k) }; }) })).filter(g => g.items.length);
+    const summary = (arr, any) => arr.length === 0 ? any : arr.length <= 2 ? arr.join(', ') : (arr.slice(0, 2).join(', ') + ' +' + (arr.length - 2));
+    const cityNames = cts.map(k => k.split('|')[0]);
+    const deadNames = dead.map(k => k.split('|')[0]), liveNames = live.map(k => k.split('|')[0]);
+    const widenStates = [...new Set(dead.map(k => k.split('|')[1]))];
+    const note = cts.length && !live.length
+      ? ('No jobs in ' + deadNames.join(' and ') + ' with these filters, so we’re showing all of ' + widenStates.join(' and ') + '.')
+      : dead.length ? (deadNames.join(' and ') + (dead.length === 1 ? ' has' : ' have') + ' no jobs with these filters. Showing ' + liveNames.join(', ') + '.') : '';
+    return {
+      Countries: [['any', allowed.us && allowed.ca ? 'Any' : allowed.ca ? 'Any in Canada' : 'Any in US'], ...['us', 'ca'].filter(k => allowed[k] && allowed.us && allowed.ca).map(k => [k, cname[k]])]
+        .map(([k, label]) => ({ label, on: ctry === k, style: pill(ctry === k), onClick: () => set({ country: k, states: [], cities: [], open: null }),
+          count: fmt(k === 'any' ? ['us', 'ca'].filter(x => allowed[x]).reduce((m, x) => m + ctryN(x), 0) : ctryN(k)),
+          countStyle: `font-size:13px;font-weight:600;color:${ctry === k ? '#5AEBEB' : '#4A5464'};` })),
+      HasCountryClear: ctry !== 'any', OnCountryClear: () => set({ country: 'any', states: [], cities: [], open: null }),
+      StateOpen: loc.open === 'state', OnStateOpen: () => set({ open: loc.open === 'state' ? null : 'state', sq: '' }),
+      StateSearchable: true, StateQ: loc.sq || '', OnStateQ: (e) => set({ sq: e.target.value }),
+      StateGroups: stateGroups, StateEmpty: stateGroups.length === 0,
+      StateFoot: sts.length ? (sts.length + ' selected') : 'Ordered by job count',
+      StateLabel: summary(sts, 'Any'), StateInk: sts.length ? 'color:#0D0D0F;' : 'color:#4A5464;',
+      HasStateClear: sts.length > 0, OnStateClear: () => set({ states: [], cities: [], open: null }),
+      CityOpen: loc.open === 'city', OnCityOpen: () => set({ open: loc.open === 'city' ? null : 'city', cq: '' }),
+      CitySearchable: cityGroups.reduce((m, g) => m + g.items.length, 0) > 8, CityQ: loc.cq || '', OnCityQ: (e) => set({ cq: e.target.value }),
+      CityGroups: cityGroups, CityEmpty: cityGroups.length === 0,
+      CityFoot: cts.length ? (cts.length + ' selected') : 'Ordered by job count',
+      CityDisabled: sts.length === 0,
+      CityFieldStyle: 'width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;box-sizing:border-box;background:#FFFFFF;border:1px solid #D5DBDF;border-radius:10px;height:48px;padding:0 14px 0 16px;font-family:inherit;font-size:15px;color:#0D0D0F;cursor:pointer;text-align:left;' + (sts.length === 0 ? 'background:#F5F6F7;cursor:not-allowed;' : ''),
+      CityLabel: summary(cityNames, 'Any'), CityInk: cts.length ? 'color:#0D0D0F;' : 'color:#4A5464;',
+      HasCityClear: cts.length > 0, OnCityClear: () => set({ cities: [], open: null }),
+      HasCityChips: cts.length > 0,
+      CityChips: cts.map(k => { const c = k.split('|')[0], n = cityN(c);
+        return { name: c, count: fmt(n), style: `display:inline-flex;align-items:center;gap:6px;border-radius:9999px;padding:5px 6px 5px 12px;font-size:14px;font-weight:600;${n === 0 ? 'background:#F5F6F7;border:1px dashed #A9B3B9;color:#4A5464;' : 'background:#F0FCFF;border:1px solid #B8EAF5;color:#022F36;'}`,
+          countStyle: cStyle(n), onRemove: () => set({ cities: cts.filter(y => y !== k) }) }; }),
+      CityHelp: sts.length === 0 ? 'Pick a state to choose cities.' : 'Ordered by job count. Counts update with your other filters.',
+      HasNote: !!note, Note: note,
+      Close: () => set({ open: null }),
+      _scope: { ctry, sts, live, widen: cts.length && !live.length, widenStates, cityN, stateN, ctryN, allowed },
+    };
   }
   __pfN(st) {
     return ({
@@ -2211,21 +2298,26 @@ v: (() => {
     clearTimeout(this._bt); this._bt = setTimeout(() => this.setState({ skillToast: null }), 2600);
   }
   closePrefs() { this.setState({ prefsOpen: false }); }
-  matchCount(st) {
-    const p = st.prefs, a = p.arrangement || {}, n = p.near || {};
-    const on = (o) => Object.values(o || {}).filter(Boolean).length;
-    let loc = 0;
-    if (a.hybrid || a.onsite) {
-      if (n.mode === 'any') loc += 300;
-      else loc += (n.cities || []).filter(k => !(n.states || []).includes(k.split('|')[1])).reduce((m, k) => m + JOBN(k.split('|')[0]), 0)
-               + (n.states || []).reduce((m, x) => m + (CITIES[x] || []).reduce((q, c) => q + JOBN(c), 0), 0);
-    }
-    if (a.remote) loc += 140;
+  prefFactor(st) {
+    const p = st.prefs, on = (o) => Object.values(o || {}).filter(Boolean).length;
     // an empty group means "no filter", not "nothing matches"
     const lv = on(p.levels) ? Math.min(1, 0.35 + on(p.levels) * 0.25) : 1;
     const ty = on(p.types) ? Math.min(1, (p.types.full ? 0.85 : 0) + (on(p.types) - (p.types.full ? 1 : 0)) * 0.15) : 1;
     const sb = (p.func === 'Software Engineering' && on(p.subs)) ? Math.min(1, 0.3 + on(p.subs) * 0.2) : 1;
-    return Math.round(loc * lv * ty * sb);
+    return lv * ty * sb;
+  }
+  matchCount(st) {
+    const a = st.prefs.arrangement || {};
+    let n = 0;
+    if (a.hybrid || a.onsite) {
+      const { ctry, sts, live, widen, widenStates, cityN, stateN, ctryN, allowed } = this.__loc(st)._scope;
+      n += live.length ? live.reduce((m, k) => m + cityN(k.split('|')[0]), 0)
+         : widen ? widenStates.reduce((m, x) => m + stateN(x), 0)
+         : sts.length ? sts.reduce((m, x) => m + stateN(x), 0)
+         : (ctry === 'any' ? ['us', 'ca'].filter(x => allowed[x]) : [ctry]).reduce((m, x) => m + ctryN(x), 0);
+    }
+    if (a.remote) n += Math.round(140 * this.prefFactor(st));
+    return n;
   }
   matchLabel(nm) {
     const capSetting = this.props.matchCap ?? '30+';
@@ -3492,11 +3584,12 @@ v: (() => {
       subHint: Object.values(st.prefs.subs).some(Boolean) ? 'Pick any that fit' : 'None picked — showing all of Software Engineering',
       pfShowNear: st.prefs.arrangement.hybrid || st.prefs.arrangement.onsite,
       pfRemoteOnly: st.prefs.arrangement.remote && !st.prefs.arrangement.hybrid && !st.prefs.arrangement.onsite,
-      ...(() => { const v = this.__pfN(st); const o = {}; Object.keys(v).forEach(k => o['pfN' + k] = v[k]); return o; })(),
+      ...(() => { const v = this.__loc(st); const o = {}; Object.keys(v).forEach(k => o['pfN' + k] = v[k]); return o; })(),
       locChip: (() => {
         const a = st.prefs.arrangement, n = st.prefs.near, parts = [];
-        if (a.hybrid || a.onsite) parts.push(n.mode === 'any' ? (st.prefs.locations.ca && st.prefs.locations.us ? 'US & Canada' : st.prefs.locations.ca ? 'Canada' : 'United States')
-          : n.states.length === 0 ? 'Pick states' : n.states.length === 1 ? n.states[0] : (n.states[0] + ' +' + (n.states.length - 1)));
+        if (a.hybrid || a.onsite) { const c = (n.cities || []).map(k => k.split('|')[0]), x = n.states || [];
+          parts.push(c.length ? (c[0] + (c.length > 1 ? ' +' + (c.length - 1) : '')) : x.length ? (x[0] + (x.length > 1 ? ' +' + (x.length - 1) : ''))
+            : n.country === 'ca' ? 'Canada' : n.country === 'us' ? 'United States' : (st.prefs.locations.ca && st.prefs.locations.us ? 'US & Canada' : st.prefs.locations.ca ? 'Canada' : 'United States')); }
         if (a.remote) parts.push('Remote');
         return parts.length ? parts.join(' + ') : 'Set your location';
       })(),
