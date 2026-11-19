@@ -1841,7 +1841,7 @@
             </div>
 
             <div style="display:flex;flex-direction:column;gap:8px;">
-              <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#0D0D0F;"><i class="icon icon-building-2" style="font-size:16px;color:#1D484F;"></i>Cities<sc-if value="{{ pfNHasCityClear }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pfNOnCityClear }}" style="margin-left:auto;background:none;border:none;padding:0;font-family:inherit;font-size:13px;font-weight:600;color:#1D484F;cursor:pointer;">Clear</button></sc-if></div>
+              <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#0D0D0F;"><i class="icon icon-building-2" style="font-size:16px;color:#1D484F;"></i>Preferred cities<span style="font-weight:500;color:#4A5464;">(optional)</span><sc-if value="{{ pfNHasCityClear }}" hint-placeholder-val="{{ false }}"><button onClick="{{ pfNOnCityClear }}" style="margin-left:auto;background:none;border:none;padding:0;font-family:inherit;font-size:13px;font-weight:600;color:#1D484F;cursor:pointer;">Clear</button></sc-if></div>
               <div style="position:relative;">
                 <button onClick="{{ pfNOnCityOpen }}" disabled="{{ pfNCityDisabled }}" aria-haspopup="listbox" aria-expanded="{{ pfNCityOpen }}" style="{{ pfNCityFieldStyle }}"><span style="{{ pfNCityInk }}">{{ pfNCityLabel }}</span><i class="icon icon-chevron-down" style="font-size:18px;color:#4A5464;flex-shrink:0;"></i></button>
                 <sc-if value="{{ pfNCityOpen }}" hint-placeholder-val="{{ false }}">
@@ -1936,6 +1936,9 @@
         </div>
 
         <div style="display:flex;justify-content:flex-end;align-items:center;gap:12px;padding:14px 24px;border-top:1px solid #F0F1F3;flex-shrink:0;">
+          <sc-if value="{{ hasUpdateSub }}" hint-placeholder-val="{{ false }}">
+            <span style="margin-right:auto;display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:#1D484F;"><i class="icon icon-map-pin" style="font-size:14px;"></i>{{ updateSub }}</span>
+          </sc-if>
           <button onClick="{{ onClosePrefs }}" style="background:#fff;border:none;font-family:inherit;font-size:14px;font-weight:700;color:#23262E;padding:11px 18px;border-radius:9999px;cursor:pointer;">Close</button>
           <button onClick="{{ onUpdatePrefs }}" style="white-space:nowrap;flex-shrink:0;background:#0C2A2C;border:none;font-family:inherit;font-size:14px;font-weight:700;color:#fff;padding:11px 24px;border-radius:9999px;cursor:pointer;" style-hover="background:#022F36;">{{ updateLabel }}</button>
         </div>
@@ -2191,10 +2194,8 @@ class Component extends DCLogic {
     if (sts.length && !liveSts.length) msgs.push('No jobs in ' + jn(sts, 'or') + ' with these filters, so we’re showing all of ' + ctryName + '.');
     else {
       if (deadSts.length) msgs.push(jn(deadSts) + (deadSts.length === 1 ? ' has' : ' have') + ' no jobs with these filters. Showing ' + jn(liveSts) + '.');
-      liveSts.forEach(x => { const picked = cts.filter(k => k.endsWith('|' + x));
-        const dn = picked.filter(k => dead.includes(k)).map(k => k.split('|')[0]), ln = picked.filter(k => live.includes(k)).map(k => k.split('|')[0]);
-        if (picked.length && !ln.length) msgs.push('No jobs in ' + jn(dn, 'or') + ' with these filters, so we’re showing all of ' + x + '.');
-        else if (dn.length) msgs.push(jn(dn) + (dn.length === 1 ? ' has' : ' have') + ' no jobs with these filters. Showing ' + jn(ln) + '.'); });
+      const dc = dead.filter(k => liveSts.includes(k.split('|')[1])).map(k => k.split('|')[0]);
+      if (dc.length) msgs.push(jn(dc) + (dc.length === 1 ? ' has' : ' have') + ' no jobs with these filters right now. You’ll still see the rest of the state.');
     }
     const note = msgs.join(' ');
     return {
@@ -2221,7 +2222,10 @@ class Component extends DCLogic {
       CityChips: cts.map(k => { const c = k.split('|')[0], n = cityN(...k.split('|'));
         return { name: c, count: fmt(n), style: `display:inline-flex;align-items:center;gap:6px;border-radius:9999px;padding:5px 6px 5px 12px;font-size:14px;font-weight:600;${n === 0 ? 'background:#F5F6F7;border:1px dashed #A9B3B9;color:#4A5464;' : 'background:#F0FCFF;border:1px solid #B8EAF5;color:#022F36;'}`,
           countStyle: cStyle(n), onRemove: () => set({ cities: cts.filter(y => y !== k) }) }; }),
-      CityHelp: sts.length === 0 ? 'Pick a state to choose cities.' : 'Ordered by job count. Counts update with your other filters.',
+      CityHelp: (() => { if (sts.length === 0) return 'Pick a state to choose preferred cities.';
+        const lv = live.filter(k => liveSts.includes(k.split('|')[1]));
+        if (!lv.length) return cts.length ? ('You’ll still see all of ' + jn(liveSts.length ? liveSts : sts) + '.') : ('Optional. Pick cities to see their jobs first. You’ll still see all of ' + jn(sts) + '.');
+        return 'Jobs in ' + jn(lv.map(k => k.split('|')[0])) + ' are shown first, then the rest of ' + jn([...new Set(lv.map(k => k.split('|')[1]))]) + '.'; })(),
       HasNote: !!note, Note: note,
       HasStateChips: sts.length > 0,
       StateChips: sts.map(x => { const n = stateN(x);
@@ -2342,12 +2346,16 @@ v: (() => {
     if (a.hybrid || a.onsite) {
       const { ctry, sts, cts, live, liveSts, cityN, stateN, ctryN, allowed } = this.__loc(st)._scope;
       const whole = () => (ctry === 'any' ? ['us', 'ca'].filter(x => allowed[x]) : [ctry]).reduce((m, x) => m + ctryN(x), 0);
-      n += !liveSts.length ? whole()
-         : liveSts.reduce((m, x) => { const lv = live.filter(k => k.endsWith('|' + x));
-             return m + (lv.length ? lv.reduce((q, k) => q + cityN(...k.split('|')), 0) : stateN(x)); }, 0);
+      n += !liveSts.length ? whole() : liveSts.reduce((m, x) => m + stateN(x), 0);
     }
     if (a.remote) n += Math.round(140 * this.prefFactor(st));
     return n;
+  }
+  boostCount(st) {
+    const a = st.prefs.arrangement || {};
+    if (!(a.hybrid || a.onsite)) return 0;
+    const { live, liveSts, cityN } = this.__loc(st)._scope;
+    return live.filter(k => liveSts.includes(k.split('|')[1])).reduce((m, k) => m + cityN(...k.split('|')), 0);
   }
   zeroStates(st) {
     const lv = st.prefs.levels || {}, ty = st.prefs.types || {}, z = [];
@@ -3614,7 +3622,7 @@ v: (() => {
         pnWaKnob: `position:absolute;top:3px;left:${on ? 23 : 3}px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.25);transition:left .2s;`,
         pnWaNote: on ? 'You’ll get updates about your applications on WhatsApp. You can turn this off anytime here.' : 'WhatsApp updates are off. Turn them on anytime here.',
       }; })(),
-      ...(() => { const nm = this.matchCount(st); return { matchBadge: this.matchLabel(nm), updateLabel: 'Update · ' + (nm === 0 ? 'No matches' : nm + (nm === 1 ? ' match' : ' matches')) }; })(),
+      ...(() => { const nm = this.matchCount(st); const bc = this.boostCount(st); return { matchBadge: this.matchLabel(nm), updateLabel: 'Update · ' + (nm === 0 ? 'No matches' : nm + (nm === 1 ? ' match' : ' matches')), updateSub: bc ? (bc + ' in your cities, shown first') : '', hasUpdateSub: bc > 0 }; })(),
       prefFunc: st.prefs.func,
       subOptions: [['fe','Frontend'],['be','Backend'],['fs','Full Stack'],['mobile','Mobile'],['devops','DevOps / Cloud'],['qa','QA / Testing']].map(([k,label]) => { const on = st.prefs.subs[k]; return { label, onClick: () => this.toggleSub(k), chipStyle: this.chipStyle(on), chipHover: this.chipHoverStyle(on), chipFocus: this.chipFocusStyle(), checkIcon: this.chipCheckIcon(on), checkIconStyle: this.chipCheckColor(on) }; }),
       subHint: Object.values(st.prefs.subs).some(Boolean) ? 'Pick any that fit' : 'None picked — showing all of Software Engineering',
@@ -3682,8 +3690,8 @@ v: (() => {
           ['one', '2 states, Ohio drops to 0', '#F0B429', ['Texas','Ohio'], [], L({ exec: true }), T({ full: true })],
           ['both', '2 states, both drop to 0', '#F76638', ['Texas','Ohio'], [], L({ exec: true }), T({ intern: true })],
           ['stcity', 'State + city drop together', '#F0B429', ['Texas','Ohio'], ['Austin|Texas','Columbus|Ohio'], L({ exec: true }), T({ full: true })],
-          ['city', '3 cities, Fort Worth is 0', '#F0B429', ['Texas'], ['Austin|Texas','Dallas|Texas','Fort Worth|Texas'], L({ entry: true, mid: true }), T({ full: true })],
-          ['allcity', 'All picked cities 0, widen to state', '#F76638', ['Texas'], ['Fort Worth|Texas','Plano|Texas'], L({ entry: true, mid: true }), T({ full: true })],
+          ['city', '3 cities picked, shown first', '#00B16B', ['Texas'], ['Austin|Texas','Dallas|Texas','Fort Worth|Texas'], L({ entry: true, mid: true }), T({ full: true })],
+          ['allcity', 'All picked cities 0, state still shows', '#F0B429', ['Texas'], ['Fort Worth|Texas','Plano|Texas'], L({ entry: true, mid: true }), T({ full: true })],
         ].map(([k, label, dot, states, cities, levels, types]) => ({ label, dot,
           onClick: () => this.setState(s => ({ locDemo: k, screen: 'jobs', prefsOpen: true, avatarMenu: false,
             prefs: { ...s.prefs, levels, types, locations: { us: true, ca: false }, arrangement: { remote: false, hybrid: true, onsite: true },
