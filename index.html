@@ -2224,8 +2224,9 @@ class Component extends DCLogic {
           countStyle: cStyle(n), onRemove: () => set({ cities: cts.filter(y => y !== k) }) }; }),
       CityHelp: (() => { if (sts.length === 0) return 'Pick a state to choose preferred cities.';
         const lv = live.filter(k => liveSts.includes(k.split('|')[1]));
-        if (!lv.length) return cts.length ? ('You’ll still see all of ' + jn(liveSts.length ? liveSts : sts) + '.') : ('Optional. Pick cities to see their jobs first. You’ll still see all of ' + jn(sts) + '.');
-        return 'Jobs in ' + jn(lv.map(k => k.split('|')[0])) + ' are shown first, then the rest of ' + jn([...new Set(lv.map(k => k.split('|')[1]))]) + '.'; })(),
+        const stName = (a) => a.length === 1 ? a[0] : 'your selected states';
+        if (!lv.length) return cts.length ? ('You’ll still see all jobs in ' + stName(liveSts.length ? liveSts : sts) + '.') : ('Optional. Pick cities to see their jobs first. You’ll still see all jobs in ' + stName(sts) + '.');
+        return 'Jobs in your preferred cities are shown first, then the rest of ' + stName([...new Set(lv.map(k => k.split('|')[1]))]) + '.'; })(),
       HasNote: !!note, Note: note,
       HasStateChips: sts.length > 0,
       StateChips: sts.map(x => { const n = stateN(x);
