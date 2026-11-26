@@ -1120,7 +1120,7 @@ v: (() => {
   signIn(e) {
     if (e && e.preventDefault) e.preventDefault();
     if (typeof this.props.onSignIn === 'function') this.props.onSignIn();
-    else window.location.href = 'Bloom Subscription Flow.dc.html';
+    else window.location.href = 'Bloom Subscription Flow.dc.html' + (/[?&]variant=a\b/i.test(window.location.search) ? '' : '?variant=b');
   }
 
   renderVals() {
